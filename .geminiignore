@@ -1,0 +1,15 @@
+   .*
+   .git/
+   .qwen/
+
+   node_modules/
+   coverage/
+   gitdownload/
+   mcp-neon-server/
+   plans/
+   src/
+   tests/
+
+   *.bak
+   *.bak2
+   *.backup

@@ -1,0 +1,17 @@
+{
+  "options": {
+    "caseSensitive": true,
+    "leftValue": "",
+    "rightValue": ""
+  },
+  "conditions": [
+    {
+      "id": "cond_valid_tg",
+      "leftValue": "={{ $json.isValid }}",
+      "rightValue": true,
+      "operator": "equals",
+      "type": "boolean"
+    }
+  ],
+  "combinator": "and"
+}

@@ -1,0 +1,36 @@
+const fs = require('fs');
+
+const filePath = 'workflows/NN_04_Telegram_Sender.json';
+const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+data.nodes.forEach(node => {
+  if (node.name === 'Format Success (POST)') {
+    node.parameters.jsCode = `const telegramResult = $input.first()?.json || {};
+const originalData = $node["Extract & Validate (PRE)"].json;
+const chat_id = telegramResult.chat?.id || originalData.chat_id || "unknown";
+
+// If Telegram node failed but we "continued on error", it might return the error object
+const isSuccess = !!telegramResult.message_id && !telegramResult.error;
+
+return [{
+  json: {
+    success: isSuccess,
+    error_code: isSuccess ? null : "TELEGRAM_API_ERROR",
+    error_message: isSuccess ? null : (telegramResult.error || "Telegram failed to send message"),
+    data: {
+      delivery_status: isSuccess ? "SENT" : "FAILED",
+      chat_id: chat_id,
+      message_id: telegramResult.message_id || null
+    },
+    _meta: {
+      source: "NN_04_Telegram_Sender",
+      timestamp: new Date().toISOString(),
+      workflow_id: "NN_04",
+      version: "1.0.0"
+    }
+  }
+}];`;
+  }
+});
+
+fs.writeFileSync(filePath, JSON.stringify(data, null, 2));

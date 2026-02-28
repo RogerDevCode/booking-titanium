@@ -1,0 +1,41 @@
+{
+  "name": "n8n-scripts-ts",
+  "version": "1.0.0",
+  "description": "TypeScript migration of N8N Python utility scripts",
+  "main": "dist/config.js",
+  "types": "dist/config.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist/",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "read:list": "tsx n8n_read_list.ts",
+    "read:get": "tsx n8n_read_get.ts",
+    "push": "tsx n8n_push.ts"
+  },
+  "keywords": [
+    "n8n",
+    "workflow",
+    "automation",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.5",
+    "dotenv": "^16.3.1",
+    "luxon": "^3.4.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,48 @@
+[
+  {
+    "name": "NN_00_Global_Error_Handler",
+    "id": "NJ06kaiVRK6EWBkV",
+    "order": 1,
+    "webhook_path": "nn-00-global-error-test",
+    "description": "Centralized error handler - receives errors from all workflows"
+  },
+  {
+    "name": "NN_02_Message_Parser",
+    "id": "Hp7ox7JqRwVA5wr8",
+    "order": 2,
+    "webhook_path": "nn-02-booking-parser-test",
+    "description": "Parses incoming Telegram messages, validates and sanitizes input"
+  },
+  {
+    "name": "NN_03_AI_Agent",
+    "id": "N2APxPodLDJCG818",
+    "order": 3,
+    "webhook_path": "nn-03-ai-agent-test",
+    "description": "AI Agent with Groq (llama-3.3-70b-versatile) for booking responses"
+  },
+  {
+    "name": "NN_04_Telegram_Sender",
+    "id": "4afRuMkIvgEh7gXt",
+    "order": 4,
+    "webhook_path": "nn-04-telegram-sender-test",
+    "description": "Sends booking confirmations and responses via Telegram"
+  },
+  {
+    "name": "NN_01_Booking_Gateway",
+    "id": "IhAvwkZIob9KfYoA",
+    "order": 5,
+    "webhook_path": "nn-01-booking-gateway-test",
+    "description": "Main entry point - orchestrates NN_02 → NN_03 → NN_04 flow"
+  },
+  {
+    "name": "DummyTriggerTest",
+    "id": "NIJ1ApGIH9383rHT",
+    "order": 6
+  },
+  {
+    "name": "NN_01_Test_Simple",
+    "id": "9PfylxWCt1JXffOh",
+    "order": 7,
+    "webhook_path": "nn-01-test-simple"
+  }
+]
