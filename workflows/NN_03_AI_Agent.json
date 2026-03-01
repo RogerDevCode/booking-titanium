@@ -22,7 +22,7 @@
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"messages\": [\n    {\"role\": \"system\", \"content\": \"Eres un asistente de reservas profesional para Booking Titanium. Responde de forma amable y concisa en español.\"},\n    {\"role\": \"user\", \"content\": \"{{ $json.text }}\"}\n  ]\n}",
+        "jsonBody": "={\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"messages\": [\n    {\"role\": \"system\", \"content\": \"Eres un asistente para Booking Titanium. REGLA DE ORO: Si el usuario pide una fecha y en el CONTEXTO DE DISPONIBILIDAD sale que no hay o hay otros días, sugiere proactivamente los slots disponibles que te pasamos. CONTEXTO DISPONIBILIDAD: {{ JSON.stringify($node[\\\"Execute Workflow Trigger\\\"].json.availability) }}\"},\n    {\"role\": \"user\", \"content\": \"{{ $json.text }}\"}\n  ]\n}",
         "options": {}
       },
       "id": "groq_http_node",

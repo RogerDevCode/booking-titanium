@@ -2,14 +2,6 @@
   "name": "NN_01_Booking_Gateway_V2",
   "nodes": [
     {
-      "parameters": {},
-      "name": "Manual Trigger",
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
-      "position": [-400, 200],
-      "id": "man_trig"
-    },
-    {
       "parameters": {
         "httpMethod": "POST",
         "path": "booking-v1",
@@ -18,26 +10,8 @@
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [-400, 400],
-      "webhookId": "booking-v1"
-    },
-    {
-      "parameters": { "inputSource": "passthrough" },
-      "name": "Execute Workflow Trigger",
-      "type": "n8n-nodes-base.executeWorkflowTrigger",
-      "typeVersion": 1.1,
-      "position": [-400, 600],
-      "id": "exec_trig"
-    },
-    {
-      "parameters": {
-        "jsCode": "/* VALIDATION SANDWICH PRE */\nconst input = $input.first()?.json || {};\nconst message = input.message || input.body?.message || input;\nconst hasContext = !!(message.chat?.id || message.chat_id);\n\nreturn [{\n  json: {\n    isValid: hasContext,\n    raw_message: message,\n    error_message: hasContext ? null : \"Falta contexto de usuario (chat_id)\"\n  }\n}];"
-      },
-      "name": "Validate Gateway PRE",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [-150, 400],
-      "id": "val_pre"
+      "position": [-400, 432],
+      "id": "webhook_v3"
     },
     {
       "parameters": {
@@ -48,8 +22,38 @@
       "name": "Execute NN_02",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [100, 400],
+      "position": [-150, 432],
       "id": "exec_nn02"
+    },
+    {
+      "parameters": {
+        "workflowId": { "__rl": true, "value": "cWWCjvSLdw6gbp7J", "mode": "id" },
+        "mode": "wait",
+        "options": { "waitForSubworkflow": true, "mode": "passthrough" }
+      },
+      "name": "Lookup Availability",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [100, 432],
+      "id": "lookup_avail"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "text", "name": "text", "value": "={{ $node[\"Execute NN_02\"].json.data.text }}", "type": "string" },
+            { "id": "chat_id", "name": "chat_id", "value": "={{ $node[\"Execute NN_02\"].json.data.chat_id }}", "type": "number" },
+            { "id": "avail_date", "name": "avail_date", "value": "={{ $node[\"Lookup Availability\"].json.date }}", "type": "string" },
+            { "id": "slots", "name": "slots", "value": "={{ $node[\"Lookup Availability\"].json.slots }}", "type": "array" }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Prepare AI Input",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [350, 432],
+      "id": "prepare_ai"
     },
     {
       "parameters": {
@@ -60,7 +64,7 @@
       "name": "Execute NN_03 (AI)",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [350, 400],
+      "position": [600, 432],
       "id": "exec_nn03"
     },
     {
@@ -74,48 +78,49 @@
       "name": "Intent Switch",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3,
-      "position": [600, 400],
+      "position": [850, 432],
       "id": "intent_switch"
     },
     {
       "parameters": {
         "workflowId": { "__rl": true, "value": "kuvqYSl3BMrXtews", "mode": "id" },
-        "mode": "wait"
+        "mode": "wait",
+        "options": {}
       },
       "name": "Flow: CREATE",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [850, 300],
+      "position": [1100, 300],
       "id": "flow_create"
     },
     {
       "parameters": {
         "workflowId": { "__rl": true, "value": "aKE6HxuHaklajZOU", "mode": "id" },
-        "mode": "wait"
+        "mode": "wait",
+        "options": {}
       },
       "name": "Flow: CANCEL",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [850, 500],
+      "position": [1100, 500],
       "id": "flow_cancel"
     },
     {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: true,\n    error_code: null,\n    data: { ai_response: $node[\"Execute NN_03 (AI)\"].json.data?.ai_response },\n    _meta: { source: \"NN_01_Booking_Gateway\", timestamp: new Date().toISOString(), workflow_id: \"NN_01\" }\n  }\n}];"
+        "jsCode": "return [{\n  json: {\n    success: true,\n    data: { ai_response: $node[\"Execute NN_03 (AI)\"].json.data?.ai_response },\n    _meta: { source: \"NN_01_Booking_Gateway\", timestamp: new Date().toISOString(), workflow_id: \"NN_01\" }\n  }\n}];"
       },
-      "name": "Standard Success Output",
+      "name": "Final Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1150, 400],
+      "position": [1400, 432],
       "id": "final_res"
     }
   ],
   "connections": {
-    "Manual Trigger": { "main": [[{ "node": "Validate Gateway PRE", "type": "main", "index": 0 }]] },
-    "Webhook": { "main": [[{ "node": "Validate Gateway PRE", "type": "main", "index": 0 }]] },
-    "Execute Workflow Trigger": { "main": [[{ "node": "Validate Gateway PRE", "type": "main", "index": 0 }]] },
-    "Validate Gateway PRE": { "main": [[{ "node": "Execute NN_02", "type": "main", "index": 0 }]] },
-    "Execute NN_02": { "main": [[{ "node": "Execute NN_03 (AI)", "type": "main", "index": 0 }]] },
+    "Webhook": { "main": [[{ "node": "Execute NN_02", "type": "main", "index": 0 }]] },
+    "Execute NN_02": { "main": [[{ "node": "Lookup Availability", "type": "main", "index": 0 }]] },
+    "Lookup Availability": { "main": [[{ "node": "Prepare AI Input", "type": "main", "index": 0 }]] },
+    "Prepare AI Input": { "main": [[{ "node": "Execute NN_03 (AI)", "type": "main", "index": 0 }]] },
     "Execute NN_03 (AI)": { "main": [[{ "node": "Intent Switch", "type": "main", "index": 0 }]] },
     "Intent Switch": {
       "main": [
@@ -123,8 +128,8 @@
         [{ "node": "Flow: CANCEL", "type": "main", "index": 0 }]
       ]
     },
-    "Flow: CREATE": { "main": [[{ "node": "Standard Success Output", "type": "main", "index": 0 }]] },
-    "Flow: CANCEL": { "main": [[{ "node": "Standard Success Output", "type": "main", "index": 0 }]] }
+    "Flow: CREATE": { "main": [[{ "node": "Final Response", "type": "main", "index": 0 }]] },
+    "Flow: CANCEL": { "main": [[{ "node": "Final Response", "type": "main", "index": 0 }]] }
   },
   "settings": { "executionOrder": "v1" }
 }

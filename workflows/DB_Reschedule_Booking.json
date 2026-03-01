@@ -1,0 +1,52 @@
+{
+  "name": "DB_Reschedule_Booking",
+  "nodes": [
+    {
+      "parameters": { "inputSource": "passthrough" },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 432],
+      "id": "trigger"
+    },
+    {
+      "parameters": {
+        "workflowId": { "__rl": true, "value": "aKE6HxuHaklajZOU", "mode": "id" },
+        "mode": "wait"
+      },
+      "name": "Step 1: Cancel Old",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [250, 432],
+      "id": "cancel_old"
+    },
+    {
+      "parameters": {
+        "workflowId": { "__rl": true, "value": "kuvqYSl3BMrXtews", "mode": "id" },
+        "mode": "wait",
+        "inputData": "={\n  \"chat_id\": {{ $node[\"Execute Workflow Trigger\"].json.chat_id }},\n  \"start_time\": \"{{ $node[\"Execute Workflow Trigger\"].json.new_start_time }}\"\n}"
+      },
+      "name": "Step 2: Create New",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [500, 432],
+      "id": "create_new"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: true,\n    data: {\n      old_booking_id: $node[\"Execute Workflow Trigger\"].json.old_booking_id,\n      new_booking_id: $node[\"Step 2: Create New\"].json.data?.booking_id\n    },\n    _meta: { source: \"DB_Reschedule_Booking\", timestamp: new Date().toISOString() }\n  }\n}];"
+      },
+      "name": "Final Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 432],
+      "id": "final_res"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Step 1: Cancel Old", "type": "main", "index": 0 }]] },
+    "Step 1: Cancel Old": { "main": [[{ "node": "Step 2: Create New", "type": "main", "index": 0 }]] },
+    "Step 2: Create New": { "main": [[{ "node": "Final Response", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
