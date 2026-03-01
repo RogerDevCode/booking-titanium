@@ -1,50 +1,211 @@
 {
-  "name": "NN_01_Booking_Gateway_V2",
+  "name": "NN_01_Booking_Gateway_V3_Robust",
   "nodes": [
+    {
+      "parameters": {},
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        384,
+        240
+      ],
+      "id": "f62274f3-3613-4522-8ad8-79e6df857114"
+    },
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "booking-v1",
-        "responseMode": "lastNode"
+        "path": "nn-01-booking-gateway-test",
+        "responseMode": "lastNode",
+        "options": {}
       },
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [-400, 432],
-      "id": "webhook_v3"
+      "position": [
+        384,
+        432
+      ],
+      "webhookId": "nn-01-booking-gateway-test",
+      "id": "92cecad5-d7a1-4cd7-8a1a-4e1b8daf0b52"
     },
     {
       "parameters": {
-        "workflowId": { "__rl": true, "value": "Hp7ox7JqRwVA5wr8", "mode": "id" },
-        "mode": "wait",
-        "options": { "waitForSubworkflow": true, "mode": "passthrough" }
+        "inputSource": "passthrough"
       },
-      "name": "Execute NN_02",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        384,
+        608
+      ],
+      "id": "bfaec557-6fb4-4b6e-a7c4-b6faa0a12f2f"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Hp7ox7JqRwVA5wr8",
+          "mode": "id"
+        },
+        "mode": "wait",
+        "options": {}
+      },
+      "name": "Parse Incoming Payload (NN_02)",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [-150, 432],
-      "id": "exec_nn02"
+      "position": [
+        600,
+        432
+      ],
+      "id": "516e330e-ce90-40f5-b70d-e658df64e562",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
-        "workflowId": { "__rl": true, "value": "cWWCjvSLdw6gbp7J", "mode": "id" },
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.success }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Verify Parser (NN_02)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        820,
+        432
+      ],
+      "id": "cbd78549-d574-40f3-a7e5-0b07c2c69006"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "N2APxPodLDJCG818",
+          "mode": "id"
+        },
         "mode": "wait",
-        "options": { "waitForSubworkflow": true, "mode": "passthrough" }
+        "options": {},
+        "inputData": "={\n  \"chat_id\": {{ $node[\"Parse Incoming Payload (NN_02)\"].json.data.chat_id }},\n  \"text\": \"{{ $node[\"Parse Incoming Payload (NN_02)\"].json.data.text }}\",\n  \"availability\": {{ $node[\"Lookup Availability\"].json }}\n}",
+        "inputSource": "expression"
+      },
+      "name": "Execute AI Agent (NN_03)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        432
+      ],
+      "id": "52277863-24a7-48fe-a809-cf48c9fd6ee6",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.success }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Verify AI (NN_03)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1260,
+        432
+      ],
+      "id": "0214e18e-9f53-4104-b3b1-1dd36b335ed1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "4afRuMkIvgEh7gXt",
+          "mode": "id"
+        },
+        "mode": "wait",
+        "options": {}
+      },
+      "name": "Send Telegram Response (NN_04)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1480,
+        432
+      ],
+      "id": "c130f750-092f-4c30-913b-8f890e759786"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Final response - Resilient Standard Contract\ntry {\n  const nn02 = $node[\"Parse Incoming Payload (NN_02)\"]?.json || {};\n  const ai_res_node = $node[\"Execute AI Agent (NN_03)\"];\n  const ai_data = (ai_res_node && ai_res_node.json) ? ai_res_node.json.data : {};\n  const tg_res = $node[\"Send Telegram Response (NN_04)\"]?.json || {};\n\n  const isSuccess = !!(nn02.success && ai_data.ai_response);\n\n  return [{\n    json: {\n      success: isSuccess,\n      error_code: isSuccess ? null : (nn02.error_code || \"ORCHESTRATION_ERROR\"),\n      error_message: isSuccess ? null : (nn02.error_message || \"Error en el flujo de orquestación\"),\n      data: isSuccess ? {\n        message_sent: tg_res.success === true,\n        chat_id: ai_data.chat_id,\n        ai_response: ai_data.ai_response,\n        intent: ai_data.intent\n      } : null,\n      _meta: {\n        source: \"NN_01_Booking_Gateway\",\n        timestamp: new Date().toISOString(),\n        workflow_id: \"NN_01\",\n        version: \"3.3.0\"\n      }\n    }\n  }];\n} catch (e) {\n  return [{\n    json: {\n      success: false,\n      error_code: \"CRITICAL_SYSTEM_ERROR\",\n      error_message: e.message,\n      data: null,\n      _meta: { source: \"NN_01_Booking_Gateway\", timestamp: new Date().toISOString() }\n    }\n  }];\n}"
+      },
+      "id": "final_robust_res",
+      "name": "Final Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1700,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "cWWCjvSLdw6gbp7J",
+          "mode": "id"
+        },
+        "mode": "wait",
+        "options": {
+          "waitForSubworkflow": true,
+          "mode": "passthrough"
+        }
       },
       "name": "Lookup Availability",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [100, 432],
+      "position": [
+        100,
+        432
+      ],
       "id": "lookup_avail"
     },
     {
       "parameters": {
         "assignments": {
           "assignments": [
-            { "id": "text", "name": "text", "value": "={{ $node[\"Execute NN_02\"].json.data.text }}", "type": "string" },
-            { "id": "chat_id", "name": "chat_id", "value": "={{ $node[\"Execute NN_02\"].json.data.chat_id }}", "type": "number" },
-            { "id": "avail_date", "name": "avail_date", "value": "={{ $node[\"Lookup Availability\"].json.date }}", "type": "string" },
-            { "id": "slots", "name": "slots", "value": "={{ $node[\"Lookup Availability\"].json.slots }}", "type": "array" }
+            {
+              "id": "text",
+              "name": "text",
+              "value": "={{ $node[\"Parse Incoming Payload (NN_02)\"].json.data.text }}",
+              "type": "string"
+            },
+            {
+              "id": "chat_id",
+              "name": "chat_id",
+              "value": "={{ $node[\"Parse Incoming Payload (NN_02)\"].json.data.chat_id }}",
+              "type": "number"
+            },
+            {
+              "id": "avail_date",
+              "name": "avail_date",
+              "value": "={{ $node[\"Lookup Availability\"].json.date }}",
+              "type": "string"
+            },
+            {
+              "id": "slots",
+              "name": "slots",
+              "value": "={{ $node[\"Lookup Availability\"].json.slots }}",
+              "type": "array"
+            }
           ]
         },
         "options": {}
@@ -52,84 +213,240 @@
       "name": "Prepare AI Input",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [350, 432],
+      "position": [
+        350,
+        432
+      ],
       "id": "prepare_ai"
-    },
-    {
-      "parameters": {
-        "workflowId": { "__rl": true, "value": "N2APxPodLDJCG818", "mode": "id" },
-        "mode": "wait",
-        "options": { "waitForSubworkflow": true, "mode": "passthrough" }
-      },
-      "name": "Execute NN_03 (AI)",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [600, 432],
-      "id": "exec_nn03"
     },
     {
       "parameters": {
         "rules": {
           "values": [
-            { "value1": "={{ $json.data.intent }}", "value2": "CANCEL", "operation": "equal" }
+            {
+              "value1": "={{ $json.data.intent }}",
+              "value2": "CANCEL",
+              "operation": "equal"
+            }
           ]
         }
       },
       "name": "Intent Switch",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3,
-      "position": [850, 432],
+      "position": [
+        850,
+        432
+      ],
       "id": "intent_switch"
     },
     {
       "parameters": {
-        "workflowId": { "__rl": true, "value": "kuvqYSl3BMrXtews", "mode": "id" },
+        "workflowId": {
+          "__rl": true,
+          "value": "kuvqYSl3BMrXtews",
+          "mode": "id"
+        },
         "mode": "wait",
         "options": {}
       },
       "name": "Flow: CREATE",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [1100, 300],
+      "position": [
+        1100,
+        300
+      ],
       "id": "flow_create"
     },
     {
       "parameters": {
-        "workflowId": { "__rl": true, "value": "aKE6HxuHaklajZOU", "mode": "id" },
+        "workflowId": {
+          "__rl": true,
+          "value": "aKE6HxuHaklajZOU",
+          "mode": "id"
+        },
         "mode": "wait",
         "options": {}
       },
       "name": "Flow: CANCEL",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [1100, 500],
+      "position": [
+        1100,
+        500
+      ],
       "id": "flow_cancel"
-    },
-    {
-      "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: true,\n    data: { ai_response: $node[\"Execute NN_03 (AI)\"].json.data?.ai_response },\n    _meta: { source: \"NN_01_Booking_Gateway\", timestamp: new Date().toISOString(), workflow_id: \"NN_01\" }\n  }\n}];"
-      },
-      "name": "Final Response",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1400, 432],
-      "id": "final_res"
     }
   ],
   "connections": {
-    "Webhook": { "main": [[{ "node": "Execute NN_02", "type": "main", "index": 0 }]] },
-    "Execute NN_02": { "main": [[{ "node": "Lookup Availability", "type": "main", "index": 0 }]] },
-    "Lookup Availability": { "main": [[{ "node": "Prepare AI Input", "type": "main", "index": 0 }]] },
-    "Prepare AI Input": { "main": [[{ "node": "Execute NN_03 (AI)", "type": "main", "index": 0 }]] },
-    "Execute NN_03 (AI)": { "main": [[{ "node": "Intent Switch", "type": "main", "index": 0 }]] },
-    "Intent Switch": {
+    "When clicking ‘Test workflow’": {
       "main": [
-        [{ "node": "Flow: CREATE", "type": "main", "index": 0 }],
-        [{ "node": "Flow: CANCEL", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Parse Incoming Payload (NN_02)",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
-    "Flow: CREATE": { "main": [[{ "node": "Final Response", "type": "main", "index": 0 }]] },
-    "Flow: CANCEL": { "main": [[{ "node": "Final Response", "type": "main", "index": 0 }]] }
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Incoming Payload (NN_02)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Incoming Payload (NN_02)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Incoming Payload (NN_02)": {
+      "main": [
+        [
+          {
+            "node": "Verify Parser (NN_02)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Parser (NN_02)": {
+      "main": [
+        [
+          {
+            "node": "Lookup Availability",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup Availability": {
+      "main": [
+        [
+          {
+            "node": "Prepare AI Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare AI Input": {
+      "main": [
+        [
+          {
+            "node": "Execute AI Agent (NN_03)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute AI Agent (NN_03)": {
+      "main": [
+        [
+          {
+            "node": "Verify AI (NN_03)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify AI (NN_03)": {
+      "main": [
+        [
+          {
+            "node": "Intent Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intent Switch": {
+      "main": [
+        [
+          {
+            "node": "Flow: CREATE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Flow: CANCEL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flow: CREATE": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Response (NN_04)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flow: CANCEL": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Response (NN_04)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Telegram Response (NN_04)": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1" }
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": true
 }
