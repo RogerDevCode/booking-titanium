@@ -6,6 +6,7 @@ ROL: Ingeniero Senior especializado en N8N workflows cloud-native.
 DOMINIO: N8N v2.0+, AI Agents, PostgreSQL, CI/CD, TypeScript.
 
 ══════════════════════════════════════════════════════════════
+
 1. PROHIBICIONES ABSOLUTAS [NUNCA HACER]
 ══════════════════════════════════════════════════════════════
 
@@ -60,6 +61,10 @@ DOMINIO: N8N v2.0+, AI Agents, PostgreSQL, CI/CD, TypeScript.
   → ÚNICA herramienta: scripts-ts/n8n_crud_agent.ts (→ Ver Sección 6)
   → SIEMPRE verificar workflow_activation_order.json antes y después
 
+[PROHIBIDO_07] Webhook URLs de testing
+  → NUNCA usar rutas /webhook-test/ en webhooks.
+  → SIEMPRE usar la ruta de producción /webhook/ para asegurar operabilidad sin la UI.
+
 ══════════════════════════════════════════════════════════════
 2. PATRONES OBLIGATORIOS [SIEMPRE APLICAR]
 ══════════════════════════════════════════════════════════════
@@ -87,7 +92,7 @@ DOMINIO: N8N v2.0+, AI Agents, PostgreSQL, CI/CD, TypeScript.
     → Opcional: sub-workflows (solo Execute Workflow Trigger)
 
   Verificación:
-    → curl -X POST https://n8n.stax.ink/webhook/<path>
+    → curl -X POST <https://n8n.stax.ink/webhook/><path>
 
 [OBLIGATORIO_02] Standard Contract - Output único
   Convención interna de contrato de salida.
@@ -162,6 +167,21 @@ DOMINIO: N8N v2.0+, AI Agents, PostgreSQL, CI/CD, TypeScript.
     1. Leer scripts-ts/README.md
     2. Si existe script compatible → usarlo
     3. Si no existe → crear + actualizar README.md (nombre, descripción, parámetros)
+
+[OBLIGATORIO_09] SSC (Strict SQL Casting) / ETB
+  → Casteo duro obligatorio (ej. $1::uuid, $2::bigint) en toda consulta SQL variable.
+
+[OBLIGATORIO_10] Validación estricta en Nodos IF (Sandwich)
+  → Usar SIEMPRE typeVersion: 1 para validaciones booleanas de seguridad.
+  → Usar coincidencia estricta: `={{ $json.isValid === true }}` para evitar inyecciones null.
+
+[OBLIGATORIO_11] Integridad del Standard Contract
+  → Los campos error_code y error_message SON OBLIGATORIOS.
+  → Si success: true, deben enviarse explícitamente como null.
+
+[OBLIGATORIO_12] Resolución de Red Docker (HTTP Requests)
+  → NUNCA usar localhost o 127.0.0.1 en N8N para apuntar a otros contenedores.
+  → SIEMPRE usar el alias de red (ej. http://dal-service:3000).
 
 ══════════════════════════════════════════════════════════════
 3. SEGURIDAD [IMPLEMENTACIÓN]
@@ -321,24 +341,28 @@ DOMINIO: N8N v2.0+, AI Agents, PostgreSQL, CI/CD, TypeScript.
 ══════════════════════════════════════════════════════════════
 
 [CREATE]
+
   1. Crear archivo: workflows/BB_XX_Name.json
   2. Implementar Triple Entry Pattern (→ OBLIGATORIO_01)
   3. Agregar Standard Contract en output (→ OBLIGATORIO_02)
   4. Validar: npx tsx scripts-ts/workflow_validator.ts --fix
 
 [UPLOAD]
+
   1. Verificar sync: npx tsx scripts-ts/verify_workflow_sync.ts
   2. Gestionar: scripts-ts/n8n_crud_agent.ts (→ PROHIBIDO_06)
   3. Verificar ejecución en servidor
   4. Confirmar workflow_activation_order.json actualizado
 
 [TEST]
+
   1. Unitario: npx jest tests/bbXX_*.test.ts
-  2. Webhook: curl -X POST https://n8n.stax.ink/webhook/<path>
+  2. Webhook: curl -X POST <https://n8n.stax.ink/webhook/><path>
   3. Manual: UI de N8N → Execute Workflow
   4. Verificar: API /executions endpoint
 
 [MAINTAIN]
+
   1. Antes de editar: consultar workflow_activation_order.json
   2. Después de editar: npx tsx scripts-ts/workflow_validator.ts --fix
   3. Antes de subir: npx tsx scripts-ts/verify_workflow_sync.ts
