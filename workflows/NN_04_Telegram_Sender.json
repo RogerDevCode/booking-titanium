@@ -87,7 +87,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Sanitize text for Telegram Markdown [SEC_02]\n// Escape special characters that Telegram interprets as Markdown\nconst text = $input.first()?.json?.text || $input.first()?.json?.ai_response || '';\n\nif (!text) {\n  return [{\n    json: {\n      ...$input.first().json,\n      sanitized_text: ''\n    }\n  }];\n}\n\n// Escape backslashes first, then other special chars\nconst sanitized = text\n  .replace(/\\\\/g, '\\\\\\\\')      // Escape backslashes\n  .replace(/_/g, '\\\\_')        // Escape underscores\n  .replace(/\\*/g, '\\\\*')       // Escape asterisks\n  .replace(/\\[/g, '\\\\[')       // Escape square brackets\n  .replace(/`/g, '\\\\`')        // Escape backticks\n  .substring(0, 4096);         // Telegram max message length\n\nreturn [{\n  json: {\n    ...$input.first().json,\n    sanitized_text: sanitized\n  }\n}];"
+        "jsCode": "// Sanitize text for Telegram MarkdownV2 [SEC_02]\nconst text = $input.first()?.json?.text || $input.first()?.json?.ai_response || '';\n\nif (!text) {\n  return [{ json: { ...$input.first().json, sanitized_text: '' } }];\n}\n\n// Official Telegram MarkdownV2 escape list\nconst sanitized = text.replace(/([_*\\[\\]()~`>#+\\-=|{}.!])/g, '\\\\$1');\n\nreturn [{ json: { ...$input.first().json, sanitized_text: sanitized } }];"
       },
       "id": "sanitize_telegram",
       "name": "Sanitize for Telegram",
@@ -103,7 +103,7 @@
         "chatId": "={{ $json.chat_id }}",
         "text": "={{ $json.sanitized_text }}",
         "additionalFields": {
-          "parse_mode": ""
+          "parse_mode": "MarkdownV2"
         }
       },
       "id": "telegram_node",
