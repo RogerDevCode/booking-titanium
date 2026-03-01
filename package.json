@@ -23,6 +23,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "express": "^5.2.1",
     "n8n-nodes-base": "^0.210.0"
   }
 }

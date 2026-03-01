@@ -7,7 +7,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const WEBHOOK_BASE = process.env.WEBHOOK_URL?.replace(/\/+$/, '') || 'https://n8n.stax.ink';
 // Append the webhook path for the specific workflow (for manual testing via webhook)
-const WEBHOOK_URL = `${WEBHOOK_BASE}/webhook/nn-01-booking-gateway-test`;
+const WEBHOOK_URL = `${WEBHOOK_BASE}/webhook/nn-01-booking-gateway-v2`;
 
 // Helper to generate a simulated Telegram message payload
 const createTelegramPayload = (text: string = "I want to book a room for tomorrow") => {

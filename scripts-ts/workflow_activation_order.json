@@ -31,7 +31,7 @@
     "name": "NN_01_Booking_Gateway",
     "id": "IhAvwkZIob9KfYoA",
     "order": 5,
-    "webhook_path": "nn-01-booking-gateway-test",
+    "webhook_path": "nn-01-booking-gateway-v2",
     "description": "Main entry point - orchestrates NN_02 → NN_03 → NN_04 flow"
   },
   {
@@ -44,5 +44,27 @@
     "id": "9PfylxWCt1JXffOh",
     "order": 7,
     "webhook_path": "nn-01-test-simple"
+  },
+  {
+    "name": "DB_Get_Availability",
+    "id": "lFMxhCabSVhaIVIN",
+    "order": 8,
+    "webhook_path": "db-get-availability-test"
+  },
+  {
+    "name": "DB_Create_Booking",
+    "id": "kuvqYSl3BMrXtews",
+    "order": 9,
+    "webhook_path": "db-create-booking-test"
+  },
+  {
+    "name": "GCAL_Create_Event",
+    "id": "bc8zMLI9O5ytO7a2",
+    "order": 10
+  },
+  {
+    "name": "GMAIL_Send_Confirmation",
+    "id": "pJmPTUO09YxJiqvb",
+    "order": 11
   }
 ]

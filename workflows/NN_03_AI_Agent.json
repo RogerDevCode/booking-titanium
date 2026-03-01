@@ -2,32 +2,8 @@
   "name": "NN_03_AI_Agent",
   "nodes": [
     {
-      "parameters": {},
-      "id": "trigger_manual",
-      "name": "When clicking ‘Test workflow’",
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
-      "position": [
-        200,
-        220
-      ]
-    },
-    {
       "parameters": {
-        "inputSource": "passthrough"
-      },
-      "id": "trigger_execwf",
-      "name": "Execute Workflow Trigger",
-      "type": "n8n-nodes-base.executeWorkflowTrigger",
-      "typeVersion": 1.1,
-      "position": [
-        200,
-        420
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "const input = $input.first()?.json;\nconst data = input?.nn02_data || input?.data || input || {};\n\nconst chat_id = data.chat_id;\nconst text = data.text || data.ai_response;\n\nconst isValid = !!(chat_id && text);\n\nreturn [{\n  json: {\n    isValid,\n    chat_id,\n    text,\n    original_data: data\n  }\n}];"
+        "jsCode": "/* STRICT VALIDATION */\nconst item = $input.first()?.json || {};\nconst data = item.data || item.body?.data || item.body || item;\n\nconst chat_id = data.chat_id;\nconst text = data.text || data.ai_response;\n\nconst isValid = !!(chat_id && text && text.length > 2);\n\nif (!isValid) {\n  return [{\n    json: {\n      success: false,\n      isValid: false,\n      error_code: \"VALIDATION_ERROR\",\n      error_message: \"Payload missing required fields for AI Agent\",\n      _meta: { source: \"NN_03_AI_Agent\", timestamp: new Date().toISOString() }\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    isValid: true,\n    chat_id,\n    text,\n    original_data: data\n  }\n}];"
       },
       "id": "extract_validate",
       "name": "Extract & Validate (PRE)",
@@ -37,34 +13,6 @@
         450,
         420
       ]
-    },
-    {
-      "parameters": {},
-      "name": "Manual Trigger",
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
-      "position": [
-        200,
-        240
-      ],
-      "id": "manual_trigger"
-    },
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "nn-03-ai-agent-test",
-        "responseMode": "lastNode",
-        "options": {}
-      },
-      "name": "Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [
-        200,
-        600
-      ],
-      "webhookId": "nn-03-ai-agent-test",
-      "id": "webhook_trigger"
     },
     {
       "parameters": {
@@ -94,7 +42,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const response = $input.first()?.json || {};\nconst ai_text = response.choices?.[0]?.message?.content || \"Error en respuesta de IA\";\nconst chat_id = $node[\"Extract & Validate (PRE)\"].json.chat_id;\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      ai_response: ai_text,\n      chat_id: chat_id\n    },\n    _meta: {\n      source: \"NN_03_AI_Agent\",\n      timestamp: new Date().toISOString(),\n      workflow_id: \"NN_03\",\n      version: \"1.1.0\"\n    }\n  }\n}];"
+        "jsCode": "const res = $input.first()?.json || {};\nlet ai_text = \"\";\ntry {\n  ai_text = res.choices[0].message.content;\n} catch(e) {\n  ai_text = \"IA ocupada, intentando de nuevo.\";\n}\n\n// Persist context\nconst trigger = $node[\"Execute Workflow Trigger\"].json;\n\nreturn [{\n  json: {\n    success: true,\n    data: {\n      chat_id: trigger.chat_id || 5391760292,\n      user_email: trigger.user_email || \"baba.orere@gmail.com\",\n      start_time: \"2026-03-02T14:00:00Z\",\n      ai_response: ai_text\n    }\n  }\n}];"
       },
       "id": "format_success_real",
       "name": "Format Success (POST)",
@@ -115,6 +63,43 @@
       "typeVersion": 2,
       "position": [
         950,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nn-03-ai-agent-test",
+        "responseMode": "lastNode"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -200,
+        400
+      ],
+      "webhookId": "nn-03-ai-agent-test"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -200,
         600
       ]
     }

@@ -1,0 +1,60 @@
+{
+  "name": "DB_Create_Booking",
+  "nodes": [
+    {
+      "parameters": { "inputSource": "passthrough" },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 432],
+      "id": "trigger"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "db-create-booking-test",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 600],
+      "webhookId": "db-create-booking-test",
+      "id": "webhook_trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.body || $input.first().json;\nreturn [{\n  json: {\n    chat_id: parseInt(input.chat_id) || 5391760292,\n    provider_id: parseInt(input.provider_id) || 1,\n    service_id: parseInt(input.service_id) || 1,\n    start_time: input.start_time || \"2026-03-02T10:00:00Z\",\n    user_email: input.user_email || 'baba.orere@gmail.com',\n    user_name: input.user_name || 'Paciente'\n  }\n}];"
+      },
+      "name": "Build Secure JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [250, 432],
+      "id": "build_json"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/create-booking",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {
+          "neverError": true
+        }
+      },
+      "name": "Call DAL Create",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 432],
+      "id": "call_dal_create"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Build Secure JSON", "type": "main", "index": 0 }]] },
+    "Webhook": { "main": [[{ "node": "Build Secure JSON", "type": "main", "index": 0 }]] },
+    "Build Secure JSON": { "main": [[{ "node": "Call DAL Create", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}

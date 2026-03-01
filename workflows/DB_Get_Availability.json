@@ -1,0 +1,98 @@
+{
+  "name": "DB_Get_Availability",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/get-slots",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"provider_id\": {{ $json.body.provider_id || 1 }},\n  \"service_id\": {{ $json.body.service_id || 1 }},\n  \"date\": \"{{ $json.body.date || '2026-03-02' }}\"\n}",
+        "options": {}
+      },
+      "name": "Call DAL Proxy",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        350,
+        432
+      ],
+      "id": "call_dal"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "db-get-availability-test",
+        "responseMode": "lastNode"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -200,
+        400
+      ],
+      "webhookId": "db-get-availability-test"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -200,
+        600
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Proxy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Proxy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Proxy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
