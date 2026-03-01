@@ -1,272 +1,130 @@
 {
-  "name": "NN_01_Booking_Gateway",
+  "name": "NN_01_Booking_Gateway_V2",
   "nodes": [
     {
       "parameters": {},
       "name": "Manual Trigger",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [
-        -200,
-        240
-      ],
-      "id": "manual_trigger"
+      "position": [-400, 200],
+      "id": "man_trig"
     },
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "nn-01-booking-gateway-v2",
+        "path": "booking-v1",
         "responseMode": "lastNode"
       },
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [
-        -200,
-        432
-      ],
-      "webhookId": "nn-01-booking-gateway-v2",
-      "id": "webhook_trigger"
+      "position": [-400, 400],
+      "webhookId": "booking-v1"
+    },
+    {
+      "parameters": { "inputSource": "passthrough" },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [-400, 600],
+      "id": "exec_trig"
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "Hp7ox7JqRwVA5wr8",
-          "mode": "id"
-        },
+        "jsCode": "/* VALIDATION SANDWICH PRE */\nconst input = $input.first()?.json || {};\nconst message = input.message || input.body?.message || input;\nconst hasContext = !!(message.chat?.id || message.chat_id);\n\nreturn [{\n  json: {\n    isValid: hasContext,\n    raw_message: message,\n    error_message: hasContext ? null : \"Falta contexto de usuario (chat_id)\"\n  }\n}];"
+      },
+      "name": "Validate Gateway PRE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-150, 400],
+      "id": "val_pre"
+    },
+    {
+      "parameters": {
+        "workflowId": { "__rl": true, "value": "Hp7ox7JqRwVA5wr8", "mode": "id" },
         "mode": "wait",
-        "options": {
-          "waitForSubworkflow": true,
-          "mode": "passthrough"
-        }
+        "options": { "waitForSubworkflow": true, "mode": "passthrough" }
       },
       "name": "Execute NN_02",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [
-        50,
-        432
-      ],
+      "position": [100, 400],
       "id": "exec_nn02"
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "N2APxPodLDJCG818",
-          "mode": "id"
-        },
+        "workflowId": { "__rl": true, "value": "N2APxPodLDJCG818", "mode": "id" },
         "mode": "wait",
-        "options": {
-          "waitForSubworkflow": true,
-          "mode": "passthrough"
-        }
+        "options": { "waitForSubworkflow": true, "mode": "passthrough" }
       },
       "name": "Execute NN_03 (AI)",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [
-        300,
-        432
-      ],
+      "position": [350, 400],
       "id": "exec_nn03"
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "kuvqYSl3BMrXtews",
-          "mode": "id"
-        },
-        "mode": "wait",
-        "options": {
-          "waitForSubworkflow": true,
-          "mode": "passthrough"
+        "rules": {
+          "values": [
+            { "value1": "={{ $json.data.intent }}", "value2": "CANCEL", "operation": "equal" }
+          ]
         }
       },
-      "name": "Execute DB Create",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        550,
-        432
-      ],
-      "id": "exec_db"
+      "name": "Intent Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [600, 400],
+      "id": "intent_switch"
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "bc8zMLI9O5ytO7a2",
-          "mode": "id"
-        },
-        "mode": "wait",
-        "options": {
-          "waitForSubworkflow": true,
-          "mode": "passthrough"
-        }
+        "workflowId": { "__rl": true, "value": "kuvqYSl3BMrXtews", "mode": "id" },
+        "mode": "wait"
       },
-      "name": "Execute GCAL",
+      "name": "Flow: CREATE",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [
-        800,
-        432
-      ],
-      "id": "exec_gcal",
-      "continueOnFail": true
+      "position": [850, 300],
+      "id": "flow_create"
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "pJmPTUO09YxJiqvb",
-          "mode": "id"
-        },
-        "mode": "wait",
-        "options": {
-          "waitForSubworkflow": true,
-          "mode": "passthrough"
-        }
+        "workflowId": { "__rl": true, "value": "aKE6HxuHaklajZOU", "mode": "id" },
+        "mode": "wait"
       },
-      "name": "Execute GMAIL",
+      "name": "Flow: CANCEL",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [
-        1050,
-        432
-      ],
-      "id": "exec_gmail",
-      "continueOnFail": true
+      "position": [850, 500],
+      "id": "flow_cancel"
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "4afRuMkIvgEh7gXt",
-          "mode": "id"
-        },
-        "mode": "wait",
-        "options": {
-          "waitForSubworkflow": true,
-          "mode": "passthrough"
-        }
+        "jsCode": "return [{\n  json: {\n    success: true,\n    error_code: null,\n    data: { ai_response: $node[\"Execute NN_03 (AI)\"].json.data?.ai_response },\n    _meta: { source: \"NN_01_Booking_Gateway\", timestamp: new Date().toISOString(), workflow_id: \"NN_01\" }\n  }\n}];"
       },
-      "name": "Execute NN_04 (Telegram)",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        1300,
-        432
-      ],
-      "id": "exec_tg"
-    },
-    {
-      "parameters": {
-        "jsCode": "return [{ json: { success: true, message: 'Bypass active' } }];"
-      },
-      "name": "Final Response",
+      "name": "Standard Success Output",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        1550,
-        432
-      ],
+      "position": [1150, 400],
       "id": "final_res"
     }
   ],
   "connections": {
-    "Manual Trigger": {
+    "Manual Trigger": { "main": [[{ "node": "Validate Gateway PRE", "type": "main", "index": 0 }]] },
+    "Webhook": { "main": [[{ "node": "Validate Gateway PRE", "type": "main", "index": 0 }]] },
+    "Execute Workflow Trigger": { "main": [[{ "node": "Validate Gateway PRE", "type": "main", "index": 0 }]] },
+    "Validate Gateway PRE": { "main": [[{ "node": "Execute NN_02", "type": "main", "index": 0 }]] },
+    "Execute NN_02": { "main": [[{ "node": "Execute NN_03 (AI)", "type": "main", "index": 0 }]] },
+    "Execute NN_03 (AI)": { "main": [[{ "node": "Intent Switch", "type": "main", "index": 0 }]] },
+    "Intent Switch": {
       "main": [
-        [
-          {
-            "node": "Execute NN_02",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{ "node": "Flow: CREATE", "type": "main", "index": 0 }],
+        [{ "node": "Flow: CANCEL", "type": "main", "index": 0 }]
       ]
     },
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Execute NN_02",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Execute NN_02": {
-      "main": [
-        [
-          {
-            "node": "Execute NN_03 (AI)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Execute NN_03 (AI)": {
-      "main": [
-        [
-          {
-            "node": "Execute DB Create",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Execute DB Create": {
-      "main": [
-        [
-          {
-            "node": "Execute GCAL",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Execute GCAL": {
-      "main": [
-        [
-          {
-            "node": "Execute GMAIL",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Execute GMAIL": {
-      "main": [
-        [
-          {
-            "node": "Execute NN_04 (Telegram)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Execute NN_04 (Telegram)": {
-      "main": [
-        [
-          {
-            "node": "Final Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
+    "Flow: CREATE": { "main": [[{ "node": "Standard Success Output", "type": "main", "index": 0 }]] },
+    "Flow: CANCEL": { "main": [[{ "node": "Standard Success Output", "type": "main", "index": 0 }]] }
   },
-  "settings": {
-    "executionOrder": "v1"
-  }
+  "settings": { "executionOrder": "v1" }
 }

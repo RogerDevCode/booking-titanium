@@ -66,5 +66,22 @@
     "name": "GMAIL_Send_Confirmation",
     "id": "pJmPTUO09YxJiqvb",
     "order": 11
+  },
+  {
+    "name": "NN_01_Booking_Gateway_V2",
+    "id": "yqHLjXUggLa8tE4Z",
+    "order": 12,
+    "webhook_path": "booking-v1"
+  },
+  {
+    "name": "DB_Cancel_Booking",
+    "id": "aKE6HxuHaklajZOU",
+    "order": 13,
+    "webhook_path": "db-cancel-booking-test"
+  },
+  {
+    "name": "GCAL_Delete_Event",
+    "id": "M3Pa8CULijP5WvB8",
+    "order": 14
   }
 ]

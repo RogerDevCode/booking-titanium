@@ -8,31 +8,22 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
-      "position": [
-        0,
-        400
-      ],
+      "position": [0, 400],
       "id": "trigger_unique"
     },
     {
       "parameters": {
         "calendar": "primary",
-        "start": "={{ $json.start_time }}",
-        "end": "={{ $json.end_time }}",
-        "summary": "=Reserva Médica: {{ $json.user_name || 'Paciente' }}",
-        "description": "=Reserva gestionada por Booking Titanium via Telegram.",
-        "additionalFields": {
-          "attendees": "={{ $json.user_email }}"
+        "filters": {
+          "timeMin": "={{ $json.start_time }}",
+          "timeMax": "={{ $json.end_time }}"
         }
       },
-      "name": "Google Calendar",
+      "name": "Check Existing Events",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.3,
-      "position": [
-        350,
-        432
-      ],
-      "id": "gcal_node",
+      "position": [250, 400],
+      "id": "gcal_check",
       "credentials": {
         "googleCalendarOAuth2Api": {
           "id": "mT5XZfEaeP1fqjl4",
@@ -42,43 +33,69 @@
     },
     {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: true,\n    gcal_event_id: $input.first().json.id,\n    _meta: { source: \"GCAL_Create_Event\", timestamp: new Date().toISOString() }\n  }\n}];"
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "rightValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "no_events_found",
+              "leftValue": "={{ $node[\"Check Existing Events\"].all().length }}",
+              "rightValue": 0,
+              "operator": { "type": "number", "operation": "equals", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Any Event Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [500, 400],
+      "id": "if_event_found"
+    },
+    {
+      "parameters": {
+        "calendar": "primary",
+        "start": "={{ $node[\"Execute Workflow Trigger\"].json.start_time }}",
+        "end": "={{ $node[\"Execute Workflow Trigger\"].json.end_time }}",
+        "summary": "=Reserva: {{ $node[\"Execute Workflow Trigger\"].json.user_name || 'Paciente' }} ({{ $node[\"Execute Workflow Trigger\"].json.service_name || 'Consulta' }})",
+        "description": "=Reserva gestionada por Booking Titanium via Telegram.",
+        "additionalFields": {
+          "attendees": "={{ $node[\"Execute Workflow Trigger\"].json.user_email }}"
+        }
+      },
+      "name": "Create Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [750, 300],
+      "id": "gcal_create",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "mT5XZfEaeP1fqjl4",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: true,\n    gcal_event_id: $input.first()?.json?.id || \"already_exists\",\n    status: $input.first()?.json?.id ? \"CREATED\" : \"ALREADY_EXISTS\",\n    _meta: { source: \"GCAL_Create_Event\", timestamp: new Date().toISOString() }\n  }\n}];"
       },
       "name": "Format Output",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        600,
-        432
-      ],
+      "position": [1000, 400],
       "id": "format_out"
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Check Existing Events", "type": "main", "index": 0 }]] },
+    "Check Existing Events": { "main": [[{ "node": "Any Event Found?", "type": "main", "index": 0 }]] },
+    "Any Event Found?": {
       "main": [
-        [
-          {
-            "node": "Google Calendar",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{ "node": "Create Event", "type": "main", "index": 0 }],
+        [{ "node": "Format Output", "type": "main", "index": 0 }]
       ]
     },
-    "Google Calendar": {
-      "main": [
-        [
-          {
-            "node": "Format Output",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
+    "Create Event": { "main": [[{ "node": "Format Output", "type": "main", "index": 0 }]] }
   },
-  "settings": {
-    "executionOrder": "v1"
-  }
+  "settings": { "executionOrder": "v1" }
 }

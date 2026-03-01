@@ -1,0 +1,36 @@
+{
+  "name": "GCAL_Delete_Event",
+  "nodes": [
+    {
+      "parameters": { "inputSource": "passthrough" },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 400],
+      "id": "trigger"
+    },
+    {
+      "parameters": {
+        "calendar": "primary",
+        "operation": "delete",
+        "eventId": "={{ $json.gcal_event_id }}"
+      },
+      "name": "Delete GCal Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [300, 400],
+      "id": "gcal_delete",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "mT5XZfEaeP1fqjl4",
+          "name": "Google Calendar account"
+        }
+      },
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Delete GCal Event", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}

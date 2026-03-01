@@ -1,0 +1,46 @@
+{
+  "name": "DB_Cancel_Booking",
+  "nodes": [
+    {
+      "parameters": { "inputSource": "passthrough" },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 400],
+      "id": "trigger"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "db-cancel-booking-test",
+        "responseMode": "lastNode"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 600],
+      "webhookId": "db-cancel-booking-test",
+      "id": "webhook_trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/cancel-booking",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"booking_id\": \"{{ $json.body?.booking_id || $json.booking_id }}\",\n  \"chat_id\": {{ $json.body?.chat_id || $json.chat_id }}\n}",
+        "options": { "neverError": true }
+      },
+      "name": "Call DAL Cancel",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [300, 500],
+      "id": "call_dal"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Call DAL Cancel", "type": "main", "index": 0 }]] },
+    "Webhook": { "main": [[{ "node": "Call DAL Cancel", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}

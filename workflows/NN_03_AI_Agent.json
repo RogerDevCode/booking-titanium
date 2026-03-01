@@ -42,7 +42,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const res = $input.first()?.json || {};\nlet ai_text = \"\";\ntry {\n  ai_text = res.choices[0].message.content;\n} catch(e) {\n  ai_text = \"IA ocupada, intentando de nuevo.\";\n}\n\n// Persist context\nconst trigger = $node[\"Execute Workflow Trigger\"].json;\n\nreturn [{\n  json: {\n    success: true,\n    data: {\n      chat_id: trigger.chat_id || 5391760292,\n      user_email: trigger.user_email || \"baba.orere@gmail.com\",\n      start_time: \"2026-03-02T14:00:00Z\",\n      ai_response: ai_text\n    }\n  }\n}];"
+        "jsCode": "const res = $input.first()?.json || {};\nlet ai_data = {};\ntry { \n  ai_data = JSON.parse(res.choices[0].message.content); \n} catch(e) { \n  ai_data = { response: res.choices[0].message.content }; \n}\n\nconst trigger = $node[\"Execute Workflow Trigger\"].json;\nreturn [{\n  json: {\n    success: true,\n    data: {\n      intent: ai_data.intent || \"CREATE\",\n      chat_id: trigger.chat_id,\n      user_email: ai_data.email,\n      booking_id: ai_data.booking_id,\n      start_time: (ai_data.date && ai_data.time) ? (ai_data.date + \"T\" + ai_data.time + \":00Z\") : null,\n      ai_response: ai_data.response\n    }\n  }\n}];"
       },
       "id": "format_success_real",
       "name": "Format Success (POST)",

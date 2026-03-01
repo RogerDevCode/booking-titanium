@@ -7,7 +7,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const WEBHOOK_BASE = process.env.WEBHOOK_URL?.replace(/\/+$/, '') || 'https://n8n.stax.ink';
 // Append the webhook path for the specific workflow (for manual testing via webhook)
-const WEBHOOK_URL = `${WEBHOOK_BASE}/webhook/nn-01-booking-gateway-v2`;
+const WEBHOOK_URL = `${WEBHOOK_BASE}/webhook/nn-01-booking-gateway-v3`;
 
 // Helper to generate a simulated Telegram message payload
 const createTelegramPayload = (text: string = "I want to book a room for tomorrow") => {
@@ -89,7 +89,7 @@ describe('NN_01_Booking_Gateway E2E Tests', () => {
 
         // Should return a failed Standard Contract via NN_01 Format Input Error node
         expect(responseData.success).toBe(false);
-        expect(responseData.error_code).toBe('INVALID_PAYLOAD');
+        expect(responseData.error_code).toBe('VALIDATION_ERROR');
         expect(responseData.data).toBeNull();
         expect(responseData._meta.source).toBe('NN_01_Booking_Gateway');
     }, 15000);
