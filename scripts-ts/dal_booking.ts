@@ -1,4 +1,4 @@
-import { Client } from 'pg';
+import { Pool } from 'pg';
 import { DateTime } from 'luxon';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
@@ -6,13 +6,15 @@ import * as path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 async function getAvailability(provider_id: number, service_id: number, date: string) {
-    const client = new Client({
+    const pool = new Pool({
         connectionString: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false }
+        ssl: { rejectUnauthorized: false },
+        max: 10,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
     });
 
     try {
-        await client.connect();
         
         // DateTime.fromISO(date).weekday returns 1 (Mon) to 7 (Sun)
         // PostgreSQL EXTRACT(DOW) returns 0 (Sun) to 6 (Sat)
@@ -21,12 +23,12 @@ async function getAvailability(provider_id: number, service_id: number, date: st
 
         const query = `
             SELECT 
-                (SELECT row_to_json(conf) FROM (SELECT s.duration_min, s.buffer_min, p.name FROM public.services s JOIN public.provider_services ps ON ps.service_id = s.id JOIN public.providers p ON p.id = ps.provider_id WHERE p.id = $1 AND s.id = $2) conf) as config,
-                (SELECT row_to_json(sch) FROM (SELECT start_time, end_time FROM public.provider_schedules WHERE provider_id = $1 AND day_of_week = $3) sch) as schedule,
-                (SELECT json_agg(bk) FROM (SELECT start_time, end_time FROM public.bookings WHERE provider_id = $1 AND status = 'CONFIRMED' AND start_time::date = $4::date) bk) as bookings;
+                (SELECT row_to_json(conf) FROM (SELECT s.duration_min, s.buffer_min, p.name FROM public.services s JOIN public.provider_services ps ON ps.service_id = s.id JOIN public.providers p ON p.id = ps.provider_id WHERE p.id = $1::integer AND s.id = $2::integer) conf) as config,
+                (SELECT row_to_json(sch) FROM (SELECT start_time, end_time FROM public.provider_schedules WHERE provider_id = $1::integer AND day_of_week = $3::integer) sch) as schedule,
+                (SELECT json_agg(bk) FROM (SELECT start_time, end_time FROM public.bookings WHERE provider_id = $1::integer AND status = 'CONFIRMED' AND start_time::date = $4::date) bk) as bookings;
         `;
 
-        const res = await client.query(query, [provider_id, service_id, pg_dow, date]);
+        const res = await pool.query(query, [provider_id, service_id, pg_dow, date]);
         const dbData = res.rows[0];
 
         if (!dbData.config || !dbData.schedule) {
@@ -46,7 +48,7 @@ async function getAvailability(provider_id: number, service_id: number, date: st
             const sStart = current;
             const sEnd = current.plus({ minutes: duration_min });
             
-            const isBusy = bookings.some((b: any) => {
+            const isBusy = bookings.some((b: { start_time: string, end_time: string }) => {
                 const bStart = DateTime.fromISO(b.start_time, { zone: 'utc' });
                 const bEnd = DateTime.fromISO(b.end_time, { zone: 'utc' });
                 // Overlap check
@@ -70,10 +72,11 @@ async function getAvailability(provider_id: number, service_id: number, date: st
             _meta: { source: "DAL_Service", timestamp: new Date().toISOString(), version: "1.0.0" }
         };
 
-    } catch (err: any) {
-        return { success: false, error_message: err.message };
+    } catch (err: unknown) {
+        const error = err as Error;
+        return { success: false, error_message: error.message };
     } finally {
-        await client.end();
+        await pool.end();
     }
 }
 

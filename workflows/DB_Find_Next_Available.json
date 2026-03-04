@@ -2,12 +2,46 @@
   "name": "DB_Find_Next_Available",
   "nodes": [
     {
-      "parameters": { "inputSource": "passthrough" },
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"provider_id\": 1, \"service_id\": 1, \"date\": \"2026-03-04\"}"
+      },
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
-      "position": [0, 400],
+      "position": [
+        0,
+        400
+      ],
       "id": "trigger"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "id": "manual"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "db-find-next-available",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        600
+      ],
+      "webhookId": "db-find-next-available",
+      "id": "webhook"
     },
     {
       "parameters": {
@@ -15,18 +49,180 @@
         "url": "http://dal-service:3000/find-next-available",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"provider_id\": 1,\n  \"service_id\": 1,\n  \"date\": \"{{ $json.date || $now.toISODate() }}\"\n}",
-        "options": {}
+        "jsonBody": "={\n  \"provider_id\": {{ $json.provider_id || $json.body?.provider_id || 1 }},\n  \"service_id\": {{ $json.service_id || $json.body?.service_id || 1 }},\n  \"date\": \"{{ $json.date || $json.body?.date || $now.toISODate() }}\"\n}",
+        "options": {
+          "timeout": 5000
+        }
       },
       "name": "Call DAL Smart Lookup",
       "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [300, 400],
+      "typeVersion": 4.4,
+      "position": [
+        500,
+        500
+      ],
       "id": "call_dal"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first()?.json || {};\nconst isCacheHit = input.cache_hit === true;\nconst dalResponse = isCacheHit ? input.cache_data : input;\nconst isSuccess = dalResponse.success === true || dalResponse.success === undefined;\n\nreturn [{\n  json: {\n    success: dalResponse.success !== undefined ? dalResponse.success : true,\n    error_code: isSuccess ? null : (dalResponse.error_code || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || 'Operation failed'),\n    data: dalResponse.data || dalResponse,\n    _meta: {\n      source: 'DB_Find_Next_Available',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Find_Next_Available',\n      version: '1.2.0'\n    }\n  }\n}];"
+      },
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        400
+      ],
+      "id": "format_out"
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst provider = $json.provider_id || $json.body?.provider_id || 1;\nconst service = $json.service_id || $json.body?.service_id || 1;\nconst date = $json.date || $json.body?.date || '2026-03-04';\nconst key = `${provider}_${service}_${date}`;\nconst now = new Date().getTime();\n\nlet hit = false;\nlet data = null;\n\nif (staticData[key] && (now - staticData[key].timestamp < 5 * 60 * 1000)) {\n  hit = true;\n  data = staticData[key].data;\n}\n\nreturn {\n  json: { provider_id: provider, service_id: service, date: date, cache_hit: hit, cache_data: data, cache_key: key }\n};"
+      },
+      "name": "Check Cache",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        400
+      ],
+      "id": "check_cache"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "19bdfba9-dbb8-4e89-9a25-a1348fc5cb6d",
+              "leftValue": "={{ $json.cache_hit === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "If Cache Hit",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        300,
+        400
+      ],
+      "id": "if_cache"
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst dalResponse = $input.first()?.json || {};\nconst cacheKey = $('Check Cache').first().json.cache_key;\nif (dalResponse.success) {\n  staticData[cacheKey] = {\n    timestamp: new Date().getTime(),\n    data: dalResponse\n  };\n}\nreturn [{ json: dalResponse }];"
+      },
+      "name": "Save Cache",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        500
+      ],
+      "id": "save_cache"
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Call DAL Smart Lookup", "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Cache",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Cache",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Cache",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Smart Lookup": {
+      "main": [
+        [
+          {
+            "node": "Save Cache",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Cache": {
+      "main": [
+        [
+          {
+            "node": "If Cache Hit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Cache Hit": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call DAL Smart Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Cache": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1" }
+  "settings": {
+    "executionOrder": "v1"
+  }
 }

@@ -8,6 +8,11 @@
 
 import axios, { AxiosError } from 'axios';
 import { N8NConfig } from './config';
+import { Watchdog, WATCHDOG_TIMEOUT } from './watchdog';
+
+// Start watchdog timer
+const watchdog = new Watchdog(WATCHDOG_TIMEOUT);
+watchdog.start();
 
 /**
  * Interface for workflow node
@@ -274,6 +279,7 @@ Examples:
     }
 
     if (workflow === null) {
+      watchdog.cancel();
       process.exit(1);
     }
 
@@ -290,7 +296,9 @@ Examples:
         console.log(formatSummary(workflow));
         break;
     }
+    watchdog.cancel();
   } catch (error: unknown) {
+    watchdog.cancel();
     const message = error instanceof Error ? error.message : String(error);
     console.error(`Error: ${message}`);
     process.exit(1);
@@ -299,6 +307,7 @@ Examples:
 
 // Run main function
 main().catch((error: unknown) => {
+  watchdog.cancel();
   const message = error instanceof Error ? error.message : String(error);
   console.error(`Fatal error: ${message}`);
   process.exit(1);

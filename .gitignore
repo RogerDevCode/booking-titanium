@@ -11,6 +11,7 @@ Thumbs.db
 *.swp
 *.swo
 *~
+docker-compose/
 
 # IDEs
 .idea/
@@ -100,7 +101,7 @@ Dockerfile.*
 current_schema_dump.sql
 current_tables_dump.sql
 
-# Binarios grandes (capturas, etc.)
+# Binarios grandes (capturas, multimedia y diseño)
 *.png
 *.jpg
 *.jpeg
@@ -108,6 +109,31 @@ current_tables_dump.sql
 *.bmp
 *.tiff
 *.ico
+*.webp
+*.avif
+*.heic
+*.heif
+*.svg
+*.eps
+*.ai
+*.psd
+
+*.avi
+*.mpeg
+*.mpg
+*.mp4
+*.m4v
+*.mov
+*.wmv
+*.flv
+*.mkv
+*.webm
+*.3gp
+*.3g2
+*.m2ts
+*.mts
+*.vob
+*.ogv
 
 # OS generated
 .DS_Store

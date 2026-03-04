@@ -10,6 +10,11 @@ import axios, { AxiosError } from 'axios';
 import * as fs from 'fs';
 import * as path from 'path';
 import { N8NConfig } from './config';
+import { Watchdog, WATCHDOG_TIMEOUT } from './watchdog';
+
+// Start watchdog timer
+const watchdog = new Watchdog(WATCHDOG_TIMEOUT);
+watchdog.start();
 
 /**
  * Interface for workflow data
@@ -235,7 +240,9 @@ Examples:
 
         if (success) {
           console.log('Success! Workflow exported.');
+          watchdog.cancel();
         } else {
+          watchdog.cancel();
           process.exit(1);
         }
       }
@@ -244,6 +251,7 @@ Examples:
       const workflows = await listWorkflows(config);
 
       if (workflows === null) {
+        watchdog.cancel();
         process.exit(1);
       }
 
@@ -251,6 +259,7 @@ Examples:
 
       if (!found) {
         console.error(`Error: Workflow '${workflowName}' not found`);
+        watchdog.cancel();
         process.exit(1);
       }
 
@@ -262,7 +271,9 @@ Examples:
 
         if (success) {
           console.log('Success! Workflow exported.');
+          watchdog.cancel();
         } else {
+          watchdog.cancel();
           process.exit(1);
         }
       }
@@ -270,6 +281,7 @@ Examples:
       // Export multiple workflows
       if (!outputDir) {
         console.error('Error: --output-dir is required');
+        watchdog.cancel();
         process.exit(1);
       }
 
@@ -284,11 +296,13 @@ Examples:
       const workflows = await listWorkflows(config, filter);
 
       if (workflows === null) {
+        watchdog.cancel();
         process.exit(1);
       }
 
       if (workflows.length === 0) {
         console.log('No workflows found to export.');
+        watchdog.cancel();
         process.exit(0);
       }
 
@@ -308,8 +322,10 @@ Examples:
       }
 
       console.log(`\nExported ${successCount}/${workflows.length} workflows to: ${outputDirectory}`);
+      watchdog.cancel();
     }
   } catch (error: unknown) {
+    watchdog.cancel();
     const message = error instanceof Error ? error.message : String(error);
     console.error(`Error: ${message}`);
     process.exit(1);
@@ -318,6 +334,7 @@ Examples:
 
 // Run main function
 main().catch((error: unknown) => {
+  watchdog.cancel();
   const message = error instanceof Error ? error.message : String(error);
   console.error(`Fatal error: ${message}`);
   process.exit(1);

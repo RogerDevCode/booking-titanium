@@ -2,35 +2,136 @@
   "name": "GCAL_Delete_Event",
   "nodes": [
     {
-      "parameters": { "inputSource": "passthrough" },
+      "parameters": {
+        "inputSource": "passthrough"
+      },
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
-      "position": [0, 400],
+      "position": [
+        0,
+        400
+      ],
       "id": "trigger"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "id": "manual"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gcal-delete-event",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        600
+      ],
+      "webhookId": "gcal-delete-event",
+      "id": "webhook"
     },
     {
       "parameters": {
         "calendar": "primary",
         "operation": "delete",
-        "eventId": "={{ $json.gcal_event_id }}"
+        "eventId": "={{ $json.gcal_event_id || $json.body?.gcal_event_id }}"
       },
       "name": "Delete GCal Event",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.3,
-      "position": [300, 400],
+      "position": [
+        300,
+        400
+      ],
       "id": "gcal_delete",
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "mT5XZfEaeP1fqjl4",
+          "id": "OsRBfz3Cs7Ph5uV5",
           "name": "Google Calendar account"
         }
       },
-      "continueOnFail": true
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $input.first()?.json || {};\nconst isError = !!result.error;\n\nreturn [{\n  json: {\n    success: !isError,\n    error_code: isError ? 'GCAL_DELETE_ERROR' : null,\n    error_message: isError ? (result.error?.message || 'Failed to delete GCal event') : null,\n    data: isError ? null : { deleted: true },\n    _meta: {\n      source: 'GCAL_Delete_Event',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'GCAL_Delete_Event',\n      version: '1.1.0'\n    }\n  }\n}];"
+      },
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        550,
+        400
+      ],
+      "id": "format_out"
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Delete GCal Event", "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Delete GCal Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Delete GCal Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Delete GCal Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete GCal Event": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1" }
+  "settings": {
+    "executionOrder": "v1"
+  }
 }

@@ -2,11 +2,17 @@
   "name": "DB_Create_Booking",
   "nodes": [
     {
-      "parameters": { "inputSource": "passthrough" },
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"start_time\": \"2026-03-04T10:00:00\", \"provider_id\": 1, \"service_id\": 1, \"user_name\": \"Juan\", \"user_email\": \"juan@example.com\", \"chat_id\": 12345}"
+      },
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
-      "position": [0, 432],
+      "position": [
+        0,
+        432
+      ],
       "id": "trigger"
     },
     {
@@ -18,19 +24,36 @@
       },
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [0, 600],
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        600
+      ],
       "webhookId": "db-create-booking-test",
       "id": "webhook_trigger"
     },
     {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        232
+      ],
+      "id": "manual"
+    },
+    {
       "parameters": {
-        "jsCode": "const input = $input.first().json.body || $input.first().json;\nreturn [{\n  json: {\n    chat_id: parseInt(input.chat_id) || 5391760292,\n    provider_id: parseInt(input.provider_id) || 1,\n    service_id: parseInt(input.service_id) || 1,\n    start_time: input.start_time || \"2026-03-02T10:00:00Z\",\n    user_email: input.user_email || 'baba.orere@gmail.com',\n    user_name: input.user_name || 'Paciente'\n  }\n}];"
+        "jsCode": "const input = $input.first().json.body || $input.first().json;\n\n// VRF — GUARD + VALIDATE\nconst chat_id = parseInt(input.chat_id);\nconst provider_id = parseInt(input.provider_id);\nconst service_id = parseInt(input.service_id);\nconst start_time = input.start_time;\nconst user_email = input.user_email || '';\nconst user_name = input.user_name || 'Paciente';\n\nif (!chat_id || !provider_id || !service_id || !start_time) {\n  throw new Error('Missing required fields: chat_id, provider_id, service_id, start_time');\n}\n\nreturn [{\n  json: {\n    chat_id,\n    provider_id,\n    service_id,\n    start_time,\n    user_email,\n    user_name\n  }\n}];"
       },
       "name": "Build Secure JSON",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [250, 432],
+      "position": [
+        250,
+        432
+      ],
       "id": "build_json"
     },
     {
@@ -41,20 +64,91 @@
         "specifyBody": "json",
         "jsonBody": "={{ $json }}",
         "options": {
-          "neverError": true
+          "neverError": true,
+          "timeout": 5000
         }
       },
       "name": "Call DAL Create",
       "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [500, 432],
+      "typeVersion": 4.4,
+      "position": [
+        500,
+        432
+      ],
       "id": "call_dal_create"
+    },
+    {
+      "parameters": {
+        "jsCode": "const dalResponse = $input.first()?.json || {};\nconst isSuccess = dalResponse.success === true;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    error_code: isSuccess ? null : (dalResponse.error_code || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || dalResponse.message || 'Booking creation failed'),\n    data: isSuccess ? (dalResponse.data || dalResponse) : null,\n    _meta: {\n      source: 'DB_Create_Booking',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Create_Booking',\n      version: '1.1.0'\n    }\n  }\n}];"
+      },
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        432
+      ],
+      "id": "format_out"
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Build Secure JSON", "type": "main", "index": 0 }]] },
-    "Webhook": { "main": [[{ "node": "Build Secure JSON", "type": "main", "index": 0 }]] },
-    "Build Secure JSON": { "main": [[{ "node": "Call DAL Create", "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Secure JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build Secure JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Secure JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Secure JSON": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Create",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Create": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1" }
+  "settings": {
+    "executionOrder": "v1"
+  }
 }

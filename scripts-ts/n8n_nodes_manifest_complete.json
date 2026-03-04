@@ -1,0 +1,3705 @@
+{
+  "n8n-nodes-base.helpScoutTrigger": {
+    "displayName": "helpScoutTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.helpScout": {
+    "displayName": "helpScout",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mailcheck": {
+    "displayName": "mailcheck",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.If": {
+    "displayName": "If",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.pipedrive": {
+    "displayName": "pipedrive",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Activity": {
+    "displayName": "Activity",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.storyblok": {
+    "displayName": "storyblok",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.bitbucketTrigger": {
+    "displayName": "bitbucketTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.openAi": {
+    "displayName": "openAi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.zendeskTrigger": {
+    "displayName": "zendeskTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.zendesk": {
+    "displayName": "zendesk",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.readPDF": {
+    "displayName": "readPDF",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.harvest": {
+    "displayName": "harvest",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.emailReadImap": {
+    "displayName": "emailReadImap",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.bannerbear": {
+    "displayName": "bannerbear",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.crypto": {
+    "displayName": "crypto",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.chargebee": {
+    "displayName": "chargebee",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.chargebeeTrigger": {
+    "displayName": "chargebeeTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.apiTemplateIo": {
+    "displayName": "apiTemplateIo",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.iCal": {
+    "displayName": "iCal",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.writeBinaryFile": {
+    "displayName": "writeBinaryFile",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.customerIo": {
+    "displayName": "customerIo",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.customerIoTrigger": {
+    "displayName": "customerIoTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.cortex": {
+    "displayName": "cortex",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.phantombuster": {
+    "displayName": "phantombuster",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.twake": {
+    "displayName": "twake",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.elasticsearch": {
+    "displayName": "elasticsearch",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.elasticSecurity": {
+    "displayName": "elasticSecurity",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.hackerNews": {
+    "displayName": "hackerNews",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.rssFeedReadTrigger": {
+    "displayName": "rssFeedReadTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.rssFeedRead": {
+    "displayName": "rssFeedRead",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.todoist": {
+    "displayName": "todoist",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Berry Red": {
+    "displayName": "Berry Red",
+    "versions": [
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.plivo": {
+    "displayName": "plivo",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.cloudflare": {
+    "displayName": "cloudflare",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.paddle": {
+    "displayName": "paddle",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.wufooTrigger": {
+    "displayName": "wufooTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.set": {
+    "displayName": "set",
+    "versions": [
+      1,
+      3
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.payPalTrigger": {
+    "displayName": "payPalTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.payPal": {
+    "displayName": "payPal",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.postgresTrigger": {
+    "displayName": "postgresTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.postgres": {
+    "displayName": "postgres",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.keap": {
+    "displayName": "keap",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.keapTrigger": {
+    "displayName": "keapTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mySql": {
+    "displayName": "mySql",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.currents": {
+    "displayName": "currents",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.currentsTrigger": {
+    "displayName": "currentsTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.rundeck": {
+    "displayName": "rundeck",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.stackby": {
+    "displayName": "stackby",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.crateDb": {
+    "displayName": "crateDb",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.signl4": {
+    "displayName": "signl4",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.perplexity": {
+    "displayName": "perplexity",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.workflowTrigger": {
+    "displayName": "workflowTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.renameKeys": {
+    "displayName": "renameKeys",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.theHiveTrigger": {
+    "displayName": "theHiveTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.theHive": {
+    "displayName": "theHive",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.humanticAi": {
+    "displayName": "humanticAi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.contentful": {
+    "displayName": "contentful",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.dhl": {
+    "displayName": "dhl",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.onfleetTrigger": {
+    "displayName": "onfleetTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.onfleet": {
+    "displayName": "onfleet",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.airtableTrigger": {
+    "displayName": "airtableTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.airtable": {
+    "displayName": "airtable",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.quickbase": {
+    "displayName": "quickbase",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.summarize": {
+    "displayName": "summarize",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.sort": {
+    "displayName": "sort",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.splitOut": {
+    "displayName": "splitOut",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.aggregate": {
+    "displayName": "aggregate",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.limit": {
+    "displayName": "limit",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.removeDuplicates": {
+    "displayName": "removeDuplicates",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.stripe": {
+    "displayName": "stripe",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.stripeTrigger": {
+    "displayName": "stripeTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.graphql": {
+    "displayName": "graphql",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mindee": {
+    "displayName": "mindee",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.affinity": {
+    "displayName": "affinity",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.affinityTrigger": {
+    "displayName": "affinityTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.clickUpTrigger": {
+    "displayName": "clickUpTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.clickUp": {
+    "displayName": "clickUp",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.jenkins": {
+    "displayName": "jenkins",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.agileCrm": {
+    "displayName": "agileCrm",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.lingvaNex": {
+    "displayName": "lingvaNex",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.vonage": {
+    "displayName": "vonage",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.coda": {
+    "displayName": "coda",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.salesforce": {
+    "displayName": "salesforce",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.salesforceTrigger": {
+    "displayName": "salesforceTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.postHog": {
+    "displayName": "postHog",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.marketstack": {
+    "displayName": "marketstack",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.strava": {
+    "displayName": "strava",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.stravaTrigger": {
+    "displayName": "stravaTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mongoDb": {
+    "displayName": "mongoDb",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.disqus": {
+    "displayName": "disqus",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.htmlExtract": {
+    "displayName": "htmlExtract",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.localFileTrigger": {
+    "displayName": "localFileTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.getResponse": {
+    "displayName": "getResponse",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.getResponseTrigger": {
+    "displayName": "getResponseTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.webhook": {
+    "displayName": "webhook",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.messageBird": {
+    "displayName": "messageBird",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.splunk": {
+    "displayName": "splunk",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mailjet": {
+    "displayName": "mailjet",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mailjetTrigger": {
+    "displayName": "mailjetTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.githubTrigger": {
+    "displayName": "githubTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.github": {
+    "displayName": "github",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Jay Gatsby": {
+    "displayName": "Jay Gatsby",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.homeAssistant": {
+    "displayName": "homeAssistant",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.twilioTrigger": {
+    "displayName": "twilioTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.twilio": {
+    "displayName": "twilio",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.uproc": {
+    "displayName": "uproc",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.gumroadTrigger": {
+    "displayName": "gumroadTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.jinaAi": {
+    "displayName": "jinaAi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.sseTrigger": {
+    "displayName": "sseTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.matrix": {
+    "displayName": "matrix",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.freshworksCrm": {
+    "displayName": "freshworksCrm",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.pushcutTrigger": {
+    "displayName": "pushcutTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.pushcut": {
+    "displayName": "pushcut",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.jwt": {
+    "displayName": "jwt",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.beeminder": {
+    "displayName": "beeminder",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.spotify": {
+    "displayName": "spotify",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.reddit": {
+    "displayName": "reddit",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.zulip": {
+    "displayName": "zulip",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.webflowTrigger": {
+    "displayName": "webflowTrigger",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Webflow": {
+    "displayName": "Webflow",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.quickChart": {
+    "displayName": "quickChart",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.urlScanIo": {
+    "displayName": "urlScanIo",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.travisCi": {
+    "displayName": "travisCi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.rocketchat": {
+    "displayName": "rocketchat",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.extractionValues": {
+    "displayName": "extractionValues",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.extractFromFile": {
+    "displayName": "extractFromFile",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.readWriteFile": {
+    "displayName": "readWriteFile",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.convertToFile": {
+    "displayName": "convertToFile",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.e2eTest": {
+    "displayName": "e2eTest",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.readBinaryFiles": {
+    "displayName": "readBinaryFiles",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Filter": {
+    "displayName": "Filter",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.orbit": {
+    "displayName": "orbit",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.deepL": {
+    "displayName": "deepL",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.splitInBatches": {
+    "displayName": "splitInBatches",
+    "versions": [
+      1,
+      2,
+      3
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.sendInBlue": {
+    "displayName": "sendInBlue",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.sendInBlueApi": {
+    "displayName": "sendInBlueApi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.grist": {
+    "displayName": "grist",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mailerLite": {
+    "displayName": "mailerLite",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mailerLiteTrigger": {
+    "displayName": "mailerLiteTrigger",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.git": {
+    "displayName": "git",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.togglTrigger": {
+    "displayName": "togglTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.respondWith": {
+    "displayName": "respondWith",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.convertKit": {
+    "displayName": "convertKit",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.convertKitTrigger": {
+    "displayName": "convertKitTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Item Lists": {
+    "displayName": "Item Lists",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Switch": {
+    "displayName": "Switch",
+    "versions": [
+      1,
+      2,
+      3
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.kafka": {
+    "displayName": "kafka",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.kafkaTrigger": {
+    "displayName": "kafkaTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.pagerDuty": {
+    "displayName": "pagerDuty",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.nasa": {
+    "displayName": "nasa",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.philipsHue": {
+    "displayName": "philipsHue",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.formstackTrigger": {
+    "displayName": "formstackTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.wiseTrigger": {
+    "displayName": "wiseTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.wise": {
+    "displayName": "wise",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.dropcontact": {
+    "displayName": "dropcontact",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.timescaleDb": {
+    "displayName": "timescaleDb",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.sentryIo": {
+    "displayName": "sentryIo",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.shopifyTrigger": {
+    "displayName": "shopifyTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.shopify": {
+    "displayName": "shopify",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.demio": {
+    "displayName": "demio",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.openThesaurus": {
+    "displayName": "openThesaurus",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.haloPSA": {
+    "displayName": "haloPSA",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.oura": {
+    "displayName": "oura",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.pushbullet": {
+    "displayName": "pushbullet",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.workableTrigger": {
+    "displayName": "workableTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.executeWorkflow": {
+    "displayName": "executeWorkflow",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.executeWorkflowTrigger": {
+    "displayName": "executeWorkflowTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.freshdesk": {
+    "displayName": "freshdesk",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.theHiveProjectTrigger": {
+    "displayName": "theHiveProjectTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.interval": {
+    "displayName": "interval",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.wekan": {
+    "displayName": "wekan",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.ciscoWebexTrigger": {
+    "displayName": "ciscoWebexTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.ciscoWebex": {
+    "displayName": "ciscoWebex",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.hunter": {
+    "displayName": "hunter",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Comment": {
+    "displayName": "Comment",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.gitlab": {
+    "displayName": "gitlab",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.profitWell": {
+    "displayName": "profitWell",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.s3": {
+    "displayName": "s3",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.misp": {
+    "displayName": "misp",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.trelloTrigger": {
+    "displayName": "trelloTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.trello": {
+    "displayName": "trello",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.autopilot": {
+    "displayName": "autopilot",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.autopilotTrigger": {
+    "displayName": "autopilotTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.sms77": {
+    "displayName": "sms77",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.compression": {
+    "displayName": "compression",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.postBin": {
+    "displayName": "postBin",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.cockpit": {
+    "displayName": "cockpit",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.invoiceNinja": {
+    "displayName": "invoiceNinja",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.invoiceNinjaTrigger": {
+    "displayName": "invoiceNinjaTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mandrill": {
+    "displayName": "mandrill",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.filemaker": {
+    "displayName": "filemaker",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.timeout": {
+    "displayName": "timeout",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.actionNetwork": {
+    "displayName": "actionNetwork",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.functionItem": {
+    "displayName": "functionItem",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.clockify": {
+    "displayName": "clockify",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.clockifyTrigger": {
+    "displayName": "clockifyTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.jotFormTrigger": {
+    "displayName": "jotFormTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.egoi": {
+    "displayName": "egoi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.okta": {
+    "displayName": "okta",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.n8nTrigger": {
+    "displayName": "n8nTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mistralAi": {
+    "displayName": "mistralAi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.stopAndError": {
+    "displayName": "stopAndError",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.wooCommerce": {
+    "displayName": "wooCommerce",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.wooCommerceTrigger": {
+    "displayName": "wooCommerceTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.copperTrigger": {
+    "displayName": "copperTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.copper": {
+    "displayName": "copper",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.bitly": {
+    "displayName": "bitly",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.simulate": {
+    "displayName": "simulate",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.simulateTrigger": {
+    "displayName": "simulateTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.adalo": {
+    "displayName": "adalo",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.calTrigger": {
+    "displayName": "calTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.netlifyTrigger": {
+    "displayName": "netlifyTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.netlify": {
+    "displayName": "netlify",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.oneSimpleApi": {
+    "displayName": "oneSimpleApi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.calendlyTrigger": {
+    "displayName": "calendlyTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.readBinaryFile": {
+    "displayName": "readBinaryFile",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.notionTrigger": {
+    "displayName": "notionTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.intercom": {
+    "displayName": "intercom",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.odoo": {
+    "displayName": "odoo",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.bitwarden": {
+    "displayName": "bitwarden",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.linkedIn": {
+    "displayName": "linkedIn",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.questDb": {
+    "displayName": "questDb",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.quickbooks": {
+    "displayName": "quickbooks",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.raindrop": {
+    "displayName": "raindrop",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.yourls": {
+    "displayName": "yourls",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.twist": {
+    "displayName": "twist",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.azureStorage": {
+    "displayName": "azureStorage",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.microsoftEntra": {
+    "displayName": "microsoftEntra",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.microsoftDynamicsCrm": {
+    "displayName": "microsoftDynamicsCrm",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.microsoftToDo": {
+    "displayName": "microsoftToDo",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.microsoftGraphSecurity": {
+    "displayName": "microsoftGraphSecurity",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.microsoftOutlookTrigger": {
+    "displayName": "microsoftOutlookTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.microsoftOutlook": {
+    "displayName": "microsoftOutlook",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.microsoftSharePoint": {
+    "displayName": "microsoftSharePoint",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.microsoftTeamsTrigger": {
+    "displayName": "microsoftTeamsTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.microsoftTeams": {
+    "displayName": "microsoftTeams",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.microsoftSql": {
+    "displayName": "microsoftSql",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.microsoftExcel": {
+    "displayName": "microsoftExcel",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.azureCosmosDb": {
+    "displayName": "azureCosmosDb",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.microsoftOneDriveTrigger": {
+    "displayName": "microsoftOneDriveTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.microsoftOneDrive": {
+    "displayName": "microsoftOneDrive",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.erpNext": {
+    "displayName": "erpNext",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.supabase": {
+    "displayName": "supabase",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.securityScorecard": {
+    "displayName": "securityScorecard",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.linearTrigger": {
+    "displayName": "linearTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.linear": {
+    "displayName": "linear",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.sendy": {
+    "displayName": "sendy",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.redisTrigger": {
+    "displayName": "redisTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.redis": {
+    "displayName": "redis",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.manualTrigger": {
+    "displayName": "manualTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.asanaTrigger": {
+    "displayName": "asanaTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.asana": {
+    "displayName": "asana",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.magento2": {
+    "displayName": "magento2",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.telegram": {
+    "displayName": "telegram",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.telegramTrigger": {
+    "displayName": "telegramTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.gong": {
+    "displayName": "gong",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.iterable": {
+    "displayName": "iterable",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.formIoTrigger": {
+    "displayName": "formIoTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.npm": {
+    "displayName": "npm",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.metabase": {
+    "displayName": "metabase",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.facebookTrigger": {
+    "displayName": "facebookTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.facebookGraphApi": {
+    "displayName": "facebookGraphApi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.acuitySchedulingTrigger": {
+    "displayName": "acuitySchedulingTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.koBoToolbox": {
+    "displayName": "koBoToolbox",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.koBoToolboxTrigger": {
+    "displayName": "koBoToolboxTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.medium": {
+    "displayName": "medium",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.debugHelper": {
+    "displayName": "debugHelper",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsSnsTrigger": {
+    "displayName": "awsSnsTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsDynamoDb": {
+    "displayName": "awsDynamoDb",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsCertificateManager": {
+    "displayName": "awsCertificateManager",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsTranscribe": {
+    "displayName": "awsTranscribe",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsSns": {
+    "displayName": "awsSns",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsS3": {
+    "displayName": "awsS3",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsComprehend": {
+    "displayName": "awsComprehend",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsRekognition": {
+    "displayName": "awsRekognition",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsSes": {
+    "displayName": "awsSes",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsSqs": {
+    "displayName": "awsSqs",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsIam": {
+    "displayName": "awsIam",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsLambda": {
+    "displayName": "awsLambda",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsTextract": {
+    "displayName": "awsTextract",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsElb": {
+    "displayName": "awsElb",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.awsCognito": {
+    "displayName": "awsCognito",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.aiTransform": {
+    "displayName": "aiTransform",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.moveBinaryData": {
+    "displayName": "moveBinaryData",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.HubSpot": {
+    "displayName": "HubSpot",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.hubspotTrigger": {
+    "displayName": "hubspotTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.monicaCrm": {
+    "displayName": "monicaCrm",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mailchimp": {
+    "displayName": "mailchimp",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mailchimpTrigger": {
+    "displayName": "mailchimpTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Brandfetch": {
+    "displayName": "Brandfetch",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.freshservice": {
+    "displayName": "freshservice",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.amount": {
+    "displayName": "amount",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.peekalink": {
+    "displayName": "peekalink",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.postmarkTrigger": {
+    "displayName": "postmarkTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.uplead": {
+    "displayName": "uplead",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.tapfiliate": {
+    "displayName": "tapfiliate",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.HTTP Request": {
+    "displayName": "HTTP Request",
+    "versions": [
+      1,
+      2,
+      3
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.figmaTrigger": {
+    "displayName": "figmaTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mocean": {
+    "displayName": "mocean",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.slackTrigger": {
+    "displayName": "slackTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Slack": {
+    "displayName": "Slack",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.discourse": {
+    "displayName": "discourse",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.clearbit": {
+    "displayName": "clearbit",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.openWeatherMap": {
+    "displayName": "openWeatherMap",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.zammad": {
+    "displayName": "zammad",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.whatsAppTrigger": {
+    "displayName": "whatsAppTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.whatsApp": {
+    "displayName": "whatsApp",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.eventbriteTrigger": {
+    "displayName": "eventbriteTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Twitter": {
+    "displayName": "Twitter",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.X": {
+    "displayName": "X",
+    "versions": [
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Spreadsheet File": {
+    "displayName": "Spreadsheet File",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.baserow": {
+    "displayName": "baserow",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.unleashedSoftware": {
+    "displayName": "unleashedSoftware",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.emailSend": {
+    "displayName": "emailSend",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.strapi": {
+    "displayName": "strapi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.dataTable": {
+    "displayName": "dataTable",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.loneScale": {
+    "displayName": "loneScale",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.loneScaleTrigger": {
+    "displayName": "loneScaleTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.emeliaTrigger": {
+    "displayName": "emeliaTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.emelia": {
+    "displayName": "emelia",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.noOp": {
+    "displayName": "noOp",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.nextCloud": {
+    "displayName": "nextCloud",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.cron": {
+    "displayName": "cron",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.executeCommand": {
+    "displayName": "executeCommand",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.function": {
+    "displayName": "function",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.xero": {
+    "displayName": "xero",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.flowTrigger": {
+    "displayName": "flowTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.flow": {
+    "displayName": "flow",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.surveyMonkeyTrigger": {
+    "displayName": "surveyMonkeyTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mondayCom": {
+    "displayName": "mondayCom",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.sendGrid": {
+    "displayName": "sendGrid",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.dropbox": {
+    "displayName": "dropbox",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.pushover": {
+    "displayName": "pushover",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.executionData": {
+    "displayName": "executionData",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.limitWaitTime": {
+    "displayName": "limitWaitTime",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.formTrigger": {
+    "displayName": "formTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.useWorkflowTimezone": {
+    "displayName": "useWorkflowTimezone",
+    "versions": [
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.ghost": {
+    "displayName": "ghost",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.errorTrigger": {
+    "displayName": "errorTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.n8n": {
+    "displayName": "n8n",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.ldap": {
+    "displayName": "ldap",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.snowflake": {
+    "displayName": "snowflake",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.citrixAdc": {
+    "displayName": "citrixAdc",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.typeformTrigger": {
+    "displayName": "typeformTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.line": {
+    "displayName": "line",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.gotify": {
+    "displayName": "gotify",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.serviceNow": {
+    "displayName": "serviceNow",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.code": {
+    "displayName": "code",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.drift": {
+    "displayName": "drift",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.salesmate": {
+    "displayName": "salesmate",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.discord": {
+    "displayName": "discord",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.n8nTrainingCustomerMessenger": {
+    "displayName": "n8nTrainingCustomerMessenger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.zoom": {
+    "displayName": "zoom",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.venafiTlsProtectDatacenterTrigger": {
+    "displayName": "venafiTlsProtectDatacenterTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.venafiTlsProtectDatacenter": {
+    "displayName": "venafiTlsProtectDatacenter",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.venafiTlsProtectCloudTrigger": {
+    "displayName": "venafiTlsProtectCloudTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.venafiTlsProtectCloud": {
+    "displayName": "venafiTlsProtectCloud",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mqtt": {
+    "displayName": "mqtt",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mqttTrigger": {
+    "displayName": "mqttTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.coinGecko": {
+    "displayName": "coinGecko",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.rabbitmq": {
+    "displayName": "rabbitmq",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.rabbitmqTrigger": {
+    "displayName": "rabbitmqTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.segment": {
+    "displayName": "segment",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.grafana": {
+    "displayName": "grafana",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.facebookLeadAdsTrigger": {
+    "displayName": "facebookLeadAdsTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.SeaTable Trigger": {
+    "displayName": "SeaTable Trigger",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.seaTable": {
+    "displayName": "seaTable",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleCloudStorage": {
+    "displayName": "googleCloudStorage",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleCloudNaturalLanguage": {
+    "displayName": "googleCloudNaturalLanguage",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleTranslate": {
+    "displayName": "googleTranslate",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.gSuiteAdmin": {
+    "displayName": "gSuiteAdmin",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googlePerspective": {
+    "displayName": "googlePerspective",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleFirebaseCloudFirestore": {
+    "displayName": "googleFirebaseCloudFirestore",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleFirebaseRealtimeDatabase": {
+    "displayName": "googleFirebaseRealtimeDatabase",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleBigQuery": {
+    "displayName": "googleBigQuery",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleCalendar": {
+    "displayName": "googleCalendar",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleCalendarTrigger": {
+    "displayName": "googleCalendarTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleBooks": {
+    "displayName": "googleBooks",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleAds": {
+    "displayName": "googleAds",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.youTube": {
+    "displayName": "youTube",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleBusinessProfileTrigger": {
+    "displayName": "googleBusinessProfileTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleBusinessProfile": {
+    "displayName": "googleBusinessProfile",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleDocs": {
+    "displayName": "googleDocs",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleSlides": {
+    "displayName": "googleSlides",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.documentId": {
+    "displayName": "documentId",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleContacts": {
+    "displayName": "googleContacts",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleDrive": {
+    "displayName": "googleDrive",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleDriveTrigger": {
+    "displayName": "googleDriveTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleChat": {
+    "displayName": "googleChat",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleAnalytics": {
+    "displayName": "googleAnalytics",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.googleTasks": {
+    "displayName": "googleTasks",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.gmail": {
+    "displayName": "gmail",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.gmailTrigger": {
+    "displayName": "gmailTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.stickyNote": {
+    "displayName": "stickyNote",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.zohoCrm": {
+    "displayName": "zohoCrm",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mauticTrigger": {
+    "displayName": "mauticTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mautic": {
+    "displayName": "mautic",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.nocoDb": {
+    "displayName": "nocoDb",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.mailgun": {
+    "displayName": "mailgun",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.dateTime": {
+    "displayName": "dateTime",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Date & Time": {
+    "displayName": "Date & Time",
+    "versions": [
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.wordpress": {
+    "displayName": "wordpress",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.uptimeRobot": {
+    "displayName": "uptimeRobot",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.ssh": {
+    "displayName": "ssh",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.goToWebinar": {
+    "displayName": "goToWebinar",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.amqpTrigger": {
+    "displayName": "amqpTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.amqp": {
+    "displayName": "amqp",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.jiraTrigger": {
+    "displayName": "jiraTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.jira": {
+    "displayName": "jira",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.xml": {
+    "displayName": "xml",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.compareDatasets": {
+    "displayName": "compareDatasets",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.scheduleTrigger": {
+    "displayName": "scheduleTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.totp": {
+    "displayName": "totp",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.boxTrigger": {
+    "displayName": "boxTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.box": {
+    "displayName": "box",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.timeSaved": {
+    "displayName": "timeSaved",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Blur": {
+    "displayName": "Blur",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.vero": {
+    "displayName": "vero",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.bubble": {
+    "displayName": "bubble",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.resource": {
+    "displayName": "resource",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.msg91": {
+    "displayName": "msg91",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.circleCi": {
+    "displayName": "circleCi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.airtop": {
+    "displayName": "airtop",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.activeCampaignTrigger": {
+    "displayName": "activeCampaignTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.activeCampaign": {
+    "displayName": "activeCampaign",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.markdown": {
+    "displayName": "markdown",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.taiga": {
+    "displayName": "taiga",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.taigaTrigger": {
+    "displayName": "taigaTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.Merge": {
+    "displayName": "Merge",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.lemlistTrigger": {
+    "displayName": "lemlistTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "n8n-nodes-base.lemlist": {
+    "displayName": "lemlist",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.modelSelector": {
+    "displayName": "modelSelector",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.OpenAI": {
+    "displayName": "OpenAI",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.microsoftAgent365Trigger": {
+    "displayName": "microsoftAgent365Trigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.retrieverMultiQuery": {
+    "displayName": "retrieverMultiQuery",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.retrieverContextualCompression": {
+    "displayName": "retrieverContextualCompression",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.retrieverWorkflow": {
+    "displayName": "retrieverWorkflow",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.retrieverVectorStore": {
+    "displayName": "retrieverVectorStore",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter": {
+    "displayName": "textSplitterCharacterTextSplitter",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.textSplitterTokenSplitter": {
+    "displayName": "textSplitterTokenSplitter",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter": {
+    "displayName": "textSplitterRecursiveCharacterTextSplitter",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.code": {
+    "displayName": "code",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.toolExecutor": {
+    "displayName": "toolExecutor",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.outputParserStructured": {
+    "displayName": "outputParserStructured",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.outputParserItemList": {
+    "displayName": "outputParserItemList",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.outputParserAutofixing": {
+    "displayName": "outputParserAutofixing",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmOpenAi": {
+    "displayName": "lmOpenAi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.model": {
+    "displayName": "model",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmOllama": {
+    "displayName": "lmOllama",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi": {
+    "displayName": "lmChatAzureOpenAi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmChatOllama": {
+    "displayName": "lmChatOllama",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.notice": {
+    "displayName": "notice",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmChatCohere": {
+    "displayName": "lmChatCohere",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmChatOpenRouter": {
+    "displayName": "lmChatOpenRouter",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmChatGoogleGemini": {
+    "displayName": "lmChatGoogleGemini",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmCohere": {
+    "displayName": "lmCohere",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmChatGroq": {
+    "displayName": "lmChatGroq",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmChatGoogleVertex": {
+    "displayName": "lmChatGoogleVertex",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmChatMistralCloud": {
+    "displayName": "lmChatMistralCloud",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmChatVercelAiGateway": {
+    "displayName": "lmChatVercelAiGateway",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmLemonade": {
+    "displayName": "lmLemonade",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmChatDeepSeek": {
+    "displayName": "lmChatDeepSeek",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmChatAwsBedrock": {
+    "displayName": "lmChatAwsBedrock",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmOpenHuggingFaceInference": {
+    "displayName": "lmOpenHuggingFaceInference",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmChatXAiGrok": {
+    "displayName": "lmChatXAiGrok",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.lmChatLemonade": {
+    "displayName": "lmChatLemonade",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.rerankerCohere": {
+    "displayName": "rerankerCohere",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.embeddingsHuggingFaceInference": {
+    "displayName": "embeddingsHuggingFaceInference",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.embeddingsLemonade": {
+    "displayName": "embeddingsLemonade",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.embeddingsMistralCloud": {
+    "displayName": "embeddingsMistralCloud",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.embeddingsAwsBedrock": {
+    "displayName": "embeddingsAwsBedrock",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.embeddingsGoogleVertex": {
+    "displayName": "embeddingsGoogleVertex",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.embeddingsOllama": {
+    "displayName": "embeddingsOllama",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini": {
+    "displayName": "embeddingsGoogleGemini",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.embeddingsCohere": {
+    "displayName": "embeddingsCohere",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.embeddingsAzureOpenAi": {
+    "displayName": "embeddingsAzureOpenAi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.memoryMotorhead": {
+    "displayName": "memoryMotorhead",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.memoryBufferWindow": {
+    "displayName": "memoryBufferWindow",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.memoryMongoDbChat": {
+    "displayName": "memoryMongoDbChat",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.memoryChatRetriever": {
+    "displayName": "memoryChatRetriever",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.memoryManager": {
+    "displayName": "memoryManager",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.memoryZep": {
+    "displayName": "memoryZep",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.memoryRedisChat": {
+    "displayName": "memoryRedisChat",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.memoryPostgresChat": {
+    "displayName": "memoryPostgresChat",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.memoryXata": {
+    "displayName": "memoryXata",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.chat": {
+    "displayName": "chat",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.allowFileUploads": {
+    "displayName": "allowFileUploads",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.manualChatTrigger": {
+    "displayName": "manualChatTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.chainLlm": {
+    "displayName": "chainLlm",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.Summarization Chain": {
+    "displayName": "Summarization Chain",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.chainRetrievalQa": {
+    "displayName": "chainRetrievalQa",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.textClassifier": {
+    "displayName": "textClassifier",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.informationExtractor": {
+    "displayName": "informationExtractor",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.sentimentAnalysis": {
+    "displayName": "sentimentAnalysis",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.openAiAssistant": {
+    "displayName": "openAiAssistant",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.agent": {
+    "displayName": "agent",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.AI Agent": {
+    "displayName": "AI Agent",
+    "versions": [
+      2,
+      3
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.AI Agent Tool": {
+    "displayName": "AI Agent Tool",
+    "versions": [
+      2.2,
+      3
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.toolCode": {
+    "displayName": "toolCode",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.toolSerpApi": {
+    "displayName": "toolSerpApi",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.toolWikipedia": {
+    "displayName": "toolWikipedia",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.toolCalculator": {
+    "displayName": "toolCalculator",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.toolVectorStore": {
+    "displayName": "toolVectorStore",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.toolThink": {
+    "displayName": "toolThink",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.toolHttpRequest": {
+    "displayName": "toolHttpRequest",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.toolWolframAlpha": {
+    "displayName": "toolWolframAlpha",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.toolSearXng": {
+    "displayName": "toolSearXng",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.Guardrails": {
+    "displayName": "Guardrails",
+    "versions": [
+      1,
+      2
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.mcpClientTool": {
+    "displayName": "mcpClientTool",
+    "versions": [],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.mcpTrigger": {
+    "displayName": "mcpTrigger",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.mcpClient": {
+    "displayName": "mcpClient",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.documentDefaultDataLoader": {
+    "displayName": "documentDefaultDataLoader",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.documentGithubLoader": {
+    "displayName": "documentGithubLoader",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.documentJsonInputLoader": {
+    "displayName": "documentJsonInputLoader",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.documentBinaryInputLoader": {
+    "displayName": "documentBinaryInputLoader",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.vectorStoreInMemoryLoad": {
+    "displayName": "vectorStoreInMemoryLoad",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.vectorStoreSupabaseInsert": {
+    "displayName": "vectorStoreSupabaseInsert",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.vectorStoreZepInsert": {
+    "displayName": "vectorStoreZepInsert",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.vectorStorePineconeInsert": {
+    "displayName": "vectorStorePineconeInsert",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.vectorStoreZepLoad": {
+    "displayName": "vectorStoreZepLoad",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.vectorStoreInMemoryInsert": {
+    "displayName": "vectorStoreInMemoryInsert",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.list": {
+    "displayName": "list",
+    "versions": [],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.vectorStorePineconeLoad": {
+    "displayName": "vectorStorePineconeLoad",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  },
+  "@n8n/n8n-nodes-langchain.vectorStoreSupabaseLoad": {
+    "displayName": "vectorStoreSupabaseLoad",
+    "versions": [
+      1
+    ],
+    "defaultVersion": null
+  }
+}

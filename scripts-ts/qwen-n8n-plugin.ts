@@ -5,7 +5,12 @@
  * @migration-source scripts-py/qwen_n8n_plugin.py
  */
 
-import { N8NCrudAgent } from './n8n-crud-agent';
+import { N8NCrudAgent } from './n8n_crud_agent';
+import { Watchdog, WATCHDOG_TIMEOUT } from './watchdog';
+
+// Start watchdog timer
+const watchdog = new Watchdog(WATCHDOG_TIMEOUT);
+watchdog.start();
 
 /**
  * Action result interface
@@ -302,11 +307,18 @@ async function main() {
   // Activate a workflow (example)
   // const result = await qwenN8nPlugin('activate_workflow', { workflow_id: 'some_id' });
   // console.log(`Activate workflow: ${result}`);
+
+  // Cancel watchdog on success
+  watchdog.cancel();
 }
 
 // Run main function if executed directly
 if (require.main === module) {
-  main();
+  main().catch((error) => {
+    watchdog.cancel();
+    console.error('Error:', error);
+    process.exit(1);
+  });
 }
 
 export { N8NPlugin, qwenN8nPlugin };

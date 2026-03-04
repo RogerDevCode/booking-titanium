@@ -3,130 +3,559 @@
   "nodes": [
     {
       "parameters": {
-        "jsCode": "/* STRICT VALIDATION */\nconst item = $input.first()?.json || {};\nconst data = item.data || item.body?.data || item.body || item;\n\nconst chat_id = data.chat_id;\nconst text = data.text || data.ai_response;\n\nconst isValid = !!(chat_id && text && text.length > 2);\n\nif (!isValid) {\n  return [{\n    json: {\n      success: false,\n      isValid: false,\n      error_code: \"VALIDATION_ERROR\",\n      error_message: \"Payload missing required fields for AI Agent\",\n      _meta: { source: \"NN_03_AI_Agent\", timestamp: new Date().toISOString() }\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    isValid: true,\n    chat_id,\n    text,\n    availability: item.availability || {},\n    original_data: data\n  }\n}];"
+        "httpMethod": "POST",
+        "path": "nn-03-ai-agent",
+        "responseMode": "lastNode",
+        "options": {}
       },
-      "id": "extract_validate",
+      "id": "2803887f-e145-4e3c-8023-83ce9459c976",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1104,
+        928
+      ],
+      "webhookId": "nn-03-ai-agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "/* STRICT VALIDATION V10 */\nconst item = $input.first()?.json || {};\nconst body = item.body || {};\nconst data = item.chat_id ? item : (body.chat_id ? body : item);\n\nconst chat_id = data.chat_id;\nconst text = data.text || data.ai_response || \"\";\n\nconst isValid = !!(chat_id && text && String(text).trim().length > 2);\n\nreturn [{ json: { isValid, chat_id, sessionId: String(chat_id || ''), text, _meta: { source: \"NN_03_AI_Agent\", timestamp: new Date().toISOString(), workflow_id: \"NN_03\", version: \"2.0.0\" } } }];"
+      },
+      "id": "a246c59e-4feb-40d3-a714-a882b7d437dd",
       "name": "Extract & Validate (PRE)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        450,
-        420
+        -512,
+        928
       ]
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first().json;\nconst avail = input.availability || {};\nconst systemPrompt = `Eres un asistente para Booking Titanium. REGLA DE ORO: Si el usuario pide una fecha y en el CONTEXTO DE DISPONIBILIDAD sale que no hay o hay otros días, sugiere proactivamente los slots disponibles que te pasamos. CONTEXTO DISPONIBILIDAD: ${JSON.stringify(avail)}`;\n\nreturn [{\n  json: {\n    payload: {\n      model: \"llama-3.3-70b-versatile\",\n      messages: [\n        { role: \"system\", content: systemPrompt },\n        { role: \"user\", content: input.text }\n      ]\n    }\n  }\n}];"
-      },
-      "id": "prepare_payload",
-      "name": "Prepare Groq Payload",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        650,
-        420
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.groq.com/openai/v1/chat/completions",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $json.payload }}",
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid_check",
+              "leftValue": "={{ $json.isValid === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": false,
         "options": {}
       },
-      "id": "groq_http_node",
-      "name": "Groq API (Real)",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "id": "33323cc6-cb67-4f4f-af6b-b937a159e64c",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
       "position": [
-        850,
-        420
-      ],
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "2Q3kWX8PH6YGd7Ll",
-          "name": "Groq Header API"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "const res = $input.first()?.json || {};\nlet ai_data = {};\ntry { \n  const content = res.choices ? res.choices[0].message.content : (res.response || JSON.stringify(res));\n  try {\n    ai_data = JSON.parse(content); \n  } catch(e) {\n    ai_data = { response: content };\n  }\n} catch(e) { \n  ai_data = { response: \"Lo siento, hubo un error procesando tu solicitud de IA.\" }; \n}\n\nconst pre = $node[\"Extract & Validate (PRE)\"]?.json || {};\nreturn [{\n  json: {\n    success: true,\n    data: {\n      intent: ai_data.intent || \"CREATE\",\n      chat_id: pre.chat_id || \"unknown\",\n      user_email: ai_data.email,\n      booking_id: ai_data.booking_id,\n      start_time: (ai_data.date && ai_data.time) ? (ai_data.date + \"T\" + ai_data.time + \":00Z\") : null,\n      ai_response: ai_data.response || ai_data.content || \"IA procesó la solicitud.\"\n    }\n  }\n}];"
-      },
-      "id": "format_success_real",
-      "name": "Format Success (POST)",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1100,
-        420
+        -320,
+        928
       ]
     },
     {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: \"AI_API_ERROR\",\n    error_message: \"Error al contactar con el motor de IA\",\n    data: null,\n    _meta: {\n      source: \"NN_03_AI_Agent\",\n      timestamp: new Date().toISOString(),\n      workflow_id: \"NN_03\"\n    }\n  }\n}];"
+        "jsCode": "return [{ json: { success: false, error_code: \"VALIDATION_ERROR\", error_message: \"Payload inválido para AI Agent\", data: null, _meta: { source: \"NN_03_AI_Agent\", timestamp: new Date().toISOString() } } }];"
       },
-      "id": "format_error_real",
-      "name": "Format Global Error",
+      "id": "0089046f-0c44-4fc4-8943-b5733074a038",
+      "name": "Format Error",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1100,
-        600
+        -128,
+        1200
       ]
-    },
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "nn-03-ai-agent-test",
-        "responseMode": "lastNode"
-      },
-      "name": "Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [
-        -200,
-        400
-      ],
-      "webhookId": "nn-03-ai-agent-test"
     },
     {
       "parameters": {},
+      "id": "faf74f3c-acf2-41c7-b38b-9e1763d1d39d",
       "name": "Manual Trigger",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -200,
-        200
+        -832,
+        800
       ]
     },
     {
       "parameters": {
         "inputSource": "passthrough"
       },
+      "id": "b373190e-8ff8-430c-a324-c7fd2debd029",
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
       "position": [
-        -200,
-        600
+        -832,
+        1040
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "Eres asistente de Booking Titanium. Ayudas a agendar, consultar y cancelar turnos usando las herramientas disponibles.\n\nReglas:\n1. Usa SIEMPRE las herramientas para datos reales.\n2. Responde en español, claro y amigable.\n3. Para crear: fecha/hora, nombre, email.\n4. Para cancelar: UUID de reserva.\n5. Si necesitas consultar múltiples fechas/servicios, ejecuta las herramientas en paralelo simultáneamente."
+        }
+      },
+      "id": "b4849a10-fe91-450c-a807-bb01ff78cbcb",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -112,
+        816
+      ]
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "temperature": 0.5
+        }
+      },
+      "id": "056f6151-cd7a-4179-8de1-347ec9d22538",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        1024
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "sM9kD1sqj5uemTMd",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.sessionId }}"
+      },
+      "id": "cb72cd92-49dd-4231-9e04-9ce9a3ab8879",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -80,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "name": "check_availability",
+        "description": "Consulta la disponibilidad de turnos para una fecha y proveedor. Parámetros: provider_id (número, default 1), service_id (número, default 1), date (formato YYYY-MM-DD).",
+        "workflowId": {
+          "__rl": true,
+          "value": "zdUslfT9C0sTI83H",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "provider_id": "={{ $fromAI('provider_id', 'ID del proveedor, default 1', 'number') }}",
+            "service_id": "={{ $fromAI('service_id', 'ID del servicio, default 1', 'number') }}",
+            "date": "={{ $fromAI('date', 'Fecha en formato YYYY-MM-DD', 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "provider_id",
+              "displayName": "provider_id",
+              "type": "number",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": false
+            },
+            {
+              "id": "service_id",
+              "displayName": "service_id",
+              "type": "number",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "type": "string",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": false
+            }
+          ]
+        }
+      },
+      "id": "tool_get_availability",
+      "name": "Tool: Check Availability",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        80,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "name": "find_next_available",
+        "description": "Busca el próximo turno disponible más cercano. Parámetros: provider_id (número, default 1), service_id (número, default 1).",
+        "workflowId": {
+          "__rl": true,
+          "value": "oi5AiSoJRbzDf2A8",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "provider_id": "={{ $fromAI('provider_id', 'ID del proveedor, default 1', 'number') }}",
+            "service_id": "={{ $fromAI('service_id', 'ID del servicio, default 1', 'number') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "provider_id",
+              "displayName": "provider_id",
+              "type": "number",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": false
+            },
+            {
+              "id": "service_id",
+              "displayName": "service_id",
+              "type": "number",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": false
+            }
+          ]
+        }
+      },
+      "id": "tool_find_next",
+      "name": "Tool: Find Next Available",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        240,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "name": "create_booking",
+        "description": "Crea una nueva reserva. Parámetros: start_time (ISO datetime), provider_id (número, default 1), service_id (número, default 1), user_name (texto), user_email (texto), chat_id (número del usuario de Telegram).",
+        "workflowId": {
+          "__rl": true,
+          "value": "ilA6a6sM5CvDsSBi",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "start_time": "={{ $fromAI('start_time', 'Hora de inicio en formato ISO datetime', 'string') }}",
+            "provider_id": "={{ $fromAI('provider_id', 'ID del proveedor, default 1', 'number') }}",
+            "service_id": "={{ $fromAI('service_id', 'ID del servicio, default 1', 'number') }}",
+            "user_name": "={{ $fromAI('user_name', 'Nombre del paciente', 'string') }}",
+            "user_email": "={{ $fromAI('user_email', 'Email del paciente', 'string') }}",
+            "chat_id": "={{ $fromAI('chat_id', 'ID de chat de Telegram del usuario', 'number') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "start_time",
+              "displayName": "start_time",
+              "type": "string",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": true
+            },
+            {
+              "id": "provider_id",
+              "displayName": "provider_id",
+              "type": "number",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": false
+            },
+            {
+              "id": "service_id",
+              "displayName": "service_id",
+              "type": "number",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": false
+            },
+            {
+              "id": "user_name",
+              "displayName": "user_name",
+              "type": "string",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": false
+            },
+            {
+              "id": "user_email",
+              "displayName": "user_email",
+              "type": "string",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": false
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "type": "number",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": true
+            }
+          ]
+        }
+      },
+      "id": "tool_create_booking",
+      "name": "Tool: Create Booking",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        400,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "name": "cancel_booking",
+        "description": "Cancela una reserva existente. Parámetros: booking_id (UUID de la reserva), chat_id (número del usuario de Telegram).",
+        "workflowId": {
+          "__rl": true,
+          "value": "mf4qnUG7UlrAKpQU",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "booking_id": "={{ $fromAI('booking_id', 'UUID de la reserva a cancelar', 'string') }}",
+            "chat_id": "={{ $fromAI('chat_id', 'ID de chat de Telegram del usuario', 'number') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "booking_id",
+              "displayName": "booking_id",
+              "type": "string",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": true
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "type": "number",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": true
+            }
+          ]
+        }
+      },
+      "id": "tool_cancel_booking",
+      "name": "Tool: Cancel Booking",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        560,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiResp = $input.first()?.json?.output || \"Sin respuesta de IA\";\nconst pre = $node[\"Extract & Validate (PRE)\"].json;\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      intent: \"AI_RESPONSE\",\n      chat_id: pre.chat_id,\n      ai_response: aiResp\n    },\n    _meta: { source: \"NN_03_AI_Agent\", timestamp: new Date().toISOString(), version: \"2.0.0\" }\n  }\n}];"
+      },
+      "id": "ceb18a95-4003-42bf-bbcc-6b1c9cf6825a",
+      "name": "Format Success (POST)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        816
       ]
     }
   ],
   "connections": {
-    "Manual Trigger": { "main": [[{ "node": "Extract & Validate (PRE)", "type": "main", "index": 0 }]] },
-    "Execute Workflow Trigger": { "main": [[{ "node": "Extract & Validate (PRE)", "type": "main", "index": 0 }]] },
-    "Webhook": { "main": [[{ "node": "Extract & Validate (PRE)", "type": "main", "index": 0 }]] },
-    "Extract & Validate (PRE)": { "main": [[{ "node": "Prepare Groq Payload", "type": "main", "index": 0 }]] },
-    "Prepare Groq Payload": { "main": [[{ "node": "Groq API (Real)", "type": "main", "index": 0 }]] },
-    "Groq API (Real)": {
+    "Webhook": {
       "main": [
-        [{ "node": "Format Success (POST)", "type": "main", "index": 0 }],
-        [{ "node": "Format Global Error", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Extract & Validate (PRE)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract & Validate (PRE)": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract & Validate (PRE)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract & Validate (PRE)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Format Success (POST)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: Check Availability": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: Find Next Available": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: Create Booking": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: Cancel Booking": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
       ]
     }
   },

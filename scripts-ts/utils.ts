@@ -5,7 +5,7 @@
  */
 
 import * as fs from 'fs';
-import { N8NCrudAgent, WorkflowData } from './n8n-crud-agent';
+import { N8NCrudAgent, WorkflowData } from './n8n_crud_agent';
 
 /**
  * Simple function to list all workflows

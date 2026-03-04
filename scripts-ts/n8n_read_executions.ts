@@ -8,6 +8,11 @@
 
 import axios, { AxiosError } from 'axios';
 import { N8NConfig } from './config';
+import { Watchdog, WATCHDOG_TIMEOUT } from './watchdog';
+
+// Start watchdog timer
+const watchdog = new Watchdog(WATCHDOG_TIMEOUT);
+watchdog.start();
 
 /**
  * Execution status enum
@@ -329,6 +334,7 @@ Examples:
       } else {
         console.log(formatExecutionSummary(execution));
       }
+      watchdog.cancel();
     } else {
       // List executions
       const executions = await listExecutions(config, {
@@ -338,11 +344,13 @@ Examples:
       });
 
       if (executions === null) {
+        watchdog.cancel();
         process.exit(1);
       }
 
       if (executions.length === 0) {
         console.log('No executions found.');
+        watchdog.cancel();
         process.exit(0);
       }
 
@@ -362,8 +370,10 @@ Examples:
           console.log(formatExecutionsTable(executions));
           break;
       }
+      watchdog.cancel();
     }
   } catch (error: unknown) {
+    watchdog.cancel();
     const message = error instanceof Error ? error.message : String(error);
     console.error(`Error: ${message}`);
     process.exit(1);
@@ -372,6 +382,7 @@ Examples:
 
 // Run main function
 main().catch((error: unknown) => {
+  watchdog.cancel();
   const message = error instanceof Error ? error.message : String(error);
   console.error(`Fatal error: ${message}`);
   process.exit(1);

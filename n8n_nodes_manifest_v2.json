@@ -1,0 +1,1610 @@
+{
+  "ActionNetwork": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ActiveCampaign": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "AcuityScheduling": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Adalo": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Affinity": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "AgileCrm": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "AiTransform": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Airtop": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Amqp": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ApiTemplateIo": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Asana": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Autopilot": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Aws": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Bannerbear": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Baserow": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Beeminder": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Bitbucket": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Bitly": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Bitwarden": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Box": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Brandfetch": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Brevo": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Bubble": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Cal": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Calendly": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Chargebee": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "CircleCi": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Clearbit": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ClickUp": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Clockify": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Cloudflare": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Cockpit": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Coda": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Code": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "CoinGecko": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "CompareDatasets": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Compression": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Contentful": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ConvertKit": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Copper": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Cortex": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "CrateDb": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Cron": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "CustomerIo": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "DataTable": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "DateTime": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "DebugHelper": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "DeepL": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Demio": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Dhl": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Discourse": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Disqus": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Drift": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Dropbox": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Dropcontact": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "E2eTest": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ERPNext": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "EditImage": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Egoi": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Emelia": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ErrorTrigger": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Eventbrite": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ExecuteCommand": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ExecutionData": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Facebook": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "FacebookLeadAds": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Figma": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "FileMaker": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Filter": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Flow": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "FormIo": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Formstack": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Freshdesk": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Freshservice": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "FreshworksCrm": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Ftp": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Function": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "FunctionItem": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "GetResponse": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Ghost": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Git": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Github": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Gitlab": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "GoToWebinar": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Gong": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Gotify": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Grafana": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "GraphQL": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Grist": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Gumroad": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "HackerNews": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "HaloPSA": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Harvest": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "HelpScout": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "HomeAssistant": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Html": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "HtmlExtract": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "HttpRequest": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Hubspot": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "HumanticAI": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Hunter": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ICalendar": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "If": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Intercom": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Interval": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "InvoiceNinja": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ItemLists": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Iterable": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Jenkins": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "JinaAI": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Jira": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "JotForm": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Jwt": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Kafka": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Keap": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "KoBoToolbox": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Ldap": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Line": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Linear": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "LingvaNex": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "LinkedIn": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "LocalFileTrigger": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "LoneScale": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "MQTT": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Magento": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Mailcheck": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Mailchimp": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Mailgun": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Mailjet": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Mandrill": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ManualTrigger": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Markdown": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Marketstack": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Matrix": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Mautic": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Medium": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "MessageBird": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Metabase": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Mindee": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Misp": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "MistralAI": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Mocean": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "MondayCom": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "MongoDb": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "MonicaCrm": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "MoveBinaryData": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Msg91": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "N8n": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "N8nTrigger": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Nasa": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Netlify": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "NextCloud": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "NoOp": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "NocoDB": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Npm": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Odoo": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Okta": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "OneSimpleApi": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Onfleet": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "OpenAi": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "OpenThesaurus": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "OpenWeatherMap": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Orbit": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Oura": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Paddle": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "PagerDuty": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "PayPal": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Peekalink": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Perplexity": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Phantombuster": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "PhilipsHue": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Pipedrive": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Plivo": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "PostBin": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "PostHog": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Postmark": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ProfitWell": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Pushbullet": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Pushcut": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Pushover": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "QuestDb": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "QuickBase": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "QuickBooks": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "QuickChart": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "RabbitMQ": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Raindrop": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ReadBinaryFile": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ReadBinaryFiles": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ReadPdf": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Reddit": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Redis": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "RenameKeys": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "RespondToWebhook": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Rocketchat": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "RssFeedRead": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Rundeck": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "S3": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Salesforce": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Salesmate": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Schedule": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "SecurityScorecard": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Segment": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "SendGrid": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Sendy": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "SentryIo": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "ServiceNow": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Shopify": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Signl4": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Simulate": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Slack": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Sms77": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Snowflake": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Spotify": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "SseTrigger": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Ssh": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Stackby": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "StickyNote": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "StopAndError": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Storyblok": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Strapi": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Strava": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Stripe": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Supabase": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "SurveyMonkey": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Switch": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Taiga": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Tapfiliate": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Telegram": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "TheHive": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "TheHiveProject": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "TimeSaved": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "TimescaleDb": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Toggl": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Totp": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "TravisCi": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Trello": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Twake": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Twilio": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Twist": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Twitter": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Typeform": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "UProc": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "UnleashedSoftware": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Uplead": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "UptimeRobot": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "UrlScanIo": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Vero": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Vonage": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Wait": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Webflow": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Webhook": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Wekan": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "WhatsApp": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Wise": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "WooCommerce": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Wordpress": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Workable": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "WorkflowTrigger": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "WriteBinaryFile": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Wufoo": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Xero": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Xml": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Yourls": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Zammad": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Zendesk": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Zoho": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Zoom": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  },
+  "Zulip": {
+    "currentVersion": 1,
+    "versionsAvailable": [
+      1
+    ]
+  }
+}

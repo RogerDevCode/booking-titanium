@@ -61,10 +61,21 @@ Este directorio contiene la migración completa de los scripts Python originales
 
 ## Validación
 
-| Script | Descripción |
-|--------|-------------|
-| `validate_all_workflows.ts` | Valida todos los workflows |
-| `workflow_validator.ts` | Validador de workflows |
+| Script | Descripción | Parámetros |
+|--------|-------------|------------|
+| `validate_all_workflows.ts` | Valida todos los workflows | - |
+| `workflow_validator.ts` | Validador de workflows | `--fix`, `--verbose` |
+| `verify_workflow_sync.ts` | Verifica sync local vs servidor | `--verbose` |
+| `verify_internal_links.ts` | Verifica referencias entre workflows | - |
+
+## Scripts de Mantenimiento (NUEVOS 2026-03-03)
+
+| Script | Descripción | Parámetros |
+|--------|-------------|------------|
+| `add_manual_triggers.ts` | Agrega Manual Trigger a workflows | `--dry-run`, `--verbose` |
+| `execute_all_workflows.ts` | Ejecuta todos los workflows vía webhook | `--timeout N`, `--parallel N` |
+| `fix_node_versions.ts` | Actualiza typeVersion de nodos | `<workflow-file.json>` |
+| `apply_all_fixes.ts` | Aplica fixes a todos los workflows | - |
 
 ## Varios
 

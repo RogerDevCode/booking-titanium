@@ -28,19 +28,19 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "nn-04-telegram-sender-test",
+        "path": "nn-04-telegram-sender-v2",
         "responseMode": "lastNode",
         "options": {}
       },
       "id": "trigger_webhook",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
+      "typeVersion": 2.1,
       "position": [
         380,
         650
       ],
-      "webhookId": "nn-04-telegram-sender-test"
+      "webhookId": "nn-04-telegram-sender-v2"
     },
     {
       "parameters": {
@@ -79,7 +79,7 @@
       "id": "verify_nn04",
       "name": "Is Valid?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
+      "typeVersion": 2.3,
       "position": [
         700,
         420
@@ -116,7 +116,7 @@
       ],
       "credentials": {
         "telegramApi": {
-          "id": "U8P4P8JT8XwCoIzD",
+          "id": "WR4umwQYS9Gx0cTO",
           "name": "Telegram Booking"
         }
       },
@@ -124,7 +124,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const telegramResult = $input.first()?.json || {};\nconst originalData = $node[\"Extract & Validate (PRE)\"].json;\nconst chat_id = telegramResult.chat?.id || originalData.chat_id || \"unknown\";\n\n// If we came from Format Rejection, it already has success: false and VALIDATION_ERROR\nif (telegramResult.error_code === \"VALIDATION_ERROR\") {\n  return [{ json: telegramResult }];\n}\n\nconst isSuccess = !!telegramResult.message_id && !telegramResult.error;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    error_code: isSuccess ? null : \"TELEGRAM_API_ERROR\",\n    error_message: isSuccess ? null : (telegramResult.error || \"Telegram failed to send message\"),\n    data: {\n      delivery_status: isSuccess ? \"SENT\" : \"FAILED\",\n      chat_id: chat_id,\n      message_id: telegramResult.message_id || null\n    },\n    _meta: {\n      source: \"NN_04_Telegram_Sender\",\n      timestamp: new Date().toISOString(),\n      workflow_id: \"NN_04\",\n      version: \"1.0.0\"\n    }\n  }\n}];"
+        "jsCode": "const telegramResult = $input.first()?.json || {};\nconst originalData = $node[\"Extract & Validate (PRE)\"].json;\nconst chat_id = telegramResult.result?.chat?.id || telegramResult.chat?.id || originalData.chat_id || \"unknown\";\n\nif (telegramResult.error_code === \"VALIDATION_ERROR\") {\n  return [{ json: telegramResult }];\n}\n\n/* n8n Telegram node v1.2 returns: { ok: true, result: { message_id, chat, ... } } */\nconst msgId = telegramResult.result?.message_id || telegramResult.message_id || null;\nconst isSuccess = !!(msgId || telegramResult.ok === true) && !telegramResult.error;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    error_code: isSuccess ? null : \"TELEGRAM_API_ERROR\",\n    error_message: isSuccess ? null : (telegramResult.error || \"Telegram failed to send message\"),\n    data: {\n      delivery_status: isSuccess ? \"SENT\" : \"FAILED\",\n      chat_id: chat_id,\n      message_id: msgId\n    },\n    _meta: {\n      source: \"NN_04_Telegram_Sender\",\n      timestamp: new Date().toISOString(),\n      workflow_id: \"NN_04\",\n      version: \"1.1.0\"\n    }\n  }\n}];"
       },
       "id": "format_success",
       "name": "Format Success (POST)",

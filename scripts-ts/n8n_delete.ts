@@ -9,6 +9,11 @@
 import axios, { AxiosError } from 'axios';
 import * as readline from 'readline';
 import { N8NConfig } from './config';
+import { Watchdog, WATCHDOG_TIMEOUT } from './watchdog';
+
+// Start watchdog timer
+const watchdog = new Watchdog(WATCHDOG_TIMEOUT);
+watchdog.start();
 
 /**
  * Interface for workflow data
@@ -299,6 +304,7 @@ Examples:
           const confirmed = await confirmDelete(targetName, targetId, isActive);
           if (!confirmed) {
             console.log('Cancelled.');
+            watchdog.cancel();
             process.exit(0);
           }
         }
@@ -314,15 +320,19 @@ Examples:
         const success = await deleteWorkflow(config, targetId);
         if (success) {
           console.log('Success! Workflow deleted.');
+          watchdog.cancel();
         } else {
+          watchdog.cancel();
           process.exit(1);
         }
       } else {
         console.error('Error: Workflow not found');
+        watchdog.cancel();
         process.exit(1);
       }
     }
   } catch (error: unknown) {
+    watchdog.cancel();
     const message = error instanceof Error ? error.message : String(error);
     console.error(`Error: ${message}`);
     process.exit(1);
@@ -331,6 +341,7 @@ Examples:
 
 // Run main function
 main().catch((error: unknown) => {
+  watchdog.cancel();
   const message = error instanceof Error ? error.message : String(error);
   console.error(`Fatal error: ${message}`);
   process.exit(1);

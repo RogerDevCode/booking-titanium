@@ -4,9 +4,14 @@
  * @migration-source scripts-py/test_publish_unpublish.py
  */
 
-import { N8NCrudAgent, WorkflowData } from './n8n-crud-agent';
+import { N8NCrudAgent, WorkflowData } from './n8n_crud_agent';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Watchdog, WATCHDOG_TIMEOUT } from './watchdog';
+
+// Start watchdog timer
+const watchdog = new Watchdog(WATCHDOG_TIMEOUT);
+watchdog.start();
 
 /**
  * Test the publish/unpublish functionality
@@ -170,11 +175,17 @@ async function testPublishUnpublish(): Promise<void> {
 
 async function main(): Promise<void> {
   await testPublishUnpublish();
+  // Cancel watchdog on success
+  watchdog.cancel();
 }
 
 // Run main function if executed directly
 if (require.main === module) {
-  main();
+  main().catch((error) => {
+    watchdog.cancel();
+    console.error('Error:', error);
+    process.exit(1);
+  });
 }
 
 export { testPublishUnpublish };

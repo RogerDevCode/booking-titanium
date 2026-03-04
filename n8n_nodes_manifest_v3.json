@@ -1,0 +1,2114 @@
+{
+  "HelpScout": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Mailcheck": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "If": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Pipedrive": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Storyblok": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Bitbucket": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "OpenAi": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Zendesk": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ReadPdf": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Harvest": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "EmailReadImap": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Bannerbear": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Crypto": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Chargebee": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ApiTemplateIo": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ICalendar": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "WriteBinaryFile": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "CustomerIo": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Cortex": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Phantombuster": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Twake": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Elasticsearch": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ElasticSecurity": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "HackerNews": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "RssFeedRead": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Todoist": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Plivo": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Cloudflare": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Paddle": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Wufoo": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Set": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "PayPal": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Postgres": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Keap": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "MySql": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Rundeck": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Stackby": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "CrateDb": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Signl4": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Perplexity": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "WorkflowTrigger": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "RenameKeys": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "TheHive": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "HumanticAI": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Contentful": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Dhl": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Onfleet": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Airtable": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "QuickBase": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Summarize": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Sort": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "SplitOut": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Aggregate": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Limit": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "RemoveDuplicates": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Stripe": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "GraphQL": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Mindee": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Affinity": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ClickUp": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Jenkins": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "AgileCrm": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "LingvaNex": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Vonage": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Coda": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Salesforce": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "PostHog": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Marketstack": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Strava": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "MongoDb": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Disqus": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "HtmlExtract": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "LocalFileTrigger": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "GetResponse": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Webhook": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "MessageBird": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Splunk": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Mailjet": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Github": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "HomeAssistant": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Twilio": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "UProc": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Gumroad": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "JinaAI": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "SseTrigger": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Matrix": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "FreshworksCrm": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Pushcut": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Jwt": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Beeminder": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Spotify": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Reddit": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Zulip": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Webflow": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "QuickChart": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "SyncroMSP": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "UrlScanIo": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "TravisCi": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Rocketchat": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Html": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ExtractFromFile": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ReadWriteFile": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ConvertToFile": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "E2eTest": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ReadBinaryFiles": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Filter": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Orbit": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "DeepL": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "SplitInBatches": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Brevo": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Grist": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "MailerLite": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Git": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Toggl": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "RespondToWebhook": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ConvertKit": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ItemLists": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Switch": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Kafka": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "PagerDuty": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Nasa": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "PhilipsHue": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Formstack": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Wise": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Dropcontact": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "TimescaleDb": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "SentryIo": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Shopify": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Demio": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "OpenThesaurus": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "HaloPSA": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Oura": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Pushbullet": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Workable": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ExecuteWorkflow": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ExecuteWorkflowTrigger": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Freshdesk": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "TheHiveProject": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Interval": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Wekan": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Webex": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Hunter": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Gitlab": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ProfitWell": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "S3": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Misp": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Trello": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Autopilot": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Sms77": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Compression": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "PostBin": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Cockpit": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "InvoiceNinja": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Mandrill": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "FileMaker": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Ftp": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ActionNetwork": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "FunctionItem": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Clockify": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "JotForm": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Egoi": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Okta": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Mattermost": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "N8nTrigger": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "MistralAI": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "StopAndError": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "WooCommerce": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Copper": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Bitly": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Simulate": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Adalo": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Cal": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Netlify": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "OneSimpleApi": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Calendly": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ReadBinaryFile": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Notion": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Intercom": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Odoo": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Bitwarden": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "LinkedIn": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "QuestDb": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "QuickBooks": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Raindrop": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Yourls": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Twist": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Storage": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Entra": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Dynamics": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ToDo": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "GraphSecurity": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Outlook": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "SharePoint": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Teams": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Sql": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Excel": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "AzureCosmosDb": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "OneDrive": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ERPNext": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Supabase": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "SecurityScorecard": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Linear": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Sendy": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Redis": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ManualTrigger": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Asana": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Magento": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Telegram": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Gong": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Iterable": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "FormIo": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Npm": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Metabase": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Facebook": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "AcuityScheduling": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "KoBoToolbox": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "BambooHr": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Medium": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "DebugHelper": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Aws": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "DynamoDB": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "CertificateManager": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Transcribe": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Comprehend": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Rekognition": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "SES": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "SQS": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "IAM": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Textract": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ELB": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Cognito": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "AiTransform": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "MoveBinaryData": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Hubspot": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "MonicaCrm": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Mailchimp": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Brandfetch": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Freshservice": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Wait": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Peekalink": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Postmark": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Uplead": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Tapfiliate": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "HttpRequest": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Figma": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Mocean": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Slack": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Discourse": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Clearbit": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "OpenWeatherMap": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Zammad": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "WhatsApp": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Eventbrite": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Twitter": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "SpreadsheetFile": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Baserow": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "UnleashedSoftware": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "EmailSend": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Strapi": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "DataTable": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "LoneScale": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Emelia": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "NoOp": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "NextCloud": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Cron": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ExecuteCommand": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Function": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Xero": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Flow": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "SurveyMonkey": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "MondayCom": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "SendGrid": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Dropbox": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Pushover": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ExecutionData": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Form": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Ghost": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ErrorTrigger": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "N8n": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Ldap": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Snowflake": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ADC": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Typeform": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Line": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Gotify": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ServiceNow": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Code": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Drift": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Salesmate": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Discord": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Zoom": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Datacenter": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ProtectCloud": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "MQTT": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "CoinGecko": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "RabbitMQ": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Segment": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Grafana": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "FacebookLeadAds": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "SeaTable": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "CloudStorage": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "CloudNaturalLanguage": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Translate": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "GSuiteAdmin": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Perspective": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "CloudFirestore": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "RealtimeDatabase": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "BigQuery": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Calendar": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Books": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Ads": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "YouTube": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "BusinessProfile": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Docs": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Slides": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Sheet": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Contacts": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Drive": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Chat": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Analytics": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Task": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Gmail": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "StickyNote": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Zoho": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Mautic": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "NocoDB": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Mailgun": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "DateTime": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Wordpress": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "UptimeRobot": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Ssh": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "GoToWebinar": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Amqp": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Jira": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Xml": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "CompareDatasets": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Schedule": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Totp": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Box": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "TimeSaved": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "EditImage": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Vero": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Bubble": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "HighLevel": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Msg91": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "CircleCi": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Airtop": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "ActiveCampaign": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Markdown": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Taiga": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Merge": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  },
+  "Lemlist": {
+    "highestVersion": 1,
+    "allDetectedVersions": [
+      1
+    ]
+  }
+}

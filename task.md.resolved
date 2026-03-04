@@ -1,0 +1,24 @@
+# Sync Check + GCAL/GMAIL Testing — 2026-03-03
+
+## Sync Check
+
+- [x] Ejecutar sync check — 14/14 IDs match servidor ✅
+- [x] Nota: `BB_90_Reminder_Scheduler` solo local (no pusheado)
+
+## GCAL Testing (datos reales)
+
+- [x] GCAL_Create_Event — ✅ event created `d2iu8nthg1ae84bpb7pqmih85c`
+- [x] GCAL_Delete_Event — ✅ event deleted successfully
+
+## GMAIL Testing (datos reales)
+
+- [x] GMAIL_Send_Confirmation — ✅ email sent (msg ID `19cb409963e14223`)
+
+## Post-Test
+
+- [x] Documentar resultados en walkthrough
+
+## NN_05_Reminder_Cron Testing
+- [ ] Analizar estructura del workflow
+- [ ] Ejecutar test manual en n8n UI
+- [ ] Verificar resultado

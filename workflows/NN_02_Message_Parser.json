@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "jsCode": "/* ROBUST VERSION */\nconst input = $input.first()?.json;\n// Support: raw_input (from NN_01), body (from direct webhook), or root\nconst data = input?.raw_input || input?.body || input || {};\n\n// Support: message object (Telegram), or direct fields\nconst message = data.message || data.channel_post || data;\n\nconst chat_id = message.chat?.id || data.chat_id;\nconst text = message.text || data.text;\n\nif (!chat_id || !text) {\n  return [{\n    json: {\n      success: false,\n      error_code: \"VALIDATION_ERROR\",\n      error_message: \"Payload missing required 'chat_id' or 'text' fields.\",\n      debug_received: input,\n      data: null,\n      _meta: { source: \"NN_02_Message_Parser\", timestamp: new Date().toISOString(), version: \"1.0.0\" }\n    }\n  }];\n}\n\nconst username = message.from?.first_name || message.chat?.first_name || data.username || \"Unknown\";\n\n// Standard Contract Output\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      chat_id: chat_id,\n      text: text.replace(/'/g, \"''\").substring(0, 500),\n      username: username.replace(/'/g, \"''\").substring(0, 100),\n      type: \"text\"\n    },\n    _meta: { source: \"NN_02_Message_Parser\", timestamp: new Date().toISOString(), version: \"1.0.0\" }\n  }\n}];"
+        "jsCode": "/* ROBUST VERSION */\nconst input = $input.first()?.json;\n// Support: raw_input (from NN_01), body (from direct webhook), or root\nconst data = input?.raw_input || input?.body || input || {};\n\n// Support: message object (Telegram), or direct fields\nconst message = data.message || data.channel_post || data;\n\nconst chat_id = message.chat?.id || data.chat_id;\nconst text = message.text || data.text;\n\nif (!chat_id || !text) {\n  return [{\n    json: {\n      success: false,\n      error_code: \"VALIDATION_ERROR\",\n      error_message: \"Payload missing required 'chat_id' or 'text' fields.\",\n      debug_received: input,\n      data: null,\n      _meta: { source: \"NN_02_Message_Parser\", timestamp: new Date().toISOString(), version: \"1.1.0\" }\n    }\n  }];\n}\n\nconst username = message.from?.first_name || message.chat?.first_name || data.username || \"Unknown\";\n\n// SEC_02: Sanitize — escape backslashes THEN single quotes, then truncate\nconst safeText = text.replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nconst safeUsername = username.replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 100);\n\n// Standard Contract Output\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      chat_id: chat_id,\n      text: safeText,\n      username: safeUsername,\n      type: \"text\"\n    },\n    _meta: { source: \"NN_02_Message_Parser\", timestamp: new Date().toISOString(), version: \"1.1.0\" }\n  }\n}];"
       },
       "id": "e6f42a9b-7c15-4a6c-b9b5-2d1b10a9f5d1",
       "name": "Extract & Validate (PRE)",
@@ -22,7 +22,7 @@
       },
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
+      "typeVersion": 2.1,
       "position": [
         -200,
         400
@@ -52,19 +52,7 @@
       ]
     }
   ],
-  "pinData": {},
   "connections": {
-    "When clicking ‘Test workflow’": {
-      "main": [
-        [
-          {
-            "node": "Extract & Validate (PRE)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Execute Workflow Trigger": {
       "main": [
         [
@@ -99,14 +87,7 @@
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1"
-  },
-  "versionId": "f0606d51-1e24-42f0-9ef2-dc18b459ccdf",
-  "id": "nn02messageparserid",
-  "meta": {
-    "instanceId": "4d7c858383fe091e962ab4b02fb1c06ad29bdb69037c2a4afd348470fceae917"
-  },
-  "tags": []
+  }
 }

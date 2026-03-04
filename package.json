@@ -15,7 +15,10 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
+    "@types/luxon": "^3.7.1",
+    "@types/pg": "^8.18.0",
     "axios": "^1.13.6",
     "dotenv": "^17.3.1",
     "jest": "^30.2.0",
@@ -24,6 +27,8 @@
   },
   "dependencies": {
     "express": "^5.2.1",
-    "n8n-nodes-base": "^0.210.0"
+    "n8n": "^2.10.2",
+    "n8n-nodes-base": "^0.210.0",
+    "n8n-workflow": "^2.10.0"
   }
 }

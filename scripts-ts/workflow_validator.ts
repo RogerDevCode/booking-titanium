@@ -1,68 +1,206 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
+import { Watchdog, WATCHDOG_TIMEOUT } from "./watchdog";
+
+// --- CONFIGURACIÓN ---
+// 1. URL de tu servidor n8n
+const N8N_URL = process.env.N8N_URL || "https://n8n.stax.ink";
+
+// 2. Captura de API Key (prioriza N8N_API_KEY, luego N8N_ACCESS_TOKEN)
+const API_KEY = process.env.N8N_API_KEY || process.env.N8N_ACCESS_TOKEN;
+
+if (!API_KEY) {
+  console.error(
+    "❌ Error: No se encontró la variable de entorno N8N_API_KEY o N8N_ACCESS_TOKEN.",
+  );
+  process.exit(1);
+}
+
+// Start watchdog timer
+const watchdog = new Watchdog(WATCHDOG_TIMEOUT);
+watchdog.start();
 
 const workflowPath = process.argv[2];
 
 if (!workflowPath) {
-    console.error('Uso: npx tsx workflow_validator.ts <workflow.json>');
-    process.exit(1);
+  console.error("Uso: npx tsx workflow_validator.ts <workflow.json>");
+  watchdog.cancel();
+  process.exit(1);
 }
 
-const data = JSON.parse(fs.readFileSync(workflowPath, 'utf8'));
+const data = JSON.parse(fs.readFileSync(workflowPath, "utf8"));
 const nodes = data.nodes || [];
 
-console.log('\n🛡️ AUDITORÍA RED TEAM - ' + path.basename(workflowPath));
-console.log('==================================================');
+console.log("\n🛡️ AUDITORÍA RED TEAM - " + path.basename(workflowPath));
+console.log("==================================================");
 
 let score = 1.0;
 let issues = 0;
 
 // 1. Standard Contract
-const lastNode = nodes.find(n => n.name === 'Final Response' || n.name === 'Standard Success Output');
-if (lastNode && JSON.stringify(lastNode).includes('_meta')) {
-    console.log('✅ Standard Contract: Detectado');
+const lastNode = nodes.find(
+  (n) => n.name === "Final Response" || n.name === "Standard Success Output",
+);
+if (lastNode && JSON.stringify(lastNode).includes("_meta")) {
+  console.log("✅ Standard Contract: Detectado");
 } else {
-    console.log('❌ Standard Contract: NO detectado');
-    score -= 0.2;
-    issues++;
+  console.log("❌ Standard Contract: NO detectado");
+  score -= 0.2;
+  issues++;
 }
 
 // 2. Triple Entry
-const trigs = nodes.filter(n => n.type.includes('Trigger') || n.type === 'n8n-nodes-base.webhook');
+const trigs = nodes.filter(
+  (n) => n.type.includes("Trigger") || n.type === "n8n-nodes-base.webhook",
+);
 if (trigs.length >= 3) {
-    console.log('✅ Triple Entry Pattern: Cumple (' + trigs.length + ')');
+  console.log("✅ Triple Entry Pattern: Cumple (" + trigs.length + ")");
 } else {
-    console.log('⚠️ Triple Entry Pattern: Solo ' + trigs.length + ' triggers (mínimo 3)');
-    score -= 0.1;
-    issues++;
+  console.log(
+    "⚠️ Triple Entry Pattern: Solo " + trigs.length + " triggers (mínimo 3)",
+  );
+  score -= 0.1;
+  issues++;
 }
 
 // 3. Prohibición $env
-const envViolations = nodes.filter(n => JSON.stringify(n).includes('$env'));
+const envViolations = nodes.filter((n) => JSON.stringify(n).includes("$env"));
 if (envViolations.length === 0) {
-    console.log('✅ PROHIBIDO_04 ($env): Sin violaciones');
+  console.log("✅ PROHIBIDO_04 ($env): Sin violaciones");
 } else {
-    console.log('❌ PROHIBIDO_04 ($env): ' + envViolations.length + ' violaciones detectadas');
-    score -= 0.3;
-    issues++;
+  console.log(
+    "❌ PROHIBIDO_04 ($env): " +
+      envViolations.length +
+      " violaciones detectadas",
+  );
+  score -= 0.3;
+  issues++;
 }
 
 // 4. Validation Sandwich
-const pre = nodes.find(n => n.name.includes('Validate') || n.name.includes('PRE') || n.name.includes('Parse'));
+const pre = nodes.find(
+  (n) =>
+    n.name.includes("Validate") ||
+    n.name.includes("PRE") ||
+    n.name.includes("Parse"),
+);
 if (pre) {
-    console.log('✅ Validation Sandwich (PRE): Implementado');
+  console.log("✅ Validation Sandwich (PRE): Implementado");
 } else {
-    console.log('❌ Validation Sandwich (PRE): No encontrado');
-    score -= 0.2;
-    issues++;
+  console.log("❌ Validation Sandwich (PRE): No encontrado");
+  score -= 0.2;
+  issues++;
 }
 
-console.log('--------------------------------------------------');
-console.log('SCORE FINAL: ' + score.toFixed(2) + ' / 1.0');
+console.log("--------------------------------------------------");
+console.log("SCORE LOCAL: " + score.toFixed(2) + " / 1.0");
 
-if (score < 0.8) {
-    console.log('\n❌ RESULTADO: FALLO DE AUDITORÍA');
+// --- VALIDACIÓN REMOTA VIA API ---
+console.log("\n🌐 VALIDACIÓN REMOTA (API n8n)");
+console.log("==================================================");
+
+async function validateWithServer() {
+  try {
+    // 1. Preparar el payload.
+    // La API de n8n requiere que el workflow tenga un nombre.
+    const payload = {
+      name: data.name || path.basename(workflowPath, ".json"),
+      nodes: data.nodes,
+      connections: data.connections,
+      settings: data.settings || {},
+      staticData: data.staticData || {},
+      tags: data.tags || [],
+    };
+
+    // 2. Verificar si ya existe un workflow con el mismo nombre para actualizar (PUT) o crear (POST)
+    // Nota: Esto busca por nombre exacto. Ten cuidado si tienes nombres duplicados.
+    const searchUrl = `${N8N_URL}/api/v1/workflows?name=${encodeURIComponent(payload.name)}`;
+
+    console.log(`🔍 Buscando workflow existente en: ${N8N_URL} ...`);
+
+    const searchRes = await fetch(searchUrl, {
+      method: "GET",
+      headers: {
+        "X-N8N-API-KEY": API_KEY,
+      },
+    });
+
+    if (!searchRes.ok) {
+      throw new Error(
+        `Error de autenticación o conexión: ${searchRes.status} ${searchRes.statusText}`,
+      );
+    }
+
+    const searchData = await searchRes.json();
+    const existingWorkflow = searchData.data?.find(
+      (w: any) => w.name === payload.name,
+    );
+
+    let method = "POST";
+    let endpoint = `${N8N_URL}/api/v1/workflows`;
+    let action = "creado";
+
+    if (existingWorkflow) {
+      method = "PUT";
+      endpoint = `${N8N_URL}/api/v1/workflows/${existingWorkflow.id}`;
+      action = "actualizado";
+      console.log(
+        `ℹ️ Workflow existente encontrado (ID: ${existingWorkflow.id}). Modo ACTUALIZACIÓN.`,
+      );
+    } else {
+      console.log(`ℹ️ Nuevo workflow. Modo CREACIÓN.`);
+    }
+
+    // 3. Enviar al servidor
+    console.log(`🚀 Enviando JSON al servidor (${method})...`);
+
+    const res = await fetch(endpoint, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+        "X-N8N-API-KEY": API_KEY,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      console.error(
+        "❌ ERROR EN API:",
+        result.message || JSON.stringify(result, null, 2),
+      );
+      console.error(
+        "   -> El servidor rechazó el JSON. Revisa las versiones de los nodos o la sintaxis.",
+      );
+
+      // Cancel watchdog before exit
+      watchdog.cancel();
+      process.exit(1);
+    }
+
+    console.log(`✅ ÉXITO: Workflow ${action} correctamente en el servidor.`);
+    console.log(`   ID: ${result.data?.id || result.id}`);
+    console.log(`   Nombre: ${result.data?.name || result.name}`);
+  } catch (error: any) {
+    console.error("❌ FALLO DE CONEXIÓN:", error.message);
+    watchdog.cancel();
     process.exit(1);
-} else {
-    console.log('\n✅ RESULTADO: PASSED');
+  }
 }
+
+// Ejecutar validación remota
+validateWithServer().then(() => {
+  // Cancel watchdog before exit
+  watchdog.cancel();
+
+  if (score < 0.8) {
+    console.log(
+      "\n⚠️ RESULTADO: PASÓ EN SERVIDOR, pero FALLO AUDITORÍA LOCAL (Score < 0.8)",
+    );
+  } else {
+    console.log(
+      "\n✅ RESULTADO: VALIDACIÓN COMPLETA (Local + Servidor) PASSED",
+    );
+  }
+});

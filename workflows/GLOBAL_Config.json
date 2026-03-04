@@ -1,0 +1,39 @@
+{
+  "name": "GLOBAL_Config",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 400],
+      "id": "trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    // URLs del sistema\n    N8N_EDITOR_BASE_URL: 'https://n8n.stax.ink',\n    N8N_WEBHOOK_URL: 'https://n8n.stax.ink/webhook',\n    DAL_SERVICE_URL: 'http://dal-service:3000',\n    \n    // IDs de canales\n    TELEGRAM_ADMIN_ID: '5391760292',\n    TELEGRAM_GROUP_ID: '-1001234567890',\n    \n    // Configuración de negocio\n    DEFAULT_PROVIDER_ID: 1,\n    DEFAULT_SERVICE_ID: 1,\n    BUSINESS_TIMEZONE: 'America/Argentina/Buenos_Aires',\n    BUSINESS_EMAIL: 'baba.orere@gmail.com',\n    \n    // Límites y timeouts\n    HTTP_TIMEOUT_MS: 30000,\n    MAX_RETRIES: 3,\n    RATE_LIMIT_PER_MINUTE: 60,\n    \n    // Feature flags\n    ENABLE_GCAL_SYNC: true,\n    ENABLE_GMAIL_NOTIFICATIONS: true,\n    ENABLE_REMINDERS: true,\n    \n    _meta: {\n      source: 'GLOBAL_Config',\n      version: '1.0.0',\n      updated_at: '2026-03-03'\n    }\n  }\n}];"
+      },
+      "name": "Global Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [250, 400],
+      "id": "config"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Global Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

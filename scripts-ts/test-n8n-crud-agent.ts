@@ -4,9 +4,14 @@
  * @migration-source scripts-py/test_n8n_crud_agent.py
  */
 
-import { N8NCrudAgent, WorkflowData } from './n8n-crud-agent';
+import { N8NCrudAgent, WorkflowData } from './n8n_crud_agent';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Watchdog, WATCHDOG_TIMEOUT } from './watchdog';
+
+// Start watchdog timer
+const watchdog = new Watchdog(WATCHDOG_TIMEOUT);
+watchdog.start();
 
 /**
  * Test result interface
@@ -434,7 +439,10 @@ async function main(): Promise<void> {
   try {
     const testSuite = new TestN8NCrudAgent();
     await testSuite.runAllTests();
+    // Cancel watchdog on success
+    watchdog.cancel();
   } catch (error: any) {
+    watchdog.cancel();
     console.error(`Failed to initialize test suite: ${error.message}`);
     process.exit(1);
   }

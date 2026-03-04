@@ -1,0 +1,7 @@
+{
+    "extends": "./tsconfig.json",
+    "include": [
+        "dal_server.ts",
+        "dal_booking.ts"
+    ]
+}

@@ -2,12 +2,18 @@
   "name": "DB_Cancel_Booking",
   "nodes": [
     {
-      "parameters": { "inputSource": "passthrough" },
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"booking_id\": \"123e4567-e89b-12d3-a456-426614174000\", \"chat_id\": 12345}"
+      },
+      "id": "trigger_exec",
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
-      "position": [0, 400],
-      "id": "trigger"
+      "position": [
+        0,
+        420
+      ]
     },
     {
       "parameters": {
@@ -15,12 +21,58 @@
         "path": "db-cancel-booking-test",
         "responseMode": "lastNode"
       },
+      "id": "trigger_webhook",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        620
+      ],
+      "webhookId": "db-cancel-booking-test"
+    },
+    {
+      "parameters": {
+        "jsCode": "/* VRF PRE: Validate UUID */\nconst item = $input.first()?.json || {};\nconst data = item.body || item;\nconst booking_id = String(data.booking_id || \"\").trim();\nconst isValid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(booking_id);\nreturn [{ json: { isValid, booking_id, chat_id: data.chat_id } }];"
+      },
+      "id": "validate_uuid",
+      "name": "Validate UUID",
+      "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [0, 600],
-      "webhookId": "db-cancel-booking-test",
-      "id": "webhook_trigger"
+      "position": [
+        200,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid_uuid_cond",
+              "leftValue": "={{ $json.isValid === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if_valid",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        500
+      ]
     },
     {
       "parameters": {
@@ -28,19 +80,124 @@
         "url": "http://dal-service:3000/cancel-booking",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"booking_id\": \"{{ $json.body?.booking_id || $json.booking_id }}\",\n  \"chat_id\": {{ $json.body?.chat_id || $json.chat_id }}\n}",
-        "options": { "neverError": true }
+        "jsonBody": "={\n  \"booking_id\": \"{{ $json.booking_id }}\",\n  \"chat_id\": {{ $json.chat_id }}\n}",
+        "options": {
+          "continueOnFail": true,
+          "timeout": 5000
+        }
       },
+      "id": "call_dal",
       "name": "Call DAL Cancel",
       "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [300, 500],
-      "id": "call_dal"
+      "typeVersion": 4.4,
+      "position": [
+        600,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format Success Response (POST) - Standard Contract\nconst dalResponse = $input.first()?.json || {};\nconst isSuccess = dalResponse.success === true;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    error_code: isSuccess ? null : (dalResponse.error_code || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || dalResponse.message || 'Booking cancellation failed'),\n    data: isSuccess ? (dalResponse.data || { cancelled: true, booking_id: $node[\"Validate UUID\"].json.booking_id }) : null,\n    _meta: {\n      source: 'DB_Cancel_Booking',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Cancel_Booking',\n      version: '1.2.0'\n    }\n  }\n}];"
+      },
+      "id": "format_success",
+      "name": "Format Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        850,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: \"INVALID_BOOKING_ID\",\n    error_message: \"El ID de reserva no es un UUID válido\",\n    data: null,\n    _meta: { source: \"DB_Cancel_Booking\", timestamp: new Date().toISOString(), version: \"1.2.0\" }\n  }\n}];"
+      },
+      "id": "format_invalid",
+      "name": "Format Invalid ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        600
+      ]
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Call DAL Cancel", "type": "main", "index": 0 }]] },
-    "Webhook": { "main": [[{ "node": "Call DAL Cancel", "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate UUID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate UUID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate UUID": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Cancel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Invalid ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Cancel": {
+      "main": [
+        [
+          {
+            "node": "Format Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Invalid ID": {
+      "main": [
+        [
+          {
+            "node": "Format Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1" }
+  "settings": {
+    "executionOrder": "v1"
+  }
 }

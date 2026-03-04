@@ -5,6 +5,11 @@
  */
 
 import { qwenN8nPlugin } from './qwen-n8n-plugin';
+import { Watchdog, WATCHDOG_TIMEOUT } from './watchdog';
+
+// Start watchdog timer
+const watchdog = new Watchdog(WATCHDOG_TIMEOUT);
+watchdog.start();
 
 /**
  * Simulate how Qwen might interpret user commands and use the n8n plugin
@@ -254,11 +259,18 @@ async function main(): Promise<void> {
     console.log(`Request: ${example}`);
     console.log(`Response: ${response}\n`);
   }
+
+  // Cancel watchdog on success
+  watchdog.cancel();
 }
 
 // Run main function if executed directly
 if (require.main === module) {
-  main();
+  main().catch((error) => {
+    watchdog.cancel();
+    console.error('Error:', error);
+    process.exit(1);
+  });
 }
 
 export { simulateQwenInteraction };

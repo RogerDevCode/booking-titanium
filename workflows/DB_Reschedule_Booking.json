@@ -2,51 +2,182 @@
   "name": "DB_Reschedule_Booking",
   "nodes": [
     {
-      "parameters": { "inputSource": "passthrough" },
+      "parameters": {
+        "inputSource": "passthrough"
+      },
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
-      "position": [0, 432],
+      "position": [
+        -200,
+        432
+      ],
       "id": "trigger"
     },
     {
       "parameters": {
-        "workflowId": { "__rl": true, "value": "aKE6HxuHaklajZOU", "mode": "id" },
-        "mode": "wait"
+        "httpMethod": "POST",
+        "path": "db-reschedule-booking",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -200,
+        632
+      ],
+      "webhookId": "db-reschedule-booking",
+      "id": "webhook_trigger"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        232
+      ],
+      "id": "manual_trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.body || $input.first().json;\n\n// VRF — GUARD + VALIDATE\nconst isValidUUID = (v) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);\nconst bookingId = input.old_booking_id || input.booking_id;\n\nif (!bookingId || !isValidUUID(bookingId)) {\n  throw new Error('Invalid or missing booking_id (UUID required)');\n}\nif (!input.new_start_time) {\n  throw new Error('Missing required field: new_start_time');\n}\n\nreturn [{\n  json: {\n    chat_id: parseInt(input.chat_id) || null,\n    booking_id: bookingId,\n    old_booking_id: bookingId,\n    new_start_time: input.new_start_time,\n    provider_id: parseInt(input.provider_id) || 1,\n    service_id: parseInt(input.service_id) || 1,\n    user_email: input.user_email || '',\n    user_name: input.user_name || 'Paciente'\n  }\n}];"
+      },
+      "name": "Build Secure JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        50,
+        432
+      ],
+      "id": "build_json"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "mf4qnUG7UlrAKpQU",
+          "mode": "id"
+        },
+        "mode": "wait",
+        "inputData": "={{ $json }}",
+        "options": {}
       },
       "name": "Step 1: Cancel Old",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [250, 432],
+      "position": [
+        300,
+        432
+      ],
       "id": "cancel_old"
     },
     {
       "parameters": {
-        "workflowId": { "__rl": true, "value": "kuvqYSl3BMrXtews", "mode": "id" },
+        "workflowId": {
+          "__rl": true,
+          "value": "ilA6a6sM5CvDsSBi",
+          "mode": "id"
+        },
         "mode": "wait",
-        "inputData": "={\n  \"chat_id\": {{ $node[\"Execute Workflow Trigger\"].json.chat_id }},\n  \"start_time\": \"{{ $node[\"Execute Workflow Trigger\"].json.new_start_time }}\"\n}"
+        "inputData": "={\n  \"chat_id\": {{ $node[\"Build Secure JSON\"].json.chat_id }},\n  \"start_time\": \"{{ $node[\"Build Secure JSON\"].json.new_start_time }}\",\n  \"provider_id\": {{ $node[\"Build Secure JSON\"].json.provider_id }},\n  \"service_id\": {{ $node[\"Build Secure JSON\"].json.service_id }},\n  \"user_email\": \"{{ $node[\"Build Secure JSON\"].json.user_email }}\",\n  \"user_name\": \"{{ $node[\"Build Secure JSON\"].json.user_name }}\"\n}",
+        "options": {}
       },
       "name": "Step 2: Create New",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [500, 432],
+      "position": [
+        550,
+        432
+      ],
       "id": "create_new"
     },
     {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: true,\n    data: {\n      old_booking_id: $node[\"Execute Workflow Trigger\"].json.old_booking_id,\n      new_booking_id: $node[\"Step 2: Create New\"].json.data?.booking_id\n    },\n    _meta: { source: \"DB_Reschedule_Booking\", timestamp: new Date().toISOString() }\n  }\n}];"
+        "jsCode": "return [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      old_booking_id: $node[\"Build Secure JSON\"]?.json?.old_booking_id || $node[\"Build Secure JSON\"]?.json?.booking_id,\n      new_booking_id: $node[\"Step 2: Create New\"]?.json?.data?.booking_id || $node[\"Step 2: Create New\"]?.json?.booking_id || null\n    },\n    _meta: { source: \"DB_Reschedule_Booking\", timestamp: new Date().toISOString() }\n  }\n}];"
       },
       "name": "Final Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [750, 432],
+      "position": [
+        800,
+        432
+      ],
       "id": "final_res"
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": { "main": [[{ "node": "Step 1: Cancel Old", "type": "main", "index": 0 }]] },
-    "Step 1: Cancel Old": { "main": [[{ "node": "Step 2: Create New", "type": "main", "index": 0 }]] },
-    "Step 2: Create New": { "main": [[{ "node": "Final Response", "type": "main", "index": 0 }]] }
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Secure JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build Secure JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Secure JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Secure JSON": {
+      "main": [
+        [
+          {
+            "node": "Step 1: Cancel Old",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 1: Cancel Old": {
+      "main": [
+        [
+          {
+            "node": "Step 2: Create New",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 2: Create New": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1" }
+  "settings": {
+    "executionOrder": "v1"
+  }
 }
