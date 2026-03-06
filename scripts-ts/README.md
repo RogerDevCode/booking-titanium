@@ -77,6 +77,28 @@ Este directorio contiene la migración completa de los scripts Python originales
 | `fix_node_versions.ts` | Actualiza typeVersion de nodos | `<workflow-file.json>` |
 | `apply_all_fixes.ts` | Aplica fixes a todos los workflows | - |
 
+## Seed Database (NUEVO 2026-03-05)
+
+| Script | Descripción | Parámetros |
+|--------|-------------|------------|
+| `seed_multi_provider.ts` | Asigna múltiples proveedores por especialidad | `--dry-run` |
+
+**Uso:**
+```bash
+# Dry-run (ver sin aplicar)
+npx tsx scripts-ts/seed_multi_provider.ts --dry-run
+
+# Ejecutar (aplica cambios)
+npx tsx scripts-ts/seed_multi_provider.ts
+```
+
+**Datos de semilla:**
+- 6 especialidades: Médico General, Pediatría, Cardiología, Dermatología, Ginecología, Traumatología
+- 2-3 proveedores por especialidad
+- Horarios estándar: Lun-Vie 09:00-13:00 y 15:00-19:00
+- Duración: 30-45 min por especialidad
+- Buffer: 15 min entre consultas
+
 ## Varios
 
 | Script | Descripción |

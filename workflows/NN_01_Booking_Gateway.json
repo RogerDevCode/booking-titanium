@@ -165,7 +165,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const nn02 = $node[\"Parse Incoming Payload (NN_02)\"]?.json || {};\nconst ai = $node[\"Execute AI Agent (NN_03)\"]?.json || {};\nconst tg = $node[\"Send Telegram Response (NN_04)\"]?.json || {};\n\n/* NN_04 returns Standard Contract: {success, data:{message_id}} */\nconst tgOk = !!(tg.success || tg.data?.message_id);\nconst isSuccess = !!(nn02.success && ai.success && tgOk);\n\nlet errCode = null;\nlet errMsg = null;\nif (!nn02.success) { errCode = nn02.error_code || 'VALIDATION_ERROR'; errMsg = nn02.error_message; }\nelse if (!ai.success) { errCode = ai.error_code || 'AI_ERROR'; errMsg = ai.error_message; }\nelse if (!tgOk) { errCode = tg.error_code || 'TELEGRAM_API_ERROR'; errMsg = tg.error_message || 'Telegram failed to send message'; }\n\nreturn [{ json: {\n  success: isSuccess,\n  error_code: isSuccess ? null : errCode,\n  error_message: isSuccess ? null : errMsg,\n  data: isSuccess ? {\n    message_sent: true,\n    chat_id: ai.data?.chat_id || nn02.data?.chat_id,\n    ai_response: ai.data?.ai_response,\n    intent: ai.data?.intent\n  } : null,\n  _meta: { source: 'NN_01_Booking_Gateway', workflow_id: 'NN_01', timestamp: new Date().toISOString(), version: '4.2.0' }\n} }];"
+        "jsCode": "let nn02 = {};\nif ($('Parse Incoming Payload (NN_02)').isExecuted) {\n  nn02 = $('Parse Incoming Payload (NN_02)').first()?.json || {};\n}\n\nlet ai = {};\nif ($('Execute AI Agent (NN_03)').isExecuted) {\n  ai = $('Execute AI Agent (NN_03)').first()?.json || {};\n}\n\nlet tg = {};\nif ($('Send Telegram Response (NN_04)').isExecuted) {\n  tg = $('Send Telegram Response (NN_04)').first()?.json || {};\n}\n\n// Telegram is ok if we got message_id or delivery status SENT, or if Telegram node executed ok\nconst tgOk = !!(tg.success || tg.data?.message_id);\nconst isSuccess = !!(nn02.success && ai.success && (tgOk || !$('Send Telegram Response (NN_04)').isExecuted));\n\nlet errCode = null;\nlet errMsg = null;\nif (!nn02.success) { errCode = nn02.error_code || 'VALIDATION_ERROR'; errMsg = nn02.error_message; }\nelse if (!ai.success) { errCode = ai.error_code || 'AI_ERROR'; errMsg = ai.error_message; }\nelse if ($('Send Telegram Response (NN_04)').isExecuted && !tgOk) { errCode = tg.error_code || 'TELEGRAM_API_ERROR'; errMsg = tg.error_message || 'Telegram failed to send message'; }\n\nreturn [{ json: {\n  success: isSuccess,\n  error_code: isSuccess ? null : errCode,\n  error_message: isSuccess ? null : errMsg,\n  data: isSuccess ? {\n    message_sent: true,\n    chat_id: ai.data?.chat_id || nn02.data?.chat_id,\n    ai_response: ai.data?.ai_response,\n    intent: ai.data?.intent\n  } : null,\n  _meta: { source: 'NN_01_Booking_Gateway', workflow_id: 'NN_01', timestamp: new Date().toISOString(), version: '4.2.0' }\n} }];"
       },
       "id": "4f259c9b-ec55-4b5a-89f9-21e636e8d8b3",
       "name": "Final Response",
@@ -183,13 +183,13 @@
             {
               "id": "text",
               "name": "text",
-              "value": "={{ $node[\"Parse Incoming Payload (NN_02)\"].json.data?.text }}",
+              "value": "={{ $('Parse Incoming Payload (NN_02)').first().json.data?.text }}",
               "type": "string"
             },
             {
               "id": "chat_id",
               "name": "chat_id",
-              "value": "={{ $node[\"Parse Incoming Payload (NN_02)\"].json.data?.chat_id }}",
+              "value": "={{ $('Parse Incoming Payload (NN_02)').first().json.data?.chat_id }}",
               "type": "number"
             }
           ]
@@ -203,6 +203,19 @@
       "position": [
         2544,
         848
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const nn02 = $('Parse Incoming Payload (NN_02)').first()?.json || {};\nconst ai = $('Execute AI Agent (NN_03)').first()?.json || {};\n\nconst chat_id = nn02.data?.chat_id || ai.data?.chat_id;\nconst error_msg = ai.error_message || 'El servicio está congestionado o experimentó un error temporal. Por favor, intenta de nuevo en un momento.';\n\nreturn [{ json: {\n  chat_id: chat_id,\n  text: \"⚠️ Error del asistente:\\n\" + error_msg\n} }];"
+      },
+      "id": "b9fbc74d-9a3b-4c5e-8b9a-112233445566",
+      "name": "Format Telegram Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2912,
+        1040
       ]
     }
   ],
@@ -280,7 +293,7 @@
         ],
         [
           {
-            "node": "Final Response",
+            "node": "Format Telegram Error",
             "type": "main",
             "index": 0
           }
@@ -314,6 +327,17 @@
         [
           {
             "node": "Parse Incoming Payload (NN_02)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Telegram Error": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Response (NN_04)",
             "type": "main",
             "index": 0
           }

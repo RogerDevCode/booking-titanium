@@ -1,0 +1,98 @@
+{
+    "name": "DB_Get_Services",
+    "nodes": [
+        {
+            "parameters": {
+                "inputSource": "jsonExample",
+                "jsonExample": "{\"provider_id\": 1}"
+            },
+            "name": "Execute Workflow Trigger",
+            "type": "n8n-nodes-base.executeWorkflowTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                0,
+                432
+            ],
+            "id": "trigger"
+        },
+        {
+            "parameters": {},
+            "name": "Manual Trigger",
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [
+                0,
+                232
+            ],
+            "id": "manual"
+        },
+        {
+            "parameters": {
+                "method": "GET",
+                "url": "={{ 'http://dal-service:3000/services-by-provider/' + ($json.provider_id || 1) }}",
+                "options": {
+                    "timeout": 5000
+                }
+            },
+            "name": "Call DAL Services",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.4,
+            "position": [
+                250,
+                432
+            ],
+            "id": "call_dal"
+        },
+        {
+            "parameters": {
+                "jsCode": "const dalResponse = $input.first()?.json || {};\nconst isSuccess = dalResponse.success === true;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    error_code: isSuccess ? null : (dalResponse.error_code || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || dalResponse.message || 'Failed to list services'),\n    data: isSuccess ? (dalResponse.data || dalResponse) : null,\n    _meta: {\n      source: 'DB_Get_Services',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Get_Services',\n      version: '1.0.0'\n    }\n  }\n}];"
+            },
+            "name": "Format Output",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                500,
+                432
+            ],
+            "id": "format_out"
+        }
+    ],
+    "connections": {
+        "Execute Workflow Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Call DAL Services",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Manual Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Call DAL Services",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Call DAL Services": {
+            "main": [
+                [
+                    {
+                        "node": "Format Output",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    }
+}

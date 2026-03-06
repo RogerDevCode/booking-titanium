@@ -20,7 +20,7 @@
     },
     {
       "parameters": {
-        "jsCode": "/* STRICT VALIDATION V10 */\nconst item = $input.first()?.json || {};\nconst body = item.body || {};\nconst data = item.chat_id ? item : (body.chat_id ? body : item);\n\nconst chat_id = data.chat_id;\nconst text = data.text || data.ai_response || \"\";\n\nconst isValid = !!(chat_id && text && String(text).trim().length > 2);\n\nreturn [{ json: { isValid, chat_id, sessionId: String(chat_id || ''), text, _meta: { source: \"NN_03_AI_Agent\", timestamp: new Date().toISOString(), workflow_id: \"NN_03\", version: \"2.0.0\" } } }];"
+        "jsCode": "const item = $input.first()?.json || {};\nconst body = item.body || {};\nconst data = item.chat_id ? item : (body.chat_id ? body : item);\n\nconst rawChatId = data.chat_id;\nconst rawText = data.text || data.ai_response || \"\";\n\n// SEC04: Validar chat_id como numérico\nconst isValidChatId = /^\\d+$/.test(String(rawChatId || ''));\n\n// SEC05: Sanitizar text\nconst sanitizedText = String(rawText)\n  .replace(/\\\\/g, '\\\\\\\\')\n  .replace(/'/g, \"''\")\n  .substring(0, 500);\n\n// SEC04 Regex seguro: alfa-numerico, espacios, guiones, puntuacion\nconst isSafeText = /^[\\w\\sáéíóúÁÉÍÓÚñÑ\\-.,!?()¿¡]+$/i.test(sanitizedText);\nconst isValidText = isSafeText && sanitizedText.trim().length > 2;\n\nconst isValid = isValidChatId && isValidText;\n\nreturn [{ json: {\n  isValid,\n  chat_id: isValidChatId ? Number(rawChatId) : null,\n  sessionId: String(rawChatId || ''),\n  text: sanitizedText,\n  _meta: {\n    source: \"NN_03_AI_Agent\",\n    timestamp: new Date().toISOString(),\n    workflow_id: \"NN_03\",\n    version: \"2.0.0\"\n  }\n}}];"
       },
       "id": "a246c59e-4feb-40d3-a714-a882b7d437dd",
       "name": "Extract & Validate (PRE)",
@@ -65,7 +65,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return [{ json: { success: false, error_code: \"VALIDATION_ERROR\", error_message: \"Payload inválido para AI Agent\", data: null, _meta: { source: \"NN_03_AI_Agent\", timestamp: new Date().toISOString() } } }];"
+        "jsCode": "return [{ json: {\n  success: false,\n  error_code: \"VALIDATION_ERROR\",\n  error_message: \"Payload inválido para AI Agent\",\n  data: null,\n  _meta: {\n    source: \"NN_03_AI_Agent\",\n    timestamp: new Date().toISOString(),\n    workflow_id: \"NN_03\",\n    version: \"2.0.0\"\n  }\n}}];"
       },
       "id": "0089046f-0c44-4fc4-8943-b5733074a038",
       "name": "Format Error",
@@ -115,7 +115,8 @@
       "position": [
         -112,
         816
-      ]
+      ],
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -165,9 +166,9 @@
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "provider_id": "={{ $fromAI('provider_id', 'ID del proveedor, default 1', 'number') }}",
-            "service_id": "={{ $fromAI('service_id', 'ID del servicio, default 1', 'number') }}",
-            "date": "={{ $fromAI('date', 'Fecha en formato YYYY-MM-DD', 'string') }}"
+            "provider_id": "={{ $fromAI('provider_id', 'ID del proveedor. SIEMPRE OBLIGATORIO. Usa 1 por defecto si no lo sabes.', 'number') }}",
+            "date": "={{ $fromAI('date', 'Fecha a consultar (YYYY-MM-DD). SIEMPRE OBLIGATORIO.', 'string') }}",
+            "service_id": "={{ $fromAI('service_id', 'ID del servicio. SIEMPRE OBLIGATORIO. Usa 1 por defecto.', 'number') }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -179,7 +180,7 @@
               "display": true,
               "canBeUsedToMatch": true,
               "removed": false,
-              "required": false
+              "required": true
             },
             {
               "id": "service_id",
@@ -189,7 +190,7 @@
               "display": true,
               "canBeUsedToMatch": true,
               "removed": false,
-              "required": false
+              "required": true
             },
             {
               "id": "date",
@@ -199,7 +200,7 @@
               "display": true,
               "canBeUsedToMatch": true,
               "removed": false,
-              "required": false
+              "required": true
             }
           ]
         }
@@ -225,8 +226,9 @@
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "provider_id": "={{ $fromAI('provider_id', 'ID del proveedor, default 1', 'number') }}",
-            "service_id": "={{ $fromAI('service_id', 'ID del servicio, default 1', 'number') }}"
+            "provider_id": "={{ $fromAI('provider_id', 'ID del proveedor. SIEMPRE OBLIGATORIO. Usa 1 por defecto si no lo sabes.', 'number') }}",
+            "service_id": "={{ $fromAI('service_id', 'ID del servicio. SIEMPRE OBLIGATORIO. Usa 1 por defecto si no lo sabes.', 'number') }}",
+            "date": "={{ $fromAI('date', 'Fecha a buscar (YYYY-MM-DD). Usa la fecha actual si no la envian.', 'string') }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -238,12 +240,22 @@
               "display": true,
               "canBeUsedToMatch": true,
               "removed": false,
-              "required": false
+              "required": true
             },
             {
               "id": "service_id",
               "displayName": "service_id",
               "type": "number",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": true
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "type": "string",
               "defaultMatch": false,
               "display": true,
               "canBeUsedToMatch": true,
@@ -258,7 +270,7 @@
       "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
       "typeVersion": 2,
       "position": [
-        240,
+        280,
         1024
       ]
     },
@@ -301,7 +313,7 @@
               "display": true,
               "canBeUsedToMatch": true,
               "removed": false,
-              "required": false
+              "required": true
             },
             {
               "id": "service_id",
@@ -311,7 +323,7 @@
               "display": true,
               "canBeUsedToMatch": true,
               "removed": false,
-              "required": false
+              "required": true
             },
             {
               "id": "user_name",
@@ -321,7 +333,7 @@
               "display": true,
               "canBeUsedToMatch": true,
               "removed": false,
-              "required": false
+              "required": true
             },
             {
               "id": "user_email",
@@ -331,7 +343,7 @@
               "display": true,
               "canBeUsedToMatch": true,
               "removed": false,
-              "required": false
+              "required": true
             },
             {
               "id": "chat_id",
@@ -351,7 +363,7 @@
       "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
       "typeVersion": 2,
       "position": [
-        400,
+        880,
         1024
       ]
     },
@@ -400,13 +412,13 @@
       "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
       "typeVersion": 2,
       "position": [
-        560,
+        1080,
         1024
       ]
     },
     {
       "parameters": {
-        "jsCode": "const aiResp = $input.first()?.json?.output || \"Sin respuesta de IA\";\nconst pre = $node[\"Extract & Validate (PRE)\"].json;\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      intent: \"AI_RESPONSE\",\n      chat_id: pre.chat_id,\n      ai_response: aiResp\n    },\n    _meta: { source: \"NN_03_AI_Agent\", timestamp: new Date().toISOString(), version: \"2.0.0\" }\n  }\n}];"
+        "jsCode": "let chatId = null;\nif ($('Extract & Validate (PRE)').isExecuted) {\n  chatId = $('Extract & Validate (PRE)').first()?.json?.chat_id;\n}\n\nconst aiOutput = $input.first()?.json || {};\n\n// If AI Agent crashed and passed an error message instead of 'output'\nif (aiOutput.error) {\n  return [{ json: {\n    success: false,\n    error_code: \"AI_AGENT_RATE_LIMIT\",\n    error_message: aiOutput.error.message || aiOutput.error || \"Error de la API de AI\",\n    data: { chat_id: chatId },\n    _meta: { source: \"NN_03_AI_Agent\", timestamp: new Date().toISOString(), workflow_id: \"NN_03\", version: \"2.0.0\" }\n  }}];\n}\n\nconst aiResp = aiOutput?.output;\nif (!aiResp || String(aiResp).trim().length === 0) {\n  return [{ json: {\n    success: false,\n    error_code: \"AI_AGENT_ERROR\",\n    error_message: aiOutput?.error?.message || aiOutput?.message || \"AI Agent no generó respuesta\",\n    data: { chat_id: chatId },\n    _meta: { source: \"NN_03_AI_Agent\", timestamp: new Date().toISOString(), workflow_id: \"NN_03\", version: \"2.0.0\" }\n  }}];\n}\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      intent: \"AI_RESPONSE\",\n      chat_id: chatId,\n      ai_response: aiResp\n    },\n    _meta: {\n      source: \"NN_03_AI_Agent\",\n      timestamp: new Date().toISOString(),\n      workflow_id: \"NN_03\",\n      version: \"2.0.0\"\n    }\n  }\n}];"
       },
       "id": "ceb18a95-4003-42bf-bbcc-6b1c9cf6825a",
       "name": "Format Success (POST)",
@@ -415,6 +427,82 @@
       "position": [
         288,
         816
+      ]
+    },
+    {
+      "parameters": {
+        "name": "get_providers",
+        "description": "Lista TODOS los proveedores y servicios del sistema en detalle.",
+        "workflowId": {
+          "__rl": true,
+          "value": "cNC4U2Bg6HoX09YP",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "list": "={{ $fromAI('list', 'Obligatorio poner true', 'boolean') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "list",
+              "displayName": "list",
+              "type": "boolean",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": false
+            }
+          ]
+        }
+      },
+      "id": "tool_get_providers",
+      "name": "Tool: Get Providers",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        480,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "name": "get_providers_by_service",
+        "description": "Busca los proveedores especialistas que ofrecen un servicio especifico. Parametros: service_id (numero).",
+        "workflowId": {
+          "__rl": true,
+          "value": "koGljfSXUzYESNoh",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "service_id": "={{ $fromAI('service_id', 'ID del servicio (numero)', 'number') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "service_id",
+              "displayName": "service_id",
+              "type": "number",
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false,
+              "required": true
+            }
+          ]
+        }
+      },
+      "id": "tool_get_providers_by_service",
+      "name": "Tool: Get Providers By Service",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        680,
+        1024
       ]
     }
   ],
@@ -489,6 +577,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Format Success (POST)",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -548,6 +643,28 @@
       ]
     },
     "Tool: Cancel Booking": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: Get Providers": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: Get Providers By Service": {
       "ai_tool": [
         [
           {

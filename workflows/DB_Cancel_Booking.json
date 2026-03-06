@@ -4,7 +4,7 @@
     {
       "parameters": {
         "inputSource": "jsonExample",
-        "jsonExample": "{\"booking_id\": \"123e4567-e89b-12d3-a456-426614174000\", \"chat_id\": 12345}"
+        "jsonExample": "{\"booking_id\": \"BKG-X7K9P2\", \"chat_id\": 12345}"
       },
       "id": "trigger_exec",
       "name": "Execute Workflow Trigger",
@@ -33,7 +33,7 @@
     },
     {
       "parameters": {
-        "jsCode": "/* VRF PRE: Validate UUID */\nconst item = $input.first()?.json || {};\nconst data = item.body || item;\nconst booking_id = String(data.booking_id || \"\").trim();\nconst isValid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(booking_id);\nreturn [{ json: { isValid, booking_id, chat_id: data.chat_id } }];"
+        "jsCode": "/* VRF PRE: Validate Booking ID (UUID or BKG-XXXXXX) */\nconst item = $input.first()?.json || {};\nconst data = item.body || item;\nconst booking_id = String(data.booking_id || \"\").trim();\n// Accept UUID or BKG-XXXXX format\nconst isValid = booking_id.length > 5;\nreturn [{ json: { isValid, booking_id, chat_id: data.chat_id } }];"
       },
       "id": "validate_uuid",
       "name": "Validate UUID",
@@ -110,7 +110,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: \"INVALID_BOOKING_ID\",\n    error_message: \"El ID de reserva no es un UUID válido\",\n    data: null,\n    _meta: { source: \"DB_Cancel_Booking\", timestamp: new Date().toISOString(), version: \"1.2.0\" }\n  }\n}];"
+        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: \"INVALID_BOOKING_ID\",\n    error_message: \"El ID de reserva no es válido (debe ser código BKG-XXXX o UUID)\",\n    data: null,\n    _meta: { source: \"DB_Cancel_Booking\", timestamp: new Date().toISOString(), version: \"1.2.0\" }\n  }\n}];"
       },
       "id": "format_invalid",
       "name": "Format Invalid ID",

@@ -1,0 +1,211 @@
+{
+  "timestamp": "2026-03-05T21:40:00.057Z",
+  "totalWorkflows": 20,
+  "executed": 15,
+  "successful": 10,
+  "failed": 5,
+  "skipped": 5,
+  "results": [
+    {
+      "workflowName": "BB_00_Config",
+      "workflowFile": "BB_00_Config.json",
+      "webhookPath": "bb-00-config",
+      "success": false,
+      "executionTime": 5884,
+      "statusCode": 404,
+      "error": "HTTP 404: Not Found"
+    },
+    {
+      "workflowName": "DB_Get_Providers",
+      "workflowFile": "DB_Get_Providers.json",
+      "success": false,
+      "error": "No webhook found in workflow"
+    },
+    {
+      "workflowName": "DB_Get_Providers_By_Service",
+      "workflowFile": "DB_Get_Providers_By_Service.json",
+      "success": false,
+      "error": "No webhook found in workflow"
+    },
+    {
+      "workflowName": "DB_Get_Services",
+      "workflowFile": "DB_Get_Services.json",
+      "success": false,
+      "error": "No webhook found in workflow"
+    },
+    {
+      "workflowName": "DB_Cancel_Booking",
+      "workflowFile": "DB_Cancel_Booking.json",
+      "webhookPath": "db-cancel-booking-test",
+      "success": true,
+      "executionTime": 5871,
+      "statusCode": 200,
+      "standardContractValid": true,
+      "error": "El ID de reserva no es válido (debe ser código BKG-XXXX o UUID)"
+    },
+    {
+      "workflowName": "DB_Create_Booking",
+      "workflowFile": "DB_Create_Booking.json",
+      "webhookPath": "db-create-booking-test",
+      "success": false,
+      "executionTime": 5909,
+      "statusCode": 500,
+      "error": "HTTP 500: Internal Server Error"
+    },
+    {
+      "workflowName": "FRONTEND_Landing_Page",
+      "workflowFile": "FRONTEND_Landing_Page.json",
+      "webhookPath": "titanium-landing",
+      "success": false,
+      "executionTime": 306,
+      "statusCode": 404,
+      "error": "HTTP 404: Not Found"
+    },
+    {
+      "workflowName": "DB_Reschedule_Booking",
+      "workflowFile": "DB_Reschedule_Booking.json",
+      "webhookPath": "db-reschedule-booking",
+      "success": false,
+      "executionTime": 342,
+      "statusCode": 500,
+      "error": "HTTP 500: Internal Server Error"
+    },
+    {
+      "workflowName": "GLOBAL_Config",
+      "workflowFile": "GLOBAL_Config.json",
+      "success": false,
+      "error": "No webhook found in workflow"
+    },
+    {
+      "workflowName": "GCAL_Create_Event",
+      "workflowFile": "GCAL_Create_Event.json",
+      "webhookPath": "gcal-create-event",
+      "success": true,
+      "executionTime": 1127,
+      "statusCode": 200,
+      "standardContractValid": true
+    },
+    {
+      "workflowName": "GCAL_Delete_Event",
+      "workflowFile": "GCAL_Delete_Event.json",
+      "webhookPath": "gcal-delete-event",
+      "success": true,
+      "executionTime": 1363,
+      "statusCode": 200,
+      "standardContractValid": true,
+      "error": "Failed to delete GCal event"
+    },
+    {
+      "workflowName": "GMAIL_Send_Confirmation",
+      "workflowFile": "GMAIL_Send_Confirmation.json",
+      "webhookPath": "gmail-send-confirmation",
+      "success": true,
+      "executionTime": 1638,
+      "statusCode": 200,
+      "standardContractValid": true
+    },
+    {
+      "workflowName": "NN_01_Booking_Gateway",
+      "workflowFile": "NN_01_Booking_Gateway.json",
+      "webhookPath": "nn-01-booking-gateway",
+      "success": false,
+      "executionTime": 599,
+      "statusCode": 500,
+      "error": "HTTP 500: Internal Server Error"
+    },
+    {
+      "workflowName": "DB_Find_Next_Available",
+      "workflowFile": "DB_Find_Next_Available.json",
+      "webhookPath": "db-find-next-available",
+      "success": true,
+      "executionTime": 8137,
+      "statusCode": 200,
+      "standardContractValid": true
+    },
+    {
+      "workflowName": "DB_Get_Availability",
+      "workflowFile": "DB_Get_Availability.json",
+      "webhookPath": "db-get-availability-test",
+      "success": true,
+      "executionTime": 8136,
+      "statusCode": 200,
+      "standardContractValid": true
+    },
+    {
+      "workflowName": "NN_05_Reminder_Cron",
+      "workflowFile": "NN_05_Reminder_Cron.json",
+      "success": false,
+      "error": "No webhook found in workflow"
+    },
+    {
+      "workflowName": "NN_02_Message_Parser",
+      "workflowFile": "NN_02_Message_Parser.json",
+      "webhookPath": "nn-02-booking-parser-test",
+      "success": true,
+      "executionTime": 483,
+      "statusCode": 200,
+      "standardContractValid": true,
+      "error": "Payload missing required chat_id or text fields."
+    },
+    {
+      "workflowName": "NN_04_Telegram_Sender",
+      "workflowFile": "NN_04_Telegram_Sender.json",
+      "webhookPath": "nn-04-telegram-sender-v2",
+      "success": true,
+      "executionTime": 404,
+      "statusCode": 200,
+      "standardContractValid": true,
+      "error": "Payload missing required fields for Telegram"
+    },
+    {
+      "workflowName": "NN_03_AI_Agent",
+      "workflowFile": "NN_03_AI_Agent.json",
+      "webhookPath": "nn-03-ai-agent",
+      "success": true,
+      "nodeVersionIssues": [
+        {
+          "nodeName": "Tool: Check Availability",
+          "nodeType": "@n8n/n8n-nodes-langchain.toolWorkflow",
+          "currentVersion": 2,
+          "latestVersion": 2.2,
+          "available": true
+        },
+        {
+          "nodeName": "Tool: Find Next Available",
+          "nodeType": "@n8n/n8n-nodes-langchain.toolWorkflow",
+          "currentVersion": 2,
+          "latestVersion": 2.2,
+          "available": true
+        },
+        {
+          "nodeName": "Tool: Create Booking",
+          "nodeType": "@n8n/n8n-nodes-langchain.toolWorkflow",
+          "currentVersion": 2,
+          "latestVersion": 2.2,
+          "available": true
+        },
+        {
+          "nodeName": "Tool: Cancel Booking",
+          "nodeType": "@n8n/n8n-nodes-langchain.toolWorkflow",
+          "currentVersion": 2,
+          "latestVersion": 2.2,
+          "available": true
+        }
+      ],
+      "executionTime": 405,
+      "statusCode": 200,
+      "standardContractValid": true,
+      "error": "Payload inválido para AI Agent"
+    },
+    {
+      "workflowName": "NN_00_Global_Error_Handler",
+      "workflowFile": "NN_00_Global_Error_Handler.json",
+      "webhookPath": "nn-00-global-error",
+      "success": true,
+      "executionTime": 4734,
+      "statusCode": 200,
+      "standardContractValid": true
+    }
+  ],
+  "coveragePercentage": 67
+}

@@ -3,6 +3,11 @@ import { Pool } from 'pg';
 import { DateTime } from 'luxon';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { customAlphabet } from 'nanoid';
+
+// Custom Alphanumeric Generator (Avoid confusing chars like 0/O, 1/L)
+const generateShortCode = customAlphabet('23456789ABCDEFGHJKLMNPQRSTUVWXYZ', 6);
+
 
 dotenv.config();
 dotenv.config({ path: path.resolve(__dirname, '.env') });
@@ -19,10 +24,14 @@ const dbConfig = {
     ssl: { rejectUnauthorized: false },
     max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    connectionTimeoutMillis: 15000, // Increased for serverless waking up
 };
 
 const pool = new Pool(dbConfig);
+
+pool.on('error', (err) => {
+    console.error('Unexpected error on idle client', err);
+});
 
 // --- HELPER: Get Slots for a Specific Day ---
 async function getSlotsForDay(provider_id: number, service_id: number, date: string) {
@@ -45,14 +54,30 @@ async function getSlotsForDay(provider_id: number, service_id: number, date: str
     const { start_time, end_time } = dbData.schedule;
     const bookings = dbData.bookings || [];
 
-    let current = DateTime.fromISO(`${date}T${start_time}`, { zone: 'utc' });
-    const finish = DateTime.fromISO(`${date}T${end_time}`, { zone: 'utc' });
+    // Safety buffer: 2 hours from NOW
+    // We use Chilean time to match n8n config, but we MUST be consistent with how we parse DB times
+    const tz = 'America/Santiago';
+    const nowWithBuffer = DateTime.now().setZone(tz).plus({ hours: 2 });
+
+    let current = DateTime.fromISO(`${date}T${start_time}`, { zone: tz });
+    const finish = DateTime.fromISO(`${date}T${end_time}`, { zone: tz });
 
     while (current.plus({ minutes: duration_min }) <= finish) {
         const sStart = current;
         const sEnd = current.plus({ minutes: duration_min });
-        const isBusy = bookings.some((b: any) => (sStart < DateTime.fromISO(b.end_time, { zone: 'utc' }) && sEnd > DateTime.fromISO(b.start_time, { zone: 'utc' })));
-        if (!isBusy) slots.push({ start_time: sStart.toISO(), display_time: sStart.toFormat('HH:mm') });
+        
+        // 1. Check if slot is BUSY (existing implementation)
+        const isBusy = bookings.some((b: any) => (sStart < DateTime.fromISO(b.end_time, { zone: tz }) && sEnd > DateTime.fromISO(b.start_time, { zone: tz })));
+        
+        // 2. Check if slot is far enough in the FUTURE (+2h resguardo)
+        const isFutureEnough = sStart >= nowWithBuffer;
+
+        if (!isBusy && isFutureEnough) {
+            slots.push({ 
+                start_time: sStart.toISO(), 
+                display_time: sStart.toFormat('HH:mm') 
+            });
+        }
         current = sEnd.plus({ minutes: buffer_min });
     }
     return slots;
@@ -60,21 +85,33 @@ async function getSlotsForDay(provider_id: number, service_id: number, date: str
 
 // --- SMART LOOKUP: Find First Available Day in 7 days ---
 async function findFirstAvailable(provider_id: number, service_id: number, startDate: string) {
+    const startLog = Date.now();
     try {
-        let currentDt = DateTime.fromISO(startDate);
+        console.log(`[AVAIL_SEARCH] Starting parallel search for Provider: ${provider_id}, Service: ${service_id}, Start: ${startDate}`);
+        const baseDt = DateTime.fromISO(startDate);
+        const days = Array.from({ length: 7 }, (_, i) => {
+            const d = baseDt.plus({ days: i }).toISODate();
+            return d;
+        }).filter((d): d is string => !!d);
         
-        for (let i = 0; i < 7; i++) {
-            const dateStr = currentDt.toISODate();
-            if (!dateStr) continue;
+        const results = await Promise.all(days.map(async (dateStr) => {
+            const dayStart = Date.now();
             const slots = await getSlotsForDay(provider_id, service_id, dateStr);
-            if (slots.length > 0) {
-                return { success: true, date: dateStr, slots: slots.slice(0, 5) }; // Devolvemos max 5 opciones
-            }
-            currentDt = currentDt.plus({ days: 1 });
+            console.log(`[AVAIL_DAY] Day: ${dateStr}, Found: ${slots.length}, Time: ${Date.now() - dayStart}ms`);
+            return slots.length > 0 ? { date: dateStr, slots } : null;
+        }));
+
+        const firstHit = results.find(r => r !== null);
+        console.log(`[AVAIL_FINISH] Total Time: ${Date.now() - startLog}ms`);
+
+        if (firstHit) {
+            return { success: true, date: firstHit.date, slots: firstHit.slots.slice(0, 5) };
         }
+        
         return { success: true, date: null, slots: [], message: "No availability in the next 7 days" };
     } catch (err: unknown) {
         const error = err as Error;
+        console.error(`[AVAIL_ERROR] Time: ${Date.now() - startLog}ms, Error:`, error.message);
         return { success: false, error_message: error.message };
     }
 }
@@ -90,6 +127,56 @@ app.post('/availability', async (req: express.Request, res: express.Response): P
 
 app.post('/find-next-available', async (req: express.Request, res: express.Response): Promise<void> => {
     res.json(await findFirstAvailable(req.body.provider_id, req.body.service_id, req.body.date));
+});
+
+// Endpoint to LIST providers
+app.get('/providers', async (_req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const query = `SELECT id, name FROM public.providers WHERE is_active = TRUE ORDER BY name ASC`;
+        const result = await pool.query(query);
+        res.json({ success: true, data: result.rows });
+    } catch (e: unknown) {
+        const error = e as Error;
+        res.status(500).json({ success: false, error_message: error.message });
+    }
+});
+
+// Endpoint to LIST services for a provider
+app.get('/services-by-provider/:provider_id', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const { provider_id } = req.params;
+        const query = `
+            SELECT s.id, s.name, s.duration_min, s.buffer_min
+            FROM public.services s
+            JOIN public.provider_services ps ON s.id = ps.service_id
+            WHERE ps.provider_id = $1::integer
+            ORDER BY s.name ASC
+        `;
+        const result = await pool.query(query, [provider_id]);
+        res.json({ success: true, data: result.rows });
+    } catch (e: unknown) {
+        const error = e as Error;
+        res.status(500).json({ success: false, error_message: error.message });
+    }
+});
+
+// Endpoint to LIST providers for a service
+app.get('/providers-by-service/:service_id', async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+        const { service_id } = req.params;
+        const query = `
+            SELECT p.id, p.name
+            FROM public.providers p
+            JOIN public.provider_services ps ON p.id = ps.provider_id
+            WHERE ps.service_id = $1::integer AND p.is_active = TRUE
+            ORDER BY p.name ASC
+        `;
+        const result = await pool.query(query, [service_id]);
+        res.json({ success: true, data: result.rows });
+    } catch (e: unknown) {
+        const error = e as Error;
+        res.status(500).json({ success: false, error_message: error.message });
+    }
 });
 
 // Endpoint to CREATE a booking
@@ -128,17 +215,21 @@ app.post('/create-booking', async (req: express.Request, res: express.Response):
         }
 
         // 3. Insert Booking (using chat_id for user_id)
+        const shortCode = `BKG-${generateShortCode()}`;
         const query = `
-            INSERT INTO public.bookings (provider_id, service_id, user_id, start_time, end_time, status)
-            VALUES ($1::integer, $2::integer, $3::bigint, $4::timestamptz, $4::timestamptz + interval '1 hour', 'CONFIRMED')
-            RETURNING id;
+            INSERT INTO public.bookings (provider_id, service_id, user_id, start_time, end_time, status, short_code)
+            VALUES ($1::integer, $2::integer, $3::bigint, $4::timestamptz, $4::timestamptz + interval '1 hour', 'CONFIRMED', $5::varchar)
+            RETURNING id, short_code;
         `;
-        const values = [provider_id, service_id, chat_id, start_time];
+        const values = [provider_id, service_id, chat_id, start_time, shortCode];
         const resInsert = await pool.query(query, values);
 
         res.json({ 
             success: true, 
-            data: { booking_id: resInsert.rows[0].id },
+            data: { 
+                booking_id: resInsert.rows[0].id,
+                booking_code: resInsert.rows[0].short_code
+            },
             _meta: { source: "DAL_Create", timestamp: new Date().toISOString() }
         });
     } catch (e: unknown) {
@@ -153,8 +244,12 @@ app.post('/cancel-booking', async (req: express.Request, res: express.Response):
     try {
         const { booking_id, chat_id } = req.body;
 
+        // Detect if booking_id is UUID or short code
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(booking_id);
+        const whereClause = isUUID ? "id = $1::uuid" : "short_code = $1::varchar";
+
         // Validate: check if exists and get status (using user_id = chat_id)
-        const checkQuery = `SELECT status FROM public.bookings WHERE id = $1::uuid AND user_id = $2::bigint`;
+        const checkQuery = `SELECT id, status FROM public.bookings WHERE ${whereClause} AND user_id = $2::bigint`;
         const resCheck = await pool.query(checkQuery, [booking_id, chat_id]);
         if (resCheck.rows.length === 0) {
             res.json({ 
@@ -176,16 +271,20 @@ app.post('/cancel-booking', async (req: express.Request, res: express.Response):
         }
 
         // Cancel
+        const realId = resCheck.rows[0].id;
         const query = `
             UPDATE public.bookings SET status = 'CANCELLED'
             WHERE id = $1::uuid AND user_id = $2::bigint
-            RETURNING id;
+            RETURNING id, short_code;
         `;
-        const resUpdate = await pool.query(query, [booking_id, chat_id]);
+        const resUpdate = await pool.query(query, [realId, chat_id]);
 
         res.json({ 
             success: true, 
-            data: { booking_id: resUpdate.rows[0].id },
+            data: { 
+                booking_id: resUpdate.rows[0].id,
+                booking_code: resUpdate.rows[0].short_code
+            },
             _meta: { source: "DAL_Cancel", timestamp: new Date().toISOString() }
         });
     } catch (e: unknown) {

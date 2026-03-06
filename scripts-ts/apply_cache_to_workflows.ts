@@ -9,7 +9,7 @@ function applyCache(workflowName: string, dalNodeName: string) {
 
   const checkCacheNode = {
     "parameters": {
-      "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst provider = $json.provider_id || $json.body?.provider_id || 1;\nconst service = $json.service_id || $json.body?.service_id || 1;\nconst date = $json.date || $json.body?.date || '2026-03-04';\nconst key = `${provider}_${service}_${date}`;\nconst now = new Date().getTime();\n\nlet hit = false;\nlet data = null;\n\nif (staticData[key] && (now - staticData[key].timestamp < 5 * 60 * 1000)) {\n  hit = true;\n  data = staticData[key].data;\n}\n\nreturn {\n  json: { provider_id: provider, service_id: service, date: date, cache_hit: hit, cache_data: data, cache_key: key }\n};"
+      "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst provider = $json.provider_id || $json.body?.provider_id || 1;\nconst service = $json.service_id || $json.body?.service_id || 1;\nconst date = $json.date || $json.body?.date || new Date().toISOString().split('T')[0];\nconst key = `${provider}_${service}_${date}`;\nconst now = new Date().getTime();\n\nlet hit = false;\nlet data = null;\n\nif (staticData[key] && (now - staticData[key].timestamp < 5 * 60 * 1000)) {\n  hit = true;\n  data = staticData[key].data;\n}\n\nreturn {\n  json: { provider_id: provider, service_id: service, date: date, cache_hit: hit, cache_data: data, cache_key: key }\n};"
     },
     "name": "Check Cache",
     "type": "n8n-nodes-base.code",
