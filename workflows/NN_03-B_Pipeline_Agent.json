@@ -1,5 +1,11 @@
 {
+  "updatedAt": "2026-03-09T18:41:53.957Z",
+  "createdAt": "2026-03-06T18:51:21.450Z",
+  "id": "X3D2dWkBu8QLlNSm",
   "name": "NN_03-B_Pipeline_Agent",
+  "description": null,
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {},
@@ -10,7 +16,7 @@
         0,
         0
       ],
-      "id": "d6bf3ce8-5a3c-4b7f-b72d-d019d999c377"
+      "id": "d135b039-b6f3-43d7-b284-132525e909fb"
     },
     {
       "parameters": {
@@ -23,7 +29,7 @@
         0,
         -200
       ],
-      "id": "96e40052-e53e-4075-8951-7d54d97846b9"
+      "id": "1bbf6930-b6a1-4d86-9945-9f7f8278915b"
     },
     {
       "parameters": {
@@ -40,25 +46,25 @@
         200
       ],
       "webhookId": "nn-03-b-pipeline",
-      "id": "edd18a38-7ee6-4e51-a4f7-cfbaceadb31d",
-      "notes": "📥 IN: { chat_id: number, text: string (2-500 chars) }"
+      "notes": "\ud83d\udce5 IN: { chat_id: number, text: string (2-500 chars) }",
+      "id": "c9a89d90-fa64-4b7d-ae1e-2f0cde133656"
     },
     {
       "parameters": {
         "jsCode": "const raw = $input.first()?.json || {};\nconst body = raw.body || {};\nconst data = raw.chat_id ? raw : (body.chat_id ? body : raw);\n\nconst chat_id = Number(data.chat_id ?? 0);\n\nreturn [{\n  json: {\n    chat_id: chat_id,\n    sessionId: String(chat_id),\n    text: String(data.text ?? '').trim(),\n    intent: 'general_chat',\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
       },
-      "name": "Type Normalization",
+      "name": "Input_Clean",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         300,
         0
       ],
-      "id": "031e10bc-cee3-498e-8abb-4e1a35e51add"
+      "id": "fb6f01f1-8da6-4159-b78f-8caa87f053ca"
     },
     {
       "parameters": {
-        "jsCode": "const chatIdStr = String($json.chat_id ?? '');\nconst chat_id_valid = chatIdStr.length > 0 && [...chatIdStr].every(c => c >= '0' && c <= '9');\nconst text = String($json.text ?? '').trim();\nconst text_valid = text.length > 2 && text.length < 500;\n\nreturn [{\n  json: {\n    ...$json,\n    isValid: chat_id_valid && text_valid\n  }\n}];"
+        "jsCode": "const chatIdStr = String($json.chat_id ?? '');\nconst chat_id_valid = chatIdStr.length > 0 && [...chatIdStr].every(c => c >= '0' && c <= '9');\nconst text = String($('Input_Clean').first().json.text ?? '').trim();\nconst text_valid = text.length > 2 && text.length < 500;\n\nreturn [{\n  json: {\n    ...$json,\n    isValid: chat_id_valid && text_valid\n  }\n}];"
       },
       "name": "Payload Validation",
       "type": "n8n-nodes-base.code",
@@ -67,7 +73,7 @@
         550,
         0
       ],
-      "id": "ff02a7bd-675a-42c6-a2aa-d4e27b533146"
+      "id": "6fa6d0dc-5be8-43f5-94dc-2f0313e89533"
     },
     {
       "parameters": {
@@ -96,11 +102,11 @@
         800,
         0
       ],
-      "id": "ef4d5748-88cf-48da-b445-1cbceba6a431"
+      "id": "65fd4ffa-fb44-4ce2-96e7-80a601e97419"
     },
     {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: 'VALIDATION_ERROR',\n    error_message: 'Datos de entrada inválidos: chat_id debe ser numérico y text entre 3-499 chars'\n  }\n}];"
+        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: 'VALIDATION_ERROR',\n    error_message: 'Datos de entrada inv\u00e1lidos: chat_id debe ser num\u00e9rico y text entre 3-499 chars',\n    data: null,\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
       },
       "name": "Err: Validation",
       "type": "n8n-nodes-base.code",
@@ -109,11 +115,11 @@
         1050,
         200
       ],
-      "id": "094d06af-3a51-4b20-bcab-5742f915e19a"
+      "id": "b6704d9b-57c4-4c98-a720-acac37248913"
     },
     {
       "parameters": {
-        "jsCode": "const textLower = String($json.text || '').toLowerCase();\n\nconst PROFANITY_REGEX = /\\b(conchetumare|ctm|culiao|qliao|pichula|tula|zorra|maraco|maricón|maricon|puta|mierda|fuck|shit|asshole|bitch|bastard|motherfucker|dick|cunt|pussy|prick|estúpido|estupido|idiota|imbécil|imbecil|gilipollas|huevon|weon)\\b/i;\n\nconst INJECTION_PHRASES = [\n  'ignore all previous instructions', 'disregard all rules', 'system prompt',\n  'jailbreak', 'dan mode', 'olvida todas las instrucciones'\n];\n\nconst OFFTOPIC_PHRASES = [\n  'escribe un poema', 'write a poem', 'cuéntame un cuento', 'cuentame un cuento',\n  'tell me a story', 'genera código', 'genera codigo', 'create code',\n  'hackear', 'hacking', 'política', 'politica'\n];\n\nlet isBlocked = false;\n\nif (PROFANITY_REGEX.test(textLower)) isBlocked = true;\nif (!isBlocked) {\n  for (const phrase of INJECTION_PHRASES) {\n    if (textLower.includes(phrase)) { isBlocked = true; break; }\n  }\n}\nif (!isBlocked) {\n  for (const phrase of OFFTOPIC_PHRASES) {\n    if (textLower.includes(phrase)) { isBlocked = true; break; }\n  }\n}\n\nreturn [{ json: { ...$json, isBlocked } }];"
+        "jsCode": "const textLower = String($('Input_Clean').first().json.text || '').toLowerCase();\n\nconst PROFANITY_REGEX = /\\b(conchetumare|ctm|culiao|qliao|pichula|tula|zorra|maraco|maric\u00f3n|maricon|puta|mierda|fuck|shit|asshole|bitch|bastard|motherfucker|dick|cunt|pussy|prick|est\u00fapido|estupido|idiota|imb\u00e9cil|imbecil|gilipollas|huevon|weon)\\b/i;\n\nconst INJECTION_PHRASES = [\n  'ignore all previous instructions', 'disregard all rules', 'system prompt',\n  'jailbreak', 'dan mode', 'olvida todas las instrucciones'\n];\n\nconst OFFTOPIC_PHRASES = [\n  'escribe un poema', 'write a poem', 'cu\u00e9ntame un cuento', 'cuentame un cuento',\n  'tell me a story', 'genera c\u00f3digo', 'genera codigo', 'create code',\n  'hackear', 'hacking', 'pol\u00edtica', 'politica'\n];\n\nlet isBlocked = false;\n\nif (PROFANITY_REGEX.test(textLower)) isBlocked = true;\nif (!isBlocked) {\n  for (const phrase of INJECTION_PHRASES) {\n    if (textLower.includes(phrase)) { isBlocked = true; break; }\n  }\n}\nif (!isBlocked) {\n  for (const phrase of OFFTOPIC_PHRASES) {\n    if (textLower.includes(phrase)) { isBlocked = true; break; }\n  }\n}\n\nreturn [{ json: { ...$json, isBlocked } }];"
       },
       "name": "Rule Firewall",
       "type": "n8n-nodes-base.code",
@@ -122,7 +128,7 @@
         1050,
         -200
       ],
-      "id": "6339dc4c-70e6-476c-96b7-b6e67e8a9fb0"
+      "id": "d141fbde-4d6b-4f25-b444-d2a25d20ad7e"
     },
     {
       "parameters": {
@@ -151,11 +157,11 @@
         1300,
         -200
       ],
-      "id": "1151f707-cd13-492b-99e3-222b859f1ddf"
+      "id": "6130180c-c89e-4ef3-ba21-aa8e6cfcd260"
     },
     {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: 'SECURITY_BLOCKED',\n    error_message: 'Mensaje bloqueado por reglas de seguridad'\n  }\n}];"
+        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: 'SECURITY_BLOCKED',\n    error_message: 'Mensaje bloqueado por reglas de seguridad',\n    data: null,\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
       },
       "name": "Err: Security",
       "type": "n8n-nodes-base.code",
@@ -164,12 +170,12 @@
         1550,
         0
       ],
-      "id": "6f6c8b2d-9119-4c11-981c-b59c730b2582"
+      "id": "21c5436f-a670-4252-8cdc-4b61bd16c5dd"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "Clasifica el siguiente mensaje del usuario en EXACTAMENTE una categoría.\n\nCATEGORÍAS VÁLIDAS:\n- create_booking: quiere AGENDAR, RESERVAR o SACAR un turno/cita.\n- cancel_booking: quiere CANCELAR un turno/cita existente.\n- check_availability: consulta horarios o disponibilidad para una fecha.\n- find_next: busca el PRIMER o PRÓXIMO turno disponible.\n- get_services: pregunta por servicios médicos, especialidades, doctores.\n- general_chat: saludos, agradecimientos, preguntas generales.\n\nMENSAJE: {{ $json.text }}\n\nResponde ÚNICAMENTE con el nombre de la categoría, sin explicación."
+        "text": "### TAREA\\nClasifica el mensaje en una de estas categor\u00edas:\\n\\n- create_booking: quiere agendar turno (ej: 'quiero un turno').\\n- cancel_booking: quiere cancelar un turno (ej: 'borra mi cita').\\n- check_availability: ver horarios o si hay lugar.\\n- find_next: buscar el primer turno libre.\\n- get_services: info sobre PRECIOS, especialidades, m\u00e9dicos, seguros, pagos, ubicaci\u00f3n, resultados.\\n- general_chat: saludos, gracias, charla informal.\\n\\n### EJEMPLOS\\n\\\"\u00bfCu\u00e1nto cuesta?\\\" -> get_services\\n\\\"\u00bfTienen cardiolog\u00eda?\\\" -> get_services\\n\\\"Hola\\\" -> general_chat\\n\\\"Aceptan OSDE?\\\" -> get_services\\n\\\"Quiero cancelar\\\" -> cancel_booking\\n\\n### MENSAJE\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde SOLO la categor\u00eda."
       },
       "name": "Intent Classifier LLM",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -179,29 +185,29 @@
         -400
       ],
       "retryOnFail": true,
-      "id": "7e26ae19-5c9f-4859-a3ca-b45ea319aaec"
+      "id": "ba1c29b6-2264-4190-bae2-a6b60be2da4c"
     },
     {
       "parameters": {
-        "model": "llama-3.1-8b-instant",
+        "model": "llama-3.3-70b-versatile",
         "options": {
           "temperature": 0
         }
       },
-      "name": "Groq Model (8B)",
+      "name": "Groq Model (70B Classifier)",
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
         1550,
         -200
       ],
-      "id": "79afb59d-05c8-4a07-a8a6-49a9e5abca5f",
       "credentials": {
         "groqApi": {
           "id": "2LYxRbHB7xVo0wNe",
           "name": "Groq account"
         }
-      }
+      },
+      "id": "72471289-9760-45e5-88f0-ed9e80c6ee39"
     },
     {
       "parameters": {
@@ -214,7 +220,7 @@
         1800,
         -400
       ],
-      "id": "1dbe9176-81c0-473f-91dd-fcd3343261b9"
+      "id": "05f34a51-f995-4499-a304-41cdfeb5feb4"
     },
     {
       "parameters": {
@@ -365,7 +371,7 @@
         2050,
         -400
       ],
-      "id": "0d84a3ae-f372-4a05-95de-f9adf12acf38"
+      "id": "b3fbbf34-81fd-41b4-9a8f-ee21d06b7fc5"
     },
     {
       "parameters": {
@@ -381,18 +387,18 @@
         3200,
         600
       ],
-      "id": "910e05b1-16f3-4287-b879-3f8999c6d929",
       "credentials": {
         "groqApi": {
           "id": "2LYxRbHB7xVo0wNe",
           "name": "Groq account"
         }
-      }
+      },
+      "id": "dd1bfe18-081e-4c03-a751-2d3c5a0b7171"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=\"Extrae los parámetros del texto para agendar médico. Responde SOLO JSON puro.\\nJSON:\\n{\\n  \\\"start_time\\\": \\\"2025-01-15T10:00:00\\\",\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"user_name\\\": \\\"Usuario\\\",\\n  \\\"user_email\\\": \\\"sin-email@booking.com\\\"\\n}\\n\\nTexto: \" + $('Rule Firewall').first().json.text"
+        "text": "### TAREA\\nExtrae par\u00e1metros para agendar m\u00e9dico. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"start_time\\\": \\\"YYYY-MM-DDTHH:MM:SS\\\",\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"user_name\\\": \\\"Nombre\\\",\\n  \\\"user_email\\\": \\\"email@ejemplo.com\\\"\\n}"
       },
       "name": "Extract Params: create_booking",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -402,11 +408,11 @@
         -1000
       ],
       "retryOnFail": true,
-      "id": "fa2181f1-fccb-4c71-a351-ea4310dd1ad8"
+      "id": "4b2dc260-de79-4fc4-ae87-a8646e6659f4"
     },
     {
       "parameters": {
-        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\nif (jsonMatch) {\n  try { params = JSON.parse(jsonMatch[0]); } catch(e) {}\n}\n\nparams.chat_id = $('Type Normalization').first().json.chat_id || 0;\n\n// SEC04/05 Robust validation\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoRegex = /^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?$/;\nparams.start_time = (params.start_time && isoRegex.test(String(params.start_time)))\n  ? params.start_time\n  : new Date().toISOString();\n\nconst sanitize = (v) => String(v || '').replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nparams.user_name = sanitize(params.user_name || 'Usuario');\n\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nparams.user_email = emailRegex.test(String(params.user_email))\n  ? String(params.user_email).substring(0, 254)\n  : 'sin-email@booking.com';\n\nreturn [{ json: params }];"
+        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\n// SEC04/05 Robust validation\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoRegex = /^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?$/;\nparams.start_time = (params.start_time && isoRegex.test(String(params.start_time)))\n  ? params.start_time\n  : new Date().toISOString();\n\nconst sanitize = (v) => String(v || '').replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nparams.user_name = sanitize(params.user_name || 'Usuario');\n\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nparams.user_email = emailRegex.test(String(params.user_email))\n  ? String(params.user_email).substring(0, 254)\n  : 'sin-email@booking.com';\n\nreturn [{ json: params }];"
       },
       "name": "Parse: create_booking",
       "type": "n8n-nodes-base.code",
@@ -415,7 +421,8 @@
         2650,
         -1000
       ],
-      "id": "b9cb89e8-3302-48c0-af80-6254ec7048b3"
+      "onError": "continueErrorOutput",
+      "id": "06ad1737-93b8-457d-b040-00f12c826b8f"
     },
     {
       "parameters": {
@@ -424,7 +431,8 @@
           "value": "ilA6a6sM5CvDsSBi",
           "mode": "id"
         },
-        "mode": "each"
+        "mode": "each",
+        "options": {}
       },
       "name": "Execute: create_booking",
       "type": "n8n-nodes-base.executeWorkflow",
@@ -433,13 +441,13 @@
         2900,
         -1000
       ],
-      "id": "92835fdf-439b-4d79-be5f-dbcd60ad7c9d",
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "id": "5f5af5a1-bc2b-49bc-bdc3-daa9c67d4ca1"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=\"Eres la recepcionista de Booking Titanium. El usuario agendó. Responde en ESPAÑOL (2 oraciones).\\nResultado: \" + JSON.stringify($json) + \"\\nMensaje: \" + $('Rule Firewall').first().json.text"
+        "text": "Eres la recepcionista de Booking Titanium. El usuario agend\u00f3.\\n\\nRESULTADO DE RESERVA:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) confirmando los datos."
       },
       "name": "Gen: create_booking",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -449,12 +457,12 @@
         -1000
       ],
       "retryOnFail": true,
-      "id": "63f272c2-bfac-4394-b4d6-ffb0cca24cd9"
+      "id": "d8b3b553-b297-4a52-ac2a-170fa532f15e"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=\"Extrae el booking_id (UUID) para cancelar. Responde SOLO JSON puro: {\\\"booking_id\\\": \\\"UUID\\\"}.\\nTexto: \" + $('Rule Firewall').first().json.text"
+        "text": "### TAREA\\nExtrae el booking_id (UUID) para cancelar. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"booking_id\\\": \\\"UUID-AQU\u00cd\\\"\\n}"
       },
       "name": "Extract Params: cancel_booking",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -464,11 +472,11 @@
         -600
       ],
       "retryOnFail": true,
-      "id": "a3955dce-815c-4140-b92d-d608a69d8a18"
+      "id": "a7fd3b30-3b6a-4048-a72f-6e33d89eb4f7"
     },
     {
       "parameters": {
-        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\nif (jsonMatch) {\n  try { params = JSON.parse(jsonMatch[0]); } catch(e) {}\n}\n\nparams.chat_id = $('Type Normalization').first().json.chat_id || 0;\n\nconst uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\nconst bookingId = String(params.booking_id || '');\n\nif (!uuidRegex.test(bookingId)) {\n  return [{\n    json: {\n      success: false,\n      error_code: 'INVALID_BOOKING_ID',\n      error_message: 'No se encontró un ID de reserva válido (UUID) en tu mensaje. Por favor indica tu código de reserva.'\n    }\n  }];\n}\n\nparams.booking_id = bookingId;\nreturn [{ json: params }];"
+        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\nconst bookingId = String(params.booking_id || '');\n\nif (!uuidRegex.test(bookingId)) {\n  throw {\n    success: false,\n    error_code: 'INVALID_BOOKING_ID',\n    error_message: 'No se encontr\u00f3 un ID de reserva v\u00e1lido (UUID) en tu mensaje.'\n  };\n}\n\nparams.booking_id = bookingId;\nreturn [{ json: params }];"
       },
       "name": "Parse: cancel_booking",
       "type": "n8n-nodes-base.code",
@@ -477,7 +485,8 @@
         2650,
         -600
       ],
-      "id": "44f883dc-ca42-4b7e-984c-99e50f97df8d"
+      "onError": "continueErrorOutput",
+      "id": "279a7dda-ca21-4a5b-a1c2-2935229aae3a"
     },
     {
       "parameters": {
@@ -486,7 +495,8 @@
           "value": "mf4qnUG7UlrAKpQU",
           "mode": "id"
         },
-        "mode": "each"
+        "mode": "each",
+        "options": {}
       },
       "name": "Execute: cancel_booking",
       "type": "n8n-nodes-base.executeWorkflow",
@@ -495,13 +505,13 @@
         2900,
         -600
       ],
-      "id": "7110865c-2f7e-41ad-85f1-3b0e0ca37f81",
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "id": "4843a1eb-1e50-4d2e-958a-8cacef532ab4"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=\"Eres la recepcionista. El usuario canceló. Responde en ESPAÑOL (2 oraciones).\\nResultado: \" + JSON.stringify($json) + \"\\nMensaje: \" + $('Rule Firewall').first().json.text"
+        "text": "Eres la recepcionista. El usuario cancel\u00f3 su turno.\\n\\nRESULTADO DE CANCELACI\u00d3N:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) lamentando la cancelaci\u00f3n."
       },
       "name": "Gen: cancel_booking",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -511,12 +521,12 @@
         -600
       ],
       "retryOnFail": true,
-      "id": "948ade82-48f0-4db4-b8f6-ebc7d6b53141"
+      "id": "9e09b9ba-dc73-480a-adba-5d2eee903681"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=\"Extrae parámetros de disponibilidad. Responde SOLO JSON puro: {\\\"provider_id\\\": 1, \\\"service_id\\\": 1, \\\"date\\\": \\\"YYYY-MM-DD\\\"}.\\nTexto: \" + $('Rule Firewall').first().json.text"
+        "text": "### TAREA\\nExtrae par\u00e1metros de disponibilidad. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"date\\\": \\\"YYYY-MM-DD\\\"\\n}"
       },
       "name": "Extract Params: check_availability",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -526,11 +536,11 @@
         -200
       ],
       "retryOnFail": true,
-      "id": "ed0b39ee-3276-4fbd-8a1d-5ccd985d804c"
+      "id": "4ad2d892-2cb0-4d87-9e86-d36bd60553d2"
     },
     {
       "parameters": {
-        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\nif (jsonMatch) {\n  try { params = JSON.parse(jsonMatch[0]); } catch(e) {}\n}\n\nparams.chat_id = $('Type Normalization').first().json.chat_id || 0;\n\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoDateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nparams.date = (params.date && isoDateRegex.test(String(params.date)))\n  ? params.date\n  : new Date().toISOString().split('T')[0];\n\nreturn [{ json: params }];"
+        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoDateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nparams.date = (params.date && isoDateRegex.test(String(params.date)))\n  ? params.date\n  : new Date().toISOString().split('T')[0];\n\nreturn [{ json: params }];"
       },
       "name": "Parse: check_availability",
       "type": "n8n-nodes-base.code",
@@ -539,7 +549,8 @@
         2650,
         -200
       ],
-      "id": "9fb9be67-b3c2-44ab-8a33-83d9a4bc8712"
+      "onError": "continueErrorOutput",
+      "id": "cd2864b4-a77d-4d78-8013-e7f621c3c7ed"
     },
     {
       "parameters": {
@@ -548,7 +559,8 @@
           "value": "zdUslfT9C0sTI83H",
           "mode": "id"
         },
-        "mode": "each"
+        "mode": "each",
+        "options": {}
       },
       "name": "Execute: check_availability",
       "type": "n8n-nodes-base.executeWorkflow",
@@ -557,13 +569,13 @@
         2900,
         -200
       ],
-      "id": "390b34d1-1cc6-447b-b7f2-08901bf1449b",
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "id": "6da79b21-acc0-42b6-8f6d-a3d4db6954da"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=\"Eres la recepcionista. Consultaron disponibilidad. Responde en ESPAÑOL (2 oraciones).\\nResultado: \" + JSON.stringify($json) + \"\\nMensaje: \" + $('Rule Firewall').first().json.text"
+        "text": "Eres la recepcionista. Consultaron disponibilidad.\\n\\nRESULTADO DE DISPONIBILIDAD:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) indicando si hay turnos."
       },
       "name": "Gen: check_availability",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -573,12 +585,12 @@
         -200
       ],
       "retryOnFail": true,
-      "id": "6b4dca6b-3a12-44c3-b6d7-df047e31bbd1"
+      "id": "f2007614-731b-4fbd-b0e9-3770db7c42ef"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=\"Extrae parámetros para próximo turno. Responde SOLO JSON puro: {\\\"provider_id\\\": 1, \\\"service_id\\\": 1, \\\"date\\\": \\\"YYYY-MM-DD\\\"}.\\nTexto: \" + $('Rule Firewall').first().json.text"
+        "text": "### TAREA\\nExtrae par\u00e1metros para pr\u00f3ximo turno libre. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"date\\\": \\\"YYYY-MM-DD\\\"\\n}"
       },
       "name": "Extract Params: find_next",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -588,11 +600,11 @@
         200
       ],
       "retryOnFail": true,
-      "id": "a95112bc-8f92-4b23-aed1-93930d51fb54"
+      "id": "d0475296-63e6-497d-ba96-70a0c9e90882"
     },
     {
       "parameters": {
-        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\nif (jsonMatch) {\n  try { params = JSON.parse(jsonMatch[0]); } catch(e) {}\n}\n\nparams.chat_id = $('Type Normalization').first().json.chat_id || 0;\n\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoDateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nparams.date = (params.date && isoDateRegex.test(String(params.date)))\n  ? params.date\n  : new Date().toISOString().split('T')[0];\n\nreturn [{ json: params }];"
+        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoDateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nparams.date = (params.date && isoDateRegex.test(String(params.date)))\n  ? params.date\n  : new Date().toISOString().split('T')[0];\n\nreturn [{ json: params }];"
       },
       "name": "Parse: find_next",
       "type": "n8n-nodes-base.code",
@@ -601,7 +613,8 @@
         2650,
         200
       ],
-      "id": "6e3547f7-2795-48dd-aae8-c8ade90ca75b"
+      "onError": "continueErrorOutput",
+      "id": "d09744db-3f28-4ce3-8c7f-ef74ca2a19c0"
     },
     {
       "parameters": {
@@ -610,7 +623,8 @@
           "value": "oi5AiSoJRbzDf2A8",
           "mode": "id"
         },
-        "mode": "each"
+        "mode": "each",
+        "options": {}
       },
       "name": "Execute: find_next",
       "type": "n8n-nodes-base.executeWorkflow",
@@ -619,13 +633,13 @@
         2900,
         200
       ],
-      "id": "a8abaa04-2323-4519-aec9-000560f01e74",
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "id": "08f7d96e-8a94-42fe-ab2b-a0ec1203346c"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=\"Eres la recepcionista. Buscaron el próximo turno. Responde en ESPAÑOL (2 oraciones).\\nResultado: \" + JSON.stringify($json) + \"\\nMensaje: \" + $('Rule Firewall').first().json.text"
+        "text": "Eres la recepcionista. Buscaron el pr\u00f3ximo turno disponible.\\n\\nRESULTADO:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) ofreciendo el turno encontrado."
       },
       "name": "Gen: find_next",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -635,14 +649,14 @@
         200
       ],
       "retryOnFail": true,
-      "id": "15d46917-7480-46da-81e7-d30ec4ec2886"
+      "id": "281f1016-e68b-4d99-baab-d8b38dea1c0f"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=\"Extrae consulta para buscar servicios. Responde SOLO JSON puro: {\\\"query\\\": \\\"texto\\\"}.\\nTexto: \" + $('Rule Firewall').first().json.text"
+        "text": "=\"Identify medical specialty. EXAMPLES: 'how much for cardio?' -> {\\\"query\\\": \\\"cardiologia\\\"}. USER: \" + $('Input_Clean').first().json.text"
       },
-      "name": "Extract Params: get_services",
+      "name": "Service_Topic_Extractor",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.9,
       "position": [
@@ -650,11 +664,11 @@
         600
       ],
       "retryOnFail": true,
-      "id": "5b762e18-44c8-458f-a60e-e287e1e73c61"
+      "id": "d76c6231-3d16-46bc-9746-800387638634"
     },
     {
       "parameters": {
-        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\nif (jsonMatch) {\n  try { params = JSON.parse(jsonMatch[0]); } catch(e) {}\n}\n\nparams.chat_id = $('Type Normalization').first().json.chat_id || 0;\n\nconst rawQuery = String(params.query || $('Rule Firewall').first().json.text || '');\nparams.query = rawQuery.replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nparams.provider_id = 1;\nparams.limit = 3;\nparams.similarity_threshold = 0.3;\n\nreturn [{ json: params }];"
+        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\ntry { params = JSON.parse(jsonMatch ? jsonMatch[0] : '{}'); } catch(e) {}\n\nconst userText = $('Input_Clean').first().json.text.toLowerCase();\nlet q = params.query || '';\n\nif (userText.includes('cardio')) q = 'cardiologia';\nelse if (userText.includes('pediat')) q = 'pediatria';\nelse if (userText.includes('derma')) q = 'dermatologia';\nelse if (userText.includes('odont')) q = 'odontologia';\nelse if (userText.includes('segu') || userText.includes('osde')) q = 'seguros';\n\nif (!q) q = $('Input_Clean').first().json.text;\n\nreturn [{ json: {\n  query: q,\n  service_name: q,\n  provider_id: 1,\n  limit: 5,\n  similarity_threshold: 0.05\n} }];"
       },
       "name": "Parse: get_services",
       "type": "n8n-nodes-base.code",
@@ -663,7 +677,43 @@
         2650,
         600
       ],
-      "id": "8a6088ee-9776-452d-9c59-781616ffa36e"
+      "onError": "continueErrorOutput",
+      "id": "8273d20d-3786-41aa-a3f9-8a4103ab07fb"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "YVrtyqLVCuykAKgB",
+          "mode": "id"
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "name": "Execute: Resolve Service ID",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2800,
+        600
+      ],
+      "onError": "continueErrorOutput",
+      "id": "e1538c5c-0b87-4b5a-bd14-c63bb860cac0"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Analyze Resolve \u2014 Decidir estrategia RAG (SEC02)\nconst resolve = $input.first()?.json.data || {};\nconst userText = $('Input_Clean').first().json.text;\nconst parseData = $('Parse: get_services').first()?.json || {};\n\n// Si el match es d\u00e9bil o no encontrado, buscar en RAG sin filtro de service_id\nconst useFilter = resolve.resolved && resolve.match_type !== 'WEAK';\n\nreturn [{\n  json: {\n    query: resolve.resolved ? resolve.service_name : (parseData.query || userText),\n    provider_id: resolve.provider_id || 1,\n    service_id: useFilter ? resolve.service_id : null,\n    limit: 5,\n    similarity_threshold: 0.05,\n    sql_context: {\n      resolved: resolve.resolved,\n      match_type: resolve.match_type,\n      service_name: resolve.service_name,\n      price: resolve.price,\n      currency: resolve.currency || 'USD',\n      candidates: resolve.candidates || []\n    }\n  }\n}];"
+      },
+      "name": "Analyze Resolve",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3000,
+        600
+      ],
+      "id": "ff54b4d6-4368-47ba-bc11-af502443da8d"
     },
     {
       "parameters": {
@@ -672,37 +722,40 @@
           "value": "RAG_02_Document_Retrieval_ID",
           "mode": "id"
         },
-        "mode": "each"
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
       },
       "name": "Execute: RAG_02",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        2900,
+        3200,
         600
       ],
-      "id": "cee23423-b609-4d6f-a754-98559f3ab21d",
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "id": "3cafd3c7-7767-4a42-b039-6e7e511063a9"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=\"Eres la recepcionista. Responde sobre servicios usando los documentos.\\nDOCUMENTOS:\\n\" + JSON.stringify($json.data?.documents || []) + \"\\nCONSULTA: \" + $('Rule Firewall').first().json.text"
+        "text": "={{ $json.prompt }}"
       },
       "name": "Gen: get_services",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.9,
       "position": [
-        3150,
+        3650,
         600
       ],
       "retryOnFail": true,
-      "id": "14d7b113-10cd-426a-9562-91f9e9e482e2"
+      "id": "ffdcbd14-e1ae-4284-86bf-1610b85c4797"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=\"Eres la recepcionista. Responde amablemente (2 oraciones).\\nMENSAJE: \" + $('Rule Firewall').first().json.text"
+        "text": "Eres la recepcionista amable de la cl\u00ednica.\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde amablemente (2 oraciones). Si pregunta algo que no sabes, invita a consultar por turnos o especialidades."
       },
       "name": "Fallback Gen",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -712,11 +765,11 @@
         1000
       ],
       "retryOnFail": true,
-      "id": "6e77c056-160a-40f9-bb3e-e046c3c03bb7"
+      "id": "dc726cef-913f-4fc7-9ca0-46f88bf58464"
     },
     {
       "parameters": {
-        "jsCode": "const nodes = ['Gen: create_booking', 'Gen: cancel_booking', 'Gen: check_availability', 'Gen: find_next', 'Gen: get_services', 'Fallback Gen'];\n\nfor (const name of nodes) {\n  try {\n    if ($(name).isExecuted) {\n      const out = $(name).first().json;\n      if (out.success === false) throw out; // Redirigir errores al handler central\n      return [{ json: out }];\n    }\n  } catch (e) {\n    if (e.success === false) throw e;\n  }\n}\n\nthrow { success: false, error_code: 'NO_BRANCH_EXECUTED', error_message: 'Ninguna rama se ejecutó correctamente.' };"
+        "jsCode": "const nodes = ['Gen: create_booking', 'Gen: cancel_booking', 'Gen: check_availability', 'Gen: find_next', 'Gen: get_services', 'Fallback Gen'];\n\nfor (const name of nodes) {\n  try {\n    if ($(name).isExecuted) {\n      const out = $(name).first().json;\n      if (out.success === false) throw out; // Redirigir errores al handler central\n      return [{ json: out }];\n    }\n  } catch (e) {\n    if (e.success === false) throw e;\n  }\n}\n\nthrow { success: false, error_code: 'NO_BRANCH_EXECUTED', error_message: 'Ninguna rama se ejecut\u00f3 correctamente.' };"
       },
       "name": "Merge All Branches",
       "type": "n8n-nodes-base.code",
@@ -725,7 +778,38 @@
         3500,
         0
       ],
-      "id": "1a939394-e4d0-4688-95d2-f2cb15240466"
+      "onError": "continueErrorOutput",
+      "id": "aa1e572b-7a17-4d65-b1c3-e7d0ac019506"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "if-success-cond",
+              "leftValue": "={{ $json.success !== false }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Is Success?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3650,
+        0
+      ],
+      "id": "15de4938-3b0b-4dfc-9662-c0c8f41ba788"
     },
     {
       "parameters": {
@@ -738,11 +822,11 @@
         3800,
         400
       ],
-      "id": "ce-01"
+      "id": "50cb25fd-cf57-40a8-b65e-5f346f98e278"
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first()?.json || {};\nlet aiResp = input.text || input.output || input.ai_response || '';\nif (typeof aiResp === 'string') aiResp = aiResp.replace(/^[\\\"']|[\\\"']$/g, '').trim();\nif (!aiResp) aiResp = 'Lo siento, no pude procesar tu solicitud.';\n\nlet chatId = 0;\nlet intent = 'general_chat';\n\ntry { if ($('Type Normalization').isExecuted) chatId = $('Type Normalization').first().json.chat_id || 0; } catch(e) {}\ntry { if ($('Intent Normalizer').isExecuted) intent = $('Intent Normalizer').first().json.intent || 'general_chat'; } catch(e) {}\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      intent,\n      chat_id: chatId,\n      ai_response: aiResp\n    },\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
+        "jsCode": "const input = $input.first()?.json || {};\nlet aiResp = input.text || input.output || input.ai_response || '';\nif (typeof aiResp === 'string') aiResp = aiResp.replace(/^[\\\"']|[\\\"']$/g, '').trim();\nif (!aiResp) aiResp = 'Lo siento, no pude procesar tu solicitud.';\n\nlet chatId = 0;\nlet intent = 'general_chat';\n\ntry { if ($('Input_Clean').isExecuted) chatId = $('Input_Clean').first().json.chat_id || 0; } catch(e) {}\ntry { if ($('Intent Normalizer').isExecuted) intent = $('Intent Normalizer').first().json.intent || 'general_chat'; } catch(e) {}\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      intent,\n      chat_id: chatId,\n      ai_response: aiResp\n    },\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      debug_topic: $('Parse: get_services').first().json.query,\n      version: '2.1.0'\n    }\n  }\n}];"
       },
       "name": "Format Response",
       "type": "n8n-nodes-base.code",
@@ -751,20 +835,34 @@
         3800,
         -200
       ],
-      "id": "f1123c45-0c43-4916-ae38-bd6d8de17a7e"
+      "id": "67950761-95e7-4a9f-917e-8eb953209855"
     },
     {
       "parameters": {
-        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\nreturn [{ json: $input.first()?.json || {} }];"
+        "jsCode": "// \ud83d\udce4 STANDARD CONTRACT OUTPUT (O02)\nreturn [{ json: $input.first()?.json || {} }];"
       },
-      "name": "📤 Standard Contract Output",
+      "name": "\ud83d\udce4 Standard Contract Output",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         4100,
         0
       ],
-      "id": "e07575ab-99ba-48c8-b903-2b12797ef63a"
+      "notes": "\ud83d\udce4 OUT: Standard Contract",
+      "id": "78d28c59-6721-45a4-af05-07042631009a"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build Prompt: get_services\nconst sql = $('Analyze Resolve').first().json.sql_context || {};\nconst ragDocs = $json.data?.documents || [];\nconst userText = $('Input_Clean').first().json.text;\n\nlet prompt = `Eres la recepcionista amable de Booking Titanium. Responde la duda del usuario.\\n\\n`;\n\nif (sql.resolved) {\n  prompt += `### INFORMACI\u00d3N OFICIAL DEL SERVICIO\\n`;\n  prompt += `- Nombre: ${sql.service_name}\\n`;\n  prompt += `- Precio: ${sql.price || 'Consultar'} ${sql.currency || 'USD'}\\n\\n`;\n}\n\nif (ragDocs.length > 0) {\n  prompt += `### DOCUMENTACI\u00d3N ADICIONAL\\n`;\n  prompt += JSON.stringify(ragDocs) + `\\n\\n`;\n}\n\nprompt += `### MENSAJE DEL USUARIO\\n${userText}\\n\\n`;\nprompt += `INSTRUCCI\u00d3N: Responde de forma breve (m\u00e1ximo 3 oraciones), profesional y amable en ESPA\u00d1OL.`;\n\nreturn [{ json: { prompt } }];"
+      },
+      "name": "Build Prompt: get_services",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3450,
+        600
+      ],
+      "id": "build-prompt-get-svc"
     }
   ],
   "connections": {
@@ -772,7 +870,7 @@
       "main": [
         [
           {
-            "node": "Type Normalization",
+            "node": "Input_Clean",
             "type": "main",
             "index": 0
           }
@@ -783,7 +881,7 @@
       "main": [
         [
           {
-            "node": "Type Normalization",
+            "node": "Input_Clean",
             "type": "main",
             "index": 0
           }
@@ -794,14 +892,14 @@
       "main": [
         [
           {
-            "node": "Type Normalization",
+            "node": "Input_Clean",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Type Normalization": {
+    "Input_Clean": {
       "main": [
         [
           {
@@ -892,7 +990,7 @@
         ]
       ]
     },
-    "Groq Model (8B)": {
+    "Groq Model (70B Classifier)": {
       "ai_languageModel": [
         [
           {
@@ -921,7 +1019,7 @@
             "index": 0
           },
           {
-            "node": "Extract Params: get_services",
+            "node": "Service_Topic_Extractor",
             "type": "ai_languageModel",
             "index": 0
           }
@@ -982,7 +1080,7 @@
         ],
         [
           {
-            "node": "Extract Params: get_services",
+            "node": "Service_Topic_Extractor",
             "type": "main",
             "index": 0
           }
@@ -1051,6 +1149,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1059,6 +1164,13 @@
         [
           {
             "node": "Gen: create_booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
             "type": "main",
             "index": 0
           }
@@ -1113,6 +1225,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1146,6 +1265,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1154,6 +1280,13 @@
         [
           {
             "node": "Gen: check_availability",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
             "type": "main",
             "index": 0
           }
@@ -1190,6 +1323,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1198,6 +1338,13 @@
         [
           {
             "node": "Gen: find_next",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
             "type": "main",
             "index": 0
           }
@@ -1215,7 +1362,7 @@
         ]
       ]
     },
-    "Extract Params: get_services": {
+    "Service_Topic_Extractor": {
       "main": [
         [
           {
@@ -1230,6 +1377,42 @@
       "main": [
         [
           {
+            "node": "Execute: Resolve Service ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute: Resolve Service ID": {
+      "main": [
+        [
+          {
+            "node": "Analyze Resolve",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Resolve": {
+      "main": [
+        [
+          {
             "node": "Execute: RAG_02",
             "type": "main",
             "index": 0
@@ -1241,7 +1424,14 @@
       "main": [
         [
           {
-            "node": "Gen: get_services",
+            "node": "Build Prompt: get_services",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
             "type": "main",
             "index": 0
           }
@@ -1274,7 +1464,32 @@
       "main": [
         [
           {
+            "node": "Is Success?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Success?": {
+      "main": [
+        [
+          {
             "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
             "type": "main",
             "index": 0
           }
@@ -1285,7 +1500,7 @@
       "main": [
         [
           {
-            "node": "📤 Standard Contract Output",
+            "node": "\ud83d\udce4 Standard Contract Output",
             "type": "main",
             "index": 0
           }
@@ -1296,7 +1511,18 @@
       "main": [
         [
           {
-            "node": "📤 Standard Contract Output",
+            "node": "\ud83d\udce4 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Prompt: get_services": {
+      "main": [
+        [
+          {
+            "node": "Gen: get_services",
             "type": "main",
             "index": 0
           }
@@ -1304,7 +1530,1559 @@
       ]
     }
   },
-  "meta": {
-    "instanceId": "dcff9bffd57bf60f63303c902ff8a9da3e3cc1df7b0fee28dae6d77c5d352c30"
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "executionTimeout": 120,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "e70331c3-7428-4d8b-a379-215d6fd8529c",
+  "activeVersionId": "e70331c3-7428-4d8b-a379-215d6fd8529c",
+  "versionCounter": 277,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-06T18:51:21.450Z",
+      "createdAt": "2026-03-06T18:51:21.450Z",
+      "role": "workflow:owner",
+      "workflowId": "X3D2dWkBu8QLlNSm",
+      "projectId": "YJNRszHcAkWXiI3k",
+      "project": {
+        "updatedAt": "2026-03-06T19:06:44.480Z",
+        "createdAt": "2026-03-06T18:41:40.568Z",
+        "id": "YJNRszHcAkWXiI3k",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "5cb60cf9-fc9d-440a-bce1-9e65876cb825"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-09T18:41:53.959Z",
+    "createdAt": "2026-03-09T18:41:53.959Z",
+    "versionId": "e70331c3-7428-4d8b-a379-215d6fd8529c",
+    "workflowId": "X3D2dWkBu8QLlNSm",
+    "nodes": [
+      {
+        "parameters": {},
+        "name": "Manual Trigger",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "d135b039-b6f3-43d7-b284-132525e909fb"
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          -200
+        ],
+        "id": "1bbf6930-b6a1-4d86-9945-9f7f8278915b"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "nn-03-b-pipeline",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          200
+        ],
+        "webhookId": "nn-03-b-pipeline",
+        "notes": "\ud83d\udce5 IN: { chat_id: number, text: string (2-500 chars) }",
+        "id": "c9a89d90-fa64-4b7d-ae1e-2f0cde133656"
+      },
+      {
+        "parameters": {
+          "jsCode": "const raw = $input.first()?.json || {};\nconst body = raw.body || {};\nconst data = raw.chat_id ? raw : (body.chat_id ? body : raw);\n\nconst chat_id = Number(data.chat_id ?? 0);\n\nreturn [{\n  json: {\n    chat_id: chat_id,\n    sessionId: String(chat_id),\n    text: String(data.text ?? '').trim(),\n    intent: 'general_chat',\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
+        },
+        "name": "Input_Clean",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          300,
+          0
+        ],
+        "id": "fb6f01f1-8da6-4159-b78f-8caa87f053ca"
+      },
+      {
+        "parameters": {
+          "jsCode": "const chatIdStr = String($json.chat_id ?? '');\nconst chat_id_valid = chatIdStr.length > 0 && [...chatIdStr].every(c => c >= '0' && c <= '9');\nconst text = String($('Input_Clean').first().json.text ?? '').trim();\nconst text_valid = text.length > 2 && text.length < 500;\n\nreturn [{\n  json: {\n    ...$json,\n    isValid: chat_id_valid && text_valid\n  }\n}];"
+        },
+        "name": "Payload Validation",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          550,
+          0
+        ],
+        "id": "6fa6d0dc-5be8-43f5-94dc-2f0313e89533"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ $json.isValid === true }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "name": "Is Valid Payload?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          800,
+          0
+        ],
+        "id": "65fd4ffa-fb44-4ce2-96e7-80a601e97419"
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: 'VALIDATION_ERROR',\n    error_message: 'Datos de entrada inv\u00e1lidos: chat_id debe ser num\u00e9rico y text entre 3-499 chars',\n    data: null,\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
+        },
+        "name": "Err: Validation",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1050,
+          200
+        ],
+        "id": "b6704d9b-57c4-4c98-a720-acac37248913"
+      },
+      {
+        "parameters": {
+          "jsCode": "const textLower = String($('Input_Clean').first().json.text || '').toLowerCase();\n\nconst PROFANITY_REGEX = /\\b(conchetumare|ctm|culiao|qliao|pichula|tula|zorra|maraco|maric\u00f3n|maricon|puta|mierda|fuck|shit|asshole|bitch|bastard|motherfucker|dick|cunt|pussy|prick|est\u00fapido|estupido|idiota|imb\u00e9cil|imbecil|gilipollas|huevon|weon)\\b/i;\n\nconst INJECTION_PHRASES = [\n  'ignore all previous instructions', 'disregard all rules', 'system prompt',\n  'jailbreak', 'dan mode', 'olvida todas las instrucciones'\n];\n\nconst OFFTOPIC_PHRASES = [\n  'escribe un poema', 'write a poem', 'cu\u00e9ntame un cuento', 'cuentame un cuento',\n  'tell me a story', 'genera c\u00f3digo', 'genera codigo', 'create code',\n  'hackear', 'hacking', 'pol\u00edtica', 'politica'\n];\n\nlet isBlocked = false;\n\nif (PROFANITY_REGEX.test(textLower)) isBlocked = true;\nif (!isBlocked) {\n  for (const phrase of INJECTION_PHRASES) {\n    if (textLower.includes(phrase)) { isBlocked = true; break; }\n  }\n}\nif (!isBlocked) {\n  for (const phrase of OFFTOPIC_PHRASES) {\n    if (textLower.includes(phrase)) { isBlocked = true; break; }\n  }\n}\n\nreturn [{ json: { ...$json, isBlocked } }];"
+        },
+        "name": "Rule Firewall",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1050,
+          -200
+        ],
+        "id": "d141fbde-4d6b-4f25-b444-d2a25d20ad7e"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ $json.isBlocked === false }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "name": "Is Safe by Rules?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1300,
+          -200
+        ],
+        "id": "6130180c-c89e-4ef3-ba21-aa8e6cfcd260"
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: 'SECURITY_BLOCKED',\n    error_message: 'Mensaje bloqueado por reglas de seguridad',\n    data: null,\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
+        },
+        "name": "Err: Security",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1550,
+          0
+        ],
+        "id": "21c5436f-a670-4252-8cdc-4b61bd16c5dd"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "### TAREA\\nClasifica el mensaje en una de estas categor\u00edas:\\n\\n- create_booking: quiere agendar turno (ej: 'quiero un turno').\\n- cancel_booking: quiere cancelar un turno (ej: 'borra mi cita').\\n- check_availability: ver horarios o si hay lugar.\\n- find_next: buscar el primer turno libre.\\n- get_services: info sobre PRECIOS, especialidades, m\u00e9dicos, seguros, pagos, ubicaci\u00f3n, resultados.\\n- general_chat: saludos, gracias, charla informal.\\n\\n### EJEMPLOS\\n\\\"\u00bfCu\u00e1nto cuesta?\\\" -> get_services\\n\\\"\u00bfTienen cardiolog\u00eda?\\\" -> get_services\\n\\\"Hola\\\" -> general_chat\\n\\\"Aceptan OSDE?\\\" -> get_services\\n\\\"Quiero cancelar\\\" -> cancel_booking\\n\\n### MENSAJE\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde SOLO la categor\u00eda."
+        },
+        "name": "Intent Classifier LLM",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          1550,
+          -400
+        ],
+        "retryOnFail": true,
+        "id": "ba1c29b6-2264-4190-bae2-a6b60be2da4c"
+      },
+      {
+        "parameters": {
+          "model": "llama-3.3-70b-versatile",
+          "options": {
+            "temperature": 0
+          }
+        },
+        "name": "Groq Model (70B Classifier)",
+        "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+        "typeVersion": 1,
+        "position": [
+          1550,
+          -200
+        ],
+        "credentials": {
+          "groqApi": {
+            "id": "2LYxRbHB7xVo0wNe",
+            "name": "Groq account"
+          }
+        },
+        "id": "72471289-9760-45e5-88f0-ed9e80c6ee39"
+      },
+      {
+        "parameters": {
+          "jsCode": "const llmOutput = String($input.first()?.json.text || '').toLowerCase().trim();\nconst allowed = ['create_booking', 'cancel_booking', 'check_availability', 'find_next', 'get_services', 'general_chat'];\n\nlet intent = 'general_chat';\nfor (const word of allowed) {\n  if (llmOutput.includes(word)) {\n    intent = word;\n    break;\n  }\n}\n\nreturn [{\n  json: {\n    ...$json,\n    intent,\n    raw_llm: llmOutput\n  }\n}];"
+        },
+        "name": "Intent Normalizer",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1800,
+          -400
+        ],
+        "id": "05f34a51-f995-4499-a304-41cdfeb5feb4"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": false,
+                    "typeValidation": "strict"
+                  },
+                  "conditions": [
+                    {
+                      "id": "sw-01",
+                      "leftValue": "={{ $json.intent }}",
+                      "rightValue": "create_booking",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "create_booking"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": false,
+                    "typeValidation": "strict"
+                  },
+                  "conditions": [
+                    {
+                      "id": "sw-02",
+                      "leftValue": "={{ $json.intent }}",
+                      "rightValue": "cancel_booking",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "cancel_booking"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": false,
+                    "typeValidation": "strict"
+                  },
+                  "conditions": [
+                    {
+                      "id": "sw-03",
+                      "leftValue": "={{ $json.intent }}",
+                      "rightValue": "check_availability",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "check_availability"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": false,
+                    "typeValidation": "strict"
+                  },
+                  "conditions": [
+                    {
+                      "id": "sw-04",
+                      "leftValue": "={{ $json.intent }}",
+                      "rightValue": "find_next",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "find_next"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": false,
+                    "typeValidation": "strict"
+                  },
+                  "conditions": [
+                    {
+                      "id": "sw-05",
+                      "leftValue": "={{ $json.intent }}",
+                      "rightValue": "get_services",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "get_services"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": false,
+                    "typeValidation": "strict"
+                  },
+                  "conditions": [
+                    {
+                      "id": "sw-06",
+                      "leftValue": "={{ $json.intent }}",
+                      "rightValue": "general_chat",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "general_chat"
+              }
+            ]
+          },
+          "options": {
+            "fallbackOutput": "extra"
+          }
+        },
+        "name": "Intent Switch",
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          2050,
+          -400
+        ],
+        "id": "b3fbbf34-81fd-41b4-9a8f-ee21d06b7fc5"
+      },
+      {
+        "parameters": {
+          "model": "llama-3.3-70b-versatile",
+          "options": {
+            "temperature": 0.5
+          }
+        },
+        "name": "Groq Model (70B)",
+        "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+        "typeVersion": 1,
+        "position": [
+          3200,
+          600
+        ],
+        "credentials": {
+          "groqApi": {
+            "id": "2LYxRbHB7xVo0wNe",
+            "name": "Groq account"
+          }
+        },
+        "id": "dd1bfe18-081e-4c03-a751-2d3c5a0b7171"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "### TAREA\\nExtrae par\u00e1metros para agendar m\u00e9dico. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"start_time\\\": \\\"YYYY-MM-DDTHH:MM:SS\\\",\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"user_name\\\": \\\"Nombre\\\",\\n  \\\"user_email\\\": \\\"email@ejemplo.com\\\"\\n}"
+        },
+        "name": "Extract Params: create_booking",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          2400,
+          -1000
+        ],
+        "retryOnFail": true,
+        "id": "4b2dc260-de79-4fc4-ae87-a8646e6659f4"
+      },
+      {
+        "parameters": {
+          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\n// SEC04/05 Robust validation\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoRegex = /^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?$/;\nparams.start_time = (params.start_time && isoRegex.test(String(params.start_time)))\n  ? params.start_time\n  : new Date().toISOString();\n\nconst sanitize = (v) => String(v || '').replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nparams.user_name = sanitize(params.user_name || 'Usuario');\n\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nparams.user_email = emailRegex.test(String(params.user_email))\n  ? String(params.user_email).substring(0, 254)\n  : 'sin-email@booking.com';\n\nreturn [{ json: params }];"
+        },
+        "name": "Parse: create_booking",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2650,
+          -1000
+        ],
+        "onError": "continueErrorOutput",
+        "id": "06ad1737-93b8-457d-b040-00f12c826b8f"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "ilA6a6sM5CvDsSBi",
+            "mode": "id"
+          },
+          "mode": "each",
+          "options": {}
+        },
+        "name": "Execute: create_booking",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          2900,
+          -1000
+        ],
+        "onError": "continueErrorOutput",
+        "id": "5f5af5a1-bc2b-49bc-bdc3-daa9c67d4ca1"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "Eres la recepcionista de Booking Titanium. El usuario agend\u00f3.\\n\\nRESULTADO DE RESERVA:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) confirmando los datos."
+        },
+        "name": "Gen: create_booking",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          3150,
+          -1000
+        ],
+        "retryOnFail": true,
+        "id": "d8b3b553-b297-4a52-ac2a-170fa532f15e"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "### TAREA\\nExtrae el booking_id (UUID) para cancelar. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"booking_id\\\": \\\"UUID-AQU\u00cd\\\"\\n}"
+        },
+        "name": "Extract Params: cancel_booking",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          2400,
+          -600
+        ],
+        "retryOnFail": true,
+        "id": "a7fd3b30-3b6a-4048-a72f-6e33d89eb4f7"
+      },
+      {
+        "parameters": {
+          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\nconst bookingId = String(params.booking_id || '');\n\nif (!uuidRegex.test(bookingId)) {\n  throw {\n    success: false,\n    error_code: 'INVALID_BOOKING_ID',\n    error_message: 'No se encontr\u00f3 un ID de reserva v\u00e1lido (UUID) en tu mensaje.'\n  };\n}\n\nparams.booking_id = bookingId;\nreturn [{ json: params }];"
+        },
+        "name": "Parse: cancel_booking",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2650,
+          -600
+        ],
+        "onError": "continueErrorOutput",
+        "id": "279a7dda-ca21-4a5b-a1c2-2935229aae3a"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "mf4qnUG7UlrAKpQU",
+            "mode": "id"
+          },
+          "mode": "each",
+          "options": {}
+        },
+        "name": "Execute: cancel_booking",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          2900,
+          -600
+        ],
+        "onError": "continueErrorOutput",
+        "id": "4843a1eb-1e50-4d2e-958a-8cacef532ab4"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "Eres la recepcionista. El usuario cancel\u00f3 su turno.\\n\\nRESULTADO DE CANCELACI\u00d3N:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) lamentando la cancelaci\u00f3n."
+        },
+        "name": "Gen: cancel_booking",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          3150,
+          -600
+        ],
+        "retryOnFail": true,
+        "id": "9e09b9ba-dc73-480a-adba-5d2eee903681"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "### TAREA\\nExtrae par\u00e1metros de disponibilidad. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"date\\\": \\\"YYYY-MM-DD\\\"\\n}"
+        },
+        "name": "Extract Params: check_availability",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          2400,
+          -200
+        ],
+        "retryOnFail": true,
+        "id": "4ad2d892-2cb0-4d87-9e86-d36bd60553d2"
+      },
+      {
+        "parameters": {
+          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoDateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nparams.date = (params.date && isoDateRegex.test(String(params.date)))\n  ? params.date\n  : new Date().toISOString().split('T')[0];\n\nreturn [{ json: params }];"
+        },
+        "name": "Parse: check_availability",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2650,
+          -200
+        ],
+        "onError": "continueErrorOutput",
+        "id": "cd2864b4-a77d-4d78-8013-e7f621c3c7ed"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "zdUslfT9C0sTI83H",
+            "mode": "id"
+          },
+          "mode": "each",
+          "options": {}
+        },
+        "name": "Execute: check_availability",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          2900,
+          -200
+        ],
+        "onError": "continueErrorOutput",
+        "id": "6da79b21-acc0-42b6-8f6d-a3d4db6954da"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "Eres la recepcionista. Consultaron disponibilidad.\\n\\nRESULTADO DE DISPONIBILIDAD:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) indicando si hay turnos."
+        },
+        "name": "Gen: check_availability",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          3150,
+          -200
+        ],
+        "retryOnFail": true,
+        "id": "f2007614-731b-4fbd-b0e9-3770db7c42ef"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "### TAREA\\nExtrae par\u00e1metros para pr\u00f3ximo turno libre. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"date\\\": \\\"YYYY-MM-DD\\\"\\n}"
+        },
+        "name": "Extract Params: find_next",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          2400,
+          200
+        ],
+        "retryOnFail": true,
+        "id": "d0475296-63e6-497d-ba96-70a0c9e90882"
+      },
+      {
+        "parameters": {
+          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoDateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nparams.date = (params.date && isoDateRegex.test(String(params.date)))\n  ? params.date\n  : new Date().toISOString().split('T')[0];\n\nreturn [{ json: params }];"
+        },
+        "name": "Parse: find_next",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2650,
+          200
+        ],
+        "onError": "continueErrorOutput",
+        "id": "d09744db-3f28-4ce3-8c7f-ef74ca2a19c0"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "oi5AiSoJRbzDf2A8",
+            "mode": "id"
+          },
+          "mode": "each",
+          "options": {}
+        },
+        "name": "Execute: find_next",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          2900,
+          200
+        ],
+        "onError": "continueErrorOutput",
+        "id": "08f7d96e-8a94-42fe-ab2b-a0ec1203346c"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "Eres la recepcionista. Buscaron el pr\u00f3ximo turno disponible.\\n\\nRESULTADO:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) ofreciendo el turno encontrado."
+        },
+        "name": "Gen: find_next",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          3150,
+          200
+        ],
+        "retryOnFail": true,
+        "id": "281f1016-e68b-4d99-baab-d8b38dea1c0f"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "### TAREA\\nExtrae el tema central de salud o consulta administrativa para buscar en la base de conocimientos. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"query\\\": \\\"t\u00e9rmino de b\u00fasqueda\\\"\\n}"
+        },
+        "name": "Service_Topic_Extractor",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          2400,
+          600
+        ],
+        "retryOnFail": true,
+        "id": "d76c6231-3d16-46bc-9746-800387638634"
+      },
+      {
+        "parameters": {
+          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\n// Protect against instruction-repetition hallucinations\nlet rawQuery = String(params.query || '').toLowerCase().trim();\nif (rawQuery.includes('extrae') || rawQuery.includes('tarea') || rawQuery.includes('tipo') || rawQuery.length < 2 || rawQuery === 'null') {\n  params.query = $('Input_Clean').first().json.text;\n  params.service_name = $('Input_Clean').first().json.text;\n} else {\n  params.service_name = params.query;\n}\n\nparams.query = String(params.query).replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nparams.provider_id = 1;\nparams.limit = 5;\nparams.similarity_threshold = 0.05;\n\nreturn [{ json: params }];"
+        },
+        "name": "Parse: get_services",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2650,
+          600
+        ],
+        "onError": "continueErrorOutput",
+        "id": "8273d20d-3786-41aa-a3f9-8a4103ab07fb"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "YVrtyqLVCuykAKgB",
+            "mode": "id"
+          },
+          "mode": "each",
+          "options": {
+            "waitForSubWorkflow": true
+          }
+        },
+        "name": "Execute: Resolve Service ID",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          2800,
+          600
+        ],
+        "onError": "continueErrorOutput",
+        "id": "e1538c5c-0b87-4b5a-bd14-c63bb860cac0"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Analyze Resolve \u2014 Decidir estrategia RAG (SEC02)\nconst resolve = $input.first()?.json.data || {};\nconst userText = $('Input_Clean').first().json.text;\nconst parseData = $('Parse: get_services').first()?.json || {};\n\n// Si el match es d\u00e9bil o no encontrado, buscar en RAG sin filtro de service_id\nconst useFilter = resolve.resolved && resolve.match_type !== 'WEAK';\n\nreturn [{\n  json: {\n    query: resolve.resolved ? resolve.service_name : (parseData.query || userText),\n    provider_id: resolve.provider_id || 1,\n    service_id: useFilter ? resolve.service_id : null,\n    limit: 5,\n    similarity_threshold: 0.05,\n    sql_context: {\n      resolved: resolve.resolved,\n      match_type: resolve.match_type,\n      service_name: resolve.service_name,\n      price: resolve.price,\n      currency: resolve.currency || 'USD',\n      candidates: resolve.candidates || []\n    }\n  }\n}];"
+        },
+        "name": "Analyze Resolve",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3000,
+          600
+        ],
+        "id": "ff54b4d6-4368-47ba-bc11-af502443da8d"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "RAG_02_Document_Retrieval_ID",
+            "mode": "id"
+          },
+          "mode": "each",
+          "options": {
+            "waitForSubWorkflow": true
+          }
+        },
+        "name": "Execute: RAG_02",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          3200,
+          600
+        ],
+        "onError": "continueErrorOutput",
+        "id": "3cafd3c7-7767-4a42-b039-6e7e511063a9"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=\"### SISTEMA DE VERDAD: RECEPCIONISTA TITANIUM\\nEres la recepcionista amable. Usa las siguientes fuentes con prioridad estricta.\\n\\n### HECHOS CONFIRMADOS (SQL - Verdad Absoluta)\\n\" + ($json.sql_context?.resolved ? '- Servicio: ' + $json.sql_context.service_name + '\\n- Precio: ' + ($json.sql_context.price || 'Consultar') + ' ' + ($json.sql_context.currency || 'USD') : 'Servicio no encontrado en lista oficial.') + \"\\n\\n### CONTEXTO ADICIONAL (RAG - Conocimiento)\\n\" + JSON.stringify($json.data?.documents || []) + \"\\n\\n### CONSULTA USUARIO\\n\" + $('Input_Clean').first().json.text + \"\\n\\nINSTRUCCI\u00d3N: Responde en ESPA\u00d1OL de forma amable y profesional. Si el hecho SQL contradice al RAG, usa SIEMPRE el dato SQL.\""
+        },
+        "name": "Gen: get_services",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          3450,
+          600
+        ],
+        "retryOnFail": true,
+        "id": "ffdcbd14-e1ae-4284-86bf-1610b85c4797"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "Eres la recepcionista amable de la cl\u00ednica.\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde amablemente (2 oraciones). Si pregunta algo que no sabes, invita a consultar por turnos o especialidades."
+        },
+        "name": "Fallback Gen",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          2400,
+          1000
+        ],
+        "retryOnFail": true,
+        "id": "dc726cef-913f-4fc7-9ca0-46f88bf58464"
+      },
+      {
+        "parameters": {
+          "jsCode": "const nodes = ['Gen: create_booking', 'Gen: cancel_booking', 'Gen: check_availability', 'Gen: find_next', 'Gen: get_services', 'Fallback Gen'];\n\nfor (const name of nodes) {\n  try {\n    if ($(name).isExecuted) {\n      const out = $(name).first().json;\n      if (out.success === false) throw out; // Redirigir errores al handler central\n      return [{ json: out }];\n    }\n  } catch (e) {\n    if (e.success === false) throw e;\n  }\n}\n\nthrow { success: false, error_code: 'NO_BRANCH_EXECUTED', error_message: 'Ninguna rama se ejecut\u00f3 correctamente.' };"
+        },
+        "name": "Merge All Branches",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3500,
+          0
+        ],
+        "onError": "continueErrorOutput",
+        "id": "aa1e572b-7a17-4d65-b1c3-e7d0ac019506"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "if-success-cond",
+                "leftValue": "={{ $json.success !== false }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          }
+        },
+        "name": "Is Success?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          3650,
+          0
+        ],
+        "id": "15de4938-3b0b-4dfc-9662-c0c8f41ba788"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.first()?.json || {};\nconst error = $input.params.error || {}; // Si viene de un onError\n\nconst success = input.success !== false && !error.message;\nconst errorCode = error.code || input.error_code || 'EXECUTION_ERROR';\nconst errorMessage = error.message || input.error_message || 'Error desconocido';\n\nreturn [{\n  json: {\n    success: false,\n    error_code: errorCode,\n    error_message: errorMessage,\n    data: null,\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
+        },
+        "name": "Central Error Handler",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3800,
+          400
+        ],
+        "id": "50cb25fd-cf57-40a8-b65e-5f346f98e278"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.first()?.json || {};\nlet aiResp = input.text || input.output || input.ai_response || '';\nif (typeof aiResp === 'string') aiResp = aiResp.replace(/^[\\\"']|[\\\"']$/g, '').trim();\nif (!aiResp) aiResp = 'Lo siento, no pude procesar tu solicitud.';\n\nlet chatId = 0;\nlet intent = 'general_chat';\n\ntry { if ($('Input_Clean').isExecuted) chatId = $('Input_Clean').first().json.chat_id || 0; } catch(e) {}\ntry { if ($('Intent Normalizer').isExecuted) intent = $('Intent Normalizer').first().json.intent || 'general_chat'; } catch(e) {}\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      intent,\n      chat_id: chatId,\n      ai_response: aiResp\n    },\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
+        },
+        "name": "Format Response",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3800,
+          -200
+        ],
+        "id": "67950761-95e7-4a9f-917e-8eb953209855"
+      },
+      {
+        "parameters": {
+          "jsCode": "// \ud83d\udce4 STANDARD CONTRACT OUTPUT (O02)\nreturn [{ json: $input.first()?.json || {} }];"
+        },
+        "name": "\ud83d\udce4 Standard Contract Output",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          4100,
+          0
+        ],
+        "notes": "\ud83d\udce4 OUT: Standard Contract",
+        "id": "78d28c59-6721-45a4-af05-07042631009a"
+      }
+    ],
+    "connections": {
+      "Manual Trigger": {
+        "main": [
+          [
+            {
+              "node": "Input_Clean",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Input_Clean",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Input_Clean",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Input_Clean": {
+        "main": [
+          [
+            {
+              "node": "Payload Validation",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Payload Validation": {
+        "main": [
+          [
+            {
+              "node": "Is Valid Payload?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Valid Payload?": {
+        "main": [
+          [
+            {
+              "node": "Rule Firewall",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Err: Validation",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Err: Validation": {
+        "main": [
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Rule Firewall": {
+        "main": [
+          [
+            {
+              "node": "Is Safe by Rules?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Safe by Rules?": {
+        "main": [
+          [
+            {
+              "node": "Intent Classifier LLM",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Err: Security",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Err: Security": {
+        "main": [
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Groq Model (70B Classifier)": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Intent Classifier LLM",
+              "type": "ai_languageModel",
+              "index": 0
+            },
+            {
+              "node": "Extract Params: create_booking",
+              "type": "ai_languageModel",
+              "index": 0
+            },
+            {
+              "node": "Extract Params: cancel_booking",
+              "type": "ai_languageModel",
+              "index": 0
+            },
+            {
+              "node": "Extract Params: check_availability",
+              "type": "ai_languageModel",
+              "index": 0
+            },
+            {
+              "node": "Extract Params: find_next",
+              "type": "ai_languageModel",
+              "index": 0
+            },
+            {
+              "node": "Service_Topic_Extractor",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Intent Classifier LLM": {
+        "main": [
+          [
+            {
+              "node": "Intent Normalizer",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Intent Normalizer": {
+        "main": [
+          [
+            {
+              "node": "Intent Switch",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Intent Switch": {
+        "main": [
+          [
+            {
+              "node": "Extract Params: create_booking",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Extract Params: cancel_booking",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Extract Params: check_availability",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Extract Params: find_next",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Service_Topic_Extractor",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Fallback Gen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Groq Model (70B)": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Gen: create_booking",
+              "type": "ai_languageModel",
+              "index": 0
+            },
+            {
+              "node": "Gen: cancel_booking",
+              "type": "ai_languageModel",
+              "index": 0
+            },
+            {
+              "node": "Gen: check_availability",
+              "type": "ai_languageModel",
+              "index": 0
+            },
+            {
+              "node": "Gen: find_next",
+              "type": "ai_languageModel",
+              "index": 0
+            },
+            {
+              "node": "Gen: get_services",
+              "type": "ai_languageModel",
+              "index": 0
+            },
+            {
+              "node": "Fallback Gen",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Params: create_booking": {
+        "main": [
+          [
+            {
+              "node": "Parse: create_booking",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse: create_booking": {
+        "main": [
+          [
+            {
+              "node": "Execute: create_booking",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute: create_booking": {
+        "main": [
+          [
+            {
+              "node": "Gen: create_booking",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gen: create_booking": {
+        "main": [
+          [
+            {
+              "node": "Merge All Branches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Params: cancel_booking": {
+        "main": [
+          [
+            {
+              "node": "Parse: cancel_booking",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse: cancel_booking": {
+        "main": [
+          [
+            {
+              "node": "Execute: cancel_booking",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute: cancel_booking": {
+        "main": [
+          [
+            {
+              "node": "Gen: cancel_booking",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gen: cancel_booking": {
+        "main": [
+          [
+            {
+              "node": "Merge All Branches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Params: check_availability": {
+        "main": [
+          [
+            {
+              "node": "Parse: check_availability",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse: check_availability": {
+        "main": [
+          [
+            {
+              "node": "Execute: check_availability",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute: check_availability": {
+        "main": [
+          [
+            {
+              "node": "Gen: check_availability",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gen: check_availability": {
+        "main": [
+          [
+            {
+              "node": "Merge All Branches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Params: find_next": {
+        "main": [
+          [
+            {
+              "node": "Parse: find_next",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse: find_next": {
+        "main": [
+          [
+            {
+              "node": "Execute: find_next",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute: find_next": {
+        "main": [
+          [
+            {
+              "node": "Gen: find_next",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gen: find_next": {
+        "main": [
+          [
+            {
+              "node": "Merge All Branches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Service_Topic_Extractor": {
+        "main": [
+          [
+            {
+              "node": "Parse: get_services",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse: get_services": {
+        "main": [
+          [
+            {
+              "node": "Execute: Resolve Service ID",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute: Resolve Service ID": {
+        "main": [
+          [
+            {
+              "node": "Analyze Resolve",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Analyze Resolve": {
+        "main": [
+          [
+            {
+              "node": "Execute: RAG_02",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute: RAG_02": {
+        "main": [
+          [
+            {
+              "node": "Gen: get_services",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gen: get_services": {
+        "main": [
+          [
+            {
+              "node": "Merge All Branches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fallback Gen": {
+        "main": [
+          [
+            {
+              "node": "Merge All Branches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge All Branches": {
+        "main": [
+          [
+            {
+              "node": "Is Success?",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Success?": {
+        "main": [
+          [
+            {
+              "node": "Format Response",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Central Error Handler",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Central Error Handler": {
+        "main": [
+          [
+            {
+              "node": "\ud83d\udce4 Standard Contract Output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Response": {
+        "main": [
+          [
+            {
+              "node": "\ud83d\udce4 Standard Contract Output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Roger Gallegos",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-09T18:41:54.363Z",
+        "id": 313,
+        "workflowId": "X3D2dWkBu8QLlNSm",
+        "versionId": "e70331c3-7428-4d8b-a379-215d6fd8529c",
+        "event": "activated",
+        "userId": "5cb60cf9-fc9d-440a-bce1-9e65876cb825"
+      }
+    ]
   }
 }
