@@ -35,7 +35,14 @@
     {
       "parameters": {
         "url": "http://dal-service:3000/pending-reminders",
-        "options": {}
+        "options": {
+          "timeout": 30000,
+          "maxRetries": 3,
+          "retryWait": {
+            "type": "exponentialBackoff",
+            "base": 1000
+          }
+        }
       },
       "name": "Fetch Pending",
       "type": "n8n-nodes-base.httpRequest",
@@ -62,7 +69,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Prepare Reminder — maps dal-service booking to NN_04 payload\nconst item = $input.first()?.json || {};\n\nconst chat_id = String(item.user_id || '');\nconst service = item.service_name || 'Cita';\nconst provider = item.provider_name || 'Profesional';\nconst startRaw = item.start_time || '';\nconst reminder_type = parseInt(item.reminder_type) || 1;\n\n// Format time for display\nlet timeDisplay = startRaw;\ntry {\n  const d = new Date(startRaw);\n  timeDisplay = d.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' });\n} catch(e) {}\n\nconst text = `\u23f0 Recordatorio: Tienes una cita de ${service} con ${provider} \u2014 ${timeDisplay}`;\n\nreturn [{\n  json: {\n    chat_id,\n    text,\n    booking_id: item.id || '',\n    reminder_type\n  }\n}];"
+        "jsCode": "// Prepare Reminder — maps dal-service booking to NN_04 payload\nconst item = $input.first()?.json || {};\n\nconst chat_id = String(item.user_id || '');\nconst service = item.service_name || 'Cita';\nconst provider = item.provider_name || 'Profesional';\nconst startRaw = item.start_time || '';\nconst reminder_type = parseInt(item.reminder_type) || 1;\n\n// Format time for display\nlet timeDisplay = startRaw;\ntry {\n  const d = new Date(startRaw);\n  timeDisplay = d.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' });\n} catch(e) {}\n\nconst text = `⏰ Recordatorio: Tienes una cita de ${service} con ${provider} — ${timeDisplay}`;\n\nreturn [{\n  json: {\n    chat_id,\n    text,\n    booking_id: item.id || '',\n    reminder_type\n  }\n}];"
       },
       "name": "Prepare Reminder",
       "type": "n8n-nodes-base.code",
@@ -98,7 +105,14 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"booking_id\": \"{{ $node[\"Prepare Reminder\"].json.booking_id }}\",\n  \"type\": {{ $node[\"Prepare Reminder\"].json.reminder_type }}\n}",
-        "options": {}
+        "options": {
+          "timeout": 30000,
+          "maxRetries": 3,
+          "retryWait": {
+            "type": "exponentialBackoff",
+            "base": 1000
+          }
+        }
       },
       "name": "Mark as Sent",
       "type": "n8n-nodes-base.httpRequest",
@@ -121,6 +135,88 @@
         432
       ],
       "id": "format_out"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nn-05-reminder-cron.json-test",
+        "responseMode": "lastNode"
+      },
+      "id": "trigger_webhook_auto",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -200,
+        600
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "trigger_exec_auto",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -200,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "/* VRF PRE: Validate */\nconst item = $input.first()?.json || {};\nconst data = item.body || item;\nconst isValid = true; // Auto-generated default\nreturn [{ json: { isValid, ...data } }];"
+      },
+      "id": "validate_pre_auto",
+      "name": "Validate PRE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid_cond_auto",
+              "leftValue": "={{ $json.isValid === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if_valid_auto",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        200,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\n// Retorna esquema unificado para todos los workflows\n\nconst result = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'NN_05_REMINDER_CRON',\n      workflow_id: 'NN_05_REMINDER_CRON',\n      timestamp: new Date().toISOString(),\n      version: '4.3.1'\n    }\n  }\n}];"
+      },
+      "id": "standard_contract_1772984456925",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5000,
+        500
+      ]
     }
   ],
   "connections": {
@@ -128,7 +224,7 @@
       "main": [
         [
           {
-            "node": "Fetch Pending",
+            "node": "Validate PRE",
             "type": "main",
             "index": 0
           }
@@ -139,7 +235,7 @@
       "main": [
         [
           {
-            "node": "Fetch Pending",
+            "node": "Validate PRE",
             "type": "main",
             "index": 0
           }
@@ -200,9 +296,59 @@
           }
         ]
       ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate PRE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate PRE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate PRE": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Fetch Pending",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "id": "trmFIo0zClyF38L8"
 }

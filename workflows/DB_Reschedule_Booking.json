@@ -44,7 +44,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first().json.body || $input.first().json;\n\n// VRF — GUARD + VALIDATE\nconst isValidUUID = (v) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);\nconst bookingId = input.old_booking_id || input.booking_id;\n\nif (!bookingId || !isValidUUID(bookingId)) {\n  throw new Error('Invalid or missing booking_id (UUID required)');\n}\nif (!input.new_start_time) {\n  throw new Error('Missing required field: new_start_time');\n}\n\nreturn [{\n  json: {\n    chat_id: parseInt(input.chat_id) || null,\n    booking_id: bookingId,\n    old_booking_id: bookingId,\n    new_start_time: input.new_start_time,\n    provider_id: parseInt(input.provider_id) || 1,\n    service_id: parseInt(input.service_id) || 1,\n    user_email: input.user_email || '',\n    user_name: input.user_name || 'Paciente'\n  }\n}];"
+        "jsCode": "const input = $input.first().json.body || $input.first().json;\n\n// VRF — GUARD + VALIDATE\nconst isValidUUID = (v) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);\nconst bookingId = input.old_booking_id || input.booking_id;\n\nlet isValid = true;\nlet error_message = null;\n\nif (!bookingId || !isValidUUID(bookingId)) {\n  isValid = false;\n  error_message = 'Invalid or missing booking_id (UUID required)';\n}\nif (isValid && !input.new_start_time) {\n  isValid = false;\n  error_message = 'Missing required field: new_start_time';\n}\n\nreturn [{\n  json: {\n    isValid,\n    error_message,\n    chat_id: parseInt(input.chat_id) || null,\n    booking_id: bookingId,\n    old_booking_id: bookingId,\n    new_start_time: input.new_start_time,\n    provider_id: parseInt(input.provider_id) || 1,\n    service_id: parseInt(input.service_id) || 1,\n    user_email: input.user_email || '',\n    user_name: input.user_name || 'Paciente'\n  }\n}];"
       },
       "name": "Build Secure JSON",
       "type": "n8n-nodes-base.code",
@@ -70,7 +70,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        300,
+        400,
         432
       ],
       "id": "cancel_old"
@@ -90,7 +90,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        550,
+        650,
         432
       ],
       "id": "create_new"
@@ -103,10 +103,66 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        800,
+        900,
         432
       ],
       "id": "final_res"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid_cond",
+              "leftValue": "={{ $json.isValid === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if_valid_reschedule",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        200,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: \"VALIDATION_ERROR\",\n    error_message: $json.error_message,\n    data: null,\n    _meta: { source: \"DB_Reschedule_Booking\", timestamp: new Date().toISOString(), version: \"1.0.0\" }\n  }\n}];"
+      },
+      "id": "format_invalid_reschedule",
+      "name": "Format Invalid",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\n// Retorna esquema unificado para todos los workflows\n\nconst result = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'DB_RESCHEDULE_BOOKING',\n      workflow_id: 'DB_RESCHEDULE_BOOKING',\n      timestamp: new Date().toISOString(),\n      version: '4.3.1'\n    }\n  }\n}];"
+      },
+      "id": "standard_contract_1772984456916",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5000,
+        500
+      ]
     }
   ],
   "connections": {
@@ -147,7 +203,7 @@
       "main": [
         [
           {
-            "node": "Step 1: Cancel Old",
+            "node": "Is Valid?",
             "type": "main",
             "index": 0
           }
@@ -175,9 +231,44 @@
           }
         ]
       ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Step 1: Cancel Old",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Invalid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Invalid": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "id": "F2F5oQ7okPDKwg9E"
 }

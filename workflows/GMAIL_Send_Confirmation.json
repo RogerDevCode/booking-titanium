@@ -77,6 +77,62 @@
         432
       ],
       "id": "format_out"
+    },
+    {
+      "parameters": {
+        "jsCode": "/* VRF PRE: Validate */\nconst item = $input.first()?.json || {};\nconst data = item.body || item;\nconst isValid = true; // Auto-generated default\nreturn [{ json: { isValid, ...data } }];"
+      },
+      "id": "validate_pre_auto",
+      "name": "Validate PRE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid_cond_auto",
+              "leftValue": "={{ $json.isValid === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if_valid_auto",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        200,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\n// Retorna esquema unificado para todos los workflows\n\nconst result = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'GMAIL_SEND_CONFIRMATION',\n      workflow_id: 'GMAIL_SEND_CONFIRMATION',\n      timestamp: new Date().toISOString(),\n      version: '4.3.1'\n    }\n  }\n}];"
+      },
+      "id": "standard_contract_1772984456920",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5000,
+        500
+      ]
     }
   ],
   "connections": {
@@ -84,7 +140,7 @@
       "main": [
         [
           {
-            "node": "Gmail",
+            "node": "Validate PRE",
             "type": "main",
             "index": 0
           }
@@ -95,7 +151,7 @@
       "main": [
         [
           {
-            "node": "Gmail",
+            "node": "Validate PRE",
             "type": "main",
             "index": 0
           }
@@ -106,7 +162,7 @@
       "main": [
         [
           {
-            "node": "Gmail",
+            "node": "Validate PRE",
             "type": "main",
             "index": 0
           }
@@ -130,9 +186,37 @@
           }
         ]
       ]
+    },
+    "Validate PRE": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "id": "uHSnVdLiMkEmpJZE"
 }

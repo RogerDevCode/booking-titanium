@@ -1,0 +1,48 @@
+{
+  "name": "DB_Inspector",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "db-inspector-last",
+        "responseMode": "lastNode"
+      },
+      "id": "trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, content, embedding::text as emb_text FROM rag_documents ORDER BY created_at DESC LIMIT 1;",
+        "options": {}
+      },
+      "id": "pg",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [250, 0],
+      "credentials": {
+        "postgres": {
+          "id": "SFNQsmuu4zirZAnP",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

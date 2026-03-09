@@ -45,7 +45,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first().json.body || $input.first().json;\n\n// VRF — GUARD + VALIDATE\nconst chat_id = parseInt(input.chat_id);\nconst provider_id = parseInt(input.provider_id);\nconst service_id = parseInt(input.service_id);\nconst start_time = input.start_time;\nconst user_email = input.user_email || '';\nconst user_name = input.user_name || 'Paciente';\n\nif (!chat_id || !provider_id || !service_id || !start_time) {\n  throw new Error('Missing required fields: chat_id, provider_id, service_id, start_time');\n}\n\nreturn [{\n  json: {\n    chat_id,\n    provider_id,\n    service_id,\n    start_time,\n    user_email,\n    user_name\n  }\n}];"
+        "jsCode": "const input = $input.first().json.body || $input.first().json;\n\n// VRF — GUARD + VALIDATE\nconst chat_id = parseInt(input.chat_id);\nconst provider_id = parseInt(input.provider_id);\nconst service_id = parseInt(input.service_id);\nconst start_time = input.start_time;\nconst user_email = input.user_email || '';\nconst user_name = input.user_name || 'Paciente';\n\nlet isValid = true;\nlet error_message = null;\n\nif (!chat_id || !provider_id || !service_id || !start_time) {\n  isValid = false;\n  error_message = 'Missing required fields: chat_id, provider_id, service_id, start_time';\n}\n\nreturn [{\n  json: {\n    isValid,\n    error_message,\n    chat_id,\n    provider_id,\n    service_id,\n    start_time,\n    user_email,\n    user_name\n  }\n}];"
       },
       "name": "Build Secure JSON",
       "type": "n8n-nodes-base.code",
@@ -65,14 +65,19 @@
         "jsonBody": "={{ $json }}",
         "options": {
           "neverError": true,
-          "timeout": 5000
+          "timeout": 5000,
+          "maxRetries": 3,
+          "retryWait": {
+            "type": "exponentialBackoff",
+            "base": 1000
+          }
         }
       },
       "name": "Call DAL Create",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        500,
+        600,
         432
       ],
       "id": "call_dal_create"
@@ -85,10 +90,66 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        750,
+        850,
         432
       ],
       "id": "format_out"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid_cond",
+              "leftValue": "={{ $json.isValid === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if_valid_create",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: \"VALIDATION_ERROR\",\n    error_message: $json.error_message,\n    data: null,\n    _meta: { source: \"DB_Create_Booking\", timestamp: new Date().toISOString(), version: \"1.1.0\" }\n  }\n}];"
+      },
+      "id": "format_invalid_create",
+      "name": "Format Invalid",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\n// Retorna esquema unificado para todos los workflows\n\nconst result = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'DB_CREATE_BOOKING',\n      workflow_id: 'DB_CREATE_BOOKING',\n      timestamp: new Date().toISOString(),\n      version: '4.3.1'\n    }\n  }\n}];"
+      },
+      "id": "standard_contract_1772984456914",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5000,
+        500
+      ]
     }
   ],
   "connections": {
@@ -129,7 +190,7 @@
       "main": [
         [
           {
-            "node": "Call DAL Create",
+            "node": "Is Valid?",
             "type": "main",
             "index": 0
           }
@@ -146,9 +207,44 @@
           }
         ]
       ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Create",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Invalid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Invalid": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "id": "ilA6a6sM5CvDsSBi"
 }

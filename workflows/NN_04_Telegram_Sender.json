@@ -116,7 +116,7 @@
       ],
       "credentials": {
         "telegramApi": {
-          "id": "WR4umwQYS9Gx0cTO",
+          "id": "ewRLYYWW68aJpgIC",
           "name": "Telegram Booking"
         }
       },
@@ -170,6 +170,19 @@
       "position": [
         480,
         850
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\n// Retorna esquema unificado para todos los workflows\n\nconst result = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'NN_04_TELEGRAM_SENDER',\n      workflow_id: 'NN_04_TELEGRAM_SENDER',\n      timestamp: new Date().toISOString(),\n      version: '4.3.1'\n    }\n  }\n}];"
+      },
+      "id": "standard_contract_1772984456924",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5000,
+        500
       ]
     }
   ],
@@ -283,6 +296,11 @@
             "node": "Format Success (POST)",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -301,5 +319,6 @@
   },
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "id": "WE7DxLKAECtsA8Up"
 }

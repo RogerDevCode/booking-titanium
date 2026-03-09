@@ -83,7 +83,12 @@
         "jsonBody": "={\n  \"booking_id\": \"{{ $json.booking_id }}\",\n  \"chat_id\": {{ $json.chat_id }}\n}",
         "options": {
           "continueOnFail": true,
-          "timeout": 5000
+          "timeout": 5000,
+          "maxRetries": 3,
+          "retryWait": {
+            "type": "exponentialBackoff",
+            "base": 1000
+          }
         }
       },
       "id": "call_dal",
@@ -119,6 +124,30 @@
       "position": [
         600,
         600
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "trigger_manual_123",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\n// Retorna esquema unificado para todos los workflows\n\nconst result = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'DB_CANCEL_BOOKING',\n      workflow_id: 'DB_CANCEL_BOOKING',\n      timestamp: new Date().toISOString(),\n      version: '4.3.1'\n    }\n  }\n}];"
+      },
+      "id": "standard_contract_1772984456913",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5000,
+        500
       ]
     }
   ],
@@ -195,9 +224,26 @@
           }
         ]
       ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate UUID",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "id": "mf4qnUG7UlrAKpQU"
 }

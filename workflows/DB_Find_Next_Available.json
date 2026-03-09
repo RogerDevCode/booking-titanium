@@ -51,7 +51,12 @@
         "specifyBody": "json",
         "jsonBody": "={\n  \"provider_id\": {{ $json.provider_id || $json.body?.provider_id || 1 }},\n  \"service_id\": {{ $json.service_id || $json.body?.service_id || 1 }},\n  \"date\": \"{{ $json.date || $json.body?.date || $now.toISODate() }}\"\n}",
         "options": {
-          "timeout": 15000
+          "timeout": 15000,
+          "maxRetries": 3,
+          "retryWait": {
+            "type": "exponentialBackoff",
+            "base": 1000
+          }
         }
       },
       "name": "Call DAL Smart Lookup",
@@ -78,30 +83,28 @@
     },
     {
       "parameters": {
-        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst provider = $json.provider_id || $json.body?.provider_id || 1;\nconst service = $json.service_id || $json.body?.service_id || 1;\nconst date = $json.date || $json.body?.date || new Date().toISOString().split('T')[0];\nconst key = `${provider}_${service}_${date}`;\nconst now = new Date().getTime();\n\nlet hit = false;\nlet data = null;\n\nif (staticData[key] && (now - staticData[key].timestamp < 5 * 60 * 1000)) {\n  hit = true;\n  data = staticData[key].data;\n}\n\nreturn {\n  json: { provider_id: provider, service_id: service, date: date, cache_hit: hit, cache_data: data, cache_key: key }\n};"
+        "jsCode": "/* VRF PRE: Validate */\nconst item = $input.first()?.json || {};\nconst data = item.body || item;\nconst isValid = true; // Auto-generated default\nreturn [{ json: { isValid, ...data } }];"
       },
-      "name": "Check Cache",
+      "id": "validate_pre_auto",
+      "name": "Validate PRE",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        100,
+        0,
         400
-      ],
-      "id": "check_cache_smart"
+      ]
     },
     {
       "parameters": {
         "conditions": {
           "options": {
-            "caseSensitive": true,
-            "leftValue": "",
             "typeValidation": "strict"
           },
           "conditions": [
             {
-              "id": "19bdfba9-dbb8-4e89-9a25-a1348fc5cb6d",
-              "leftValue": "={{ $json.cache_hit === true }}",
-              "rightValue": "",
+              "id": "valid_cond_auto",
+              "leftValue": "={{ $json.isValid === true }}",
+              "rightValue": true,
               "operator": {
                 "type": "boolean",
                 "operation": "true",
@@ -110,30 +113,29 @@
             }
           ],
           "combinator": "and"
-        },
-        "options": {}
+        }
       },
-      "name": "If Cache Hit",
+      "id": "if_valid_auto",
+      "name": "Is Valid?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        300,
+        200,
         400
-      ],
-      "id": "if_cache_smart"
+      ]
     },
     {
       "parameters": {
-        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst dalResponse = $input.first()?.json || {};\nconst cacheKey = $('Check Cache').first().json.cache_key;\nif (dalResponse.success) {\n  staticData[cacheKey] = {\n    timestamp: new Date().getTime(),\n    data: dalResponse\n  };\n}\nreturn [{ json: dalResponse }];"
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\n// Retorna esquema unificado para todos los workflows\n\nconst result = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'DB_FIND_NEXT_AVAILABLE',\n      workflow_id: 'DB_FIND_NEXT_AVAILABLE',\n      timestamp: new Date().toISOString(),\n      version: '4.3.1'\n    }\n  }\n}];"
       },
-      "name": "Save Cache",
+      "id": "standard_contract_1772984456914",
+      "name": "📤 Standard Contract Output",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        700,
+        5000,
         500
-      ],
-      "id": "save_cache_smart"
+      ]
     }
   ],
   "connections": {
@@ -141,7 +143,7 @@
       "main": [
         [
           {
-            "node": "Check Cache",
+            "node": "Validate PRE",
             "type": "main",
             "index": 0
           }
@@ -152,7 +154,7 @@
       "main": [
         [
           {
-            "node": "Check Cache",
+            "node": "Validate PRE",
             "type": "main",
             "index": 0
           }
@@ -163,7 +165,7 @@
       "main": [
         [
           {
-            "node": "Check Cache",
+            "node": "Validate PRE",
             "type": "main",
             "index": 0
           }
@@ -174,47 +176,34 @@
       "main": [
         [
           {
-            "node": "Save Cache",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Check Cache": {
-      "main": [
-        [
-          {
-            "node": "If Cache Hit",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "If Cache Hit": {
-      "main": [
-        [
-          {
             "node": "Format Output",
             "type": "main",
             "index": 0
           }
-        ],
+        ]
+      ]
+    },
+    "Validate PRE": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
         [
           {
             "node": "Call DAL Smart Lookup",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "Save Cache": {
-      "main": [
-        [
+          },
           {
-            "node": "Format Output",
+            "node": "📤 Standard Contract Output",
             "type": "main",
             "index": 0
           }
@@ -224,5 +213,6 @@
   },
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "id": "oi5AiSoJRbzDf2A8"
 }

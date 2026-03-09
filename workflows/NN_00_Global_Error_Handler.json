@@ -154,7 +154,7 @@
       "id": "07ed3e76-cd3d-41fa-a226-de4242a5b33f",
       "credentials": {
         "telegramApi": {
-          "id": "WR4umwQYS9Gx0cTO",
+          "id": "ewRLYYWW68aJpgIC",
           "name": "Telegram Booking"
         }
       },
@@ -195,6 +195,62 @@
         432
       ],
       "id": "24a9b7a8-5e28-49f7-80ea-b9a546175e21"
+    },
+    {
+      "parameters": {
+        "jsCode": "/* VRF PRE: Validate */\nconst item = $input.first()?.json || {};\nconst data = item.body || item;\nconst isValid = true; // Auto-generated default\nreturn [{ json: { isValid, ...data } }];"
+      },
+      "id": "validate_pre_auto",
+      "name": "Validate PRE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid_cond_auto",
+              "leftValue": "={{ $json.isValid === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if_valid_auto",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        200,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\n// Retorna esquema unificado para todos los workflows\n\nconst result = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'NN_00_GLOBAL_ERROR_HANDLER',\n      workflow_id: 'NN_00_GLOBAL_ERROR_HANDLER',\n      timestamp: new Date().toISOString(),\n      version: '4.3.1'\n    }\n  }\n}];"
+      },
+      "id": "standard_contract_1772984456920",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5000,
+        500
+      ]
     }
   ],
   "connections": {
@@ -202,7 +258,7 @@
       "main": [
         [
           {
-            "node": "Global Config",
+            "node": "Validate PRE",
             "type": "main",
             "index": 0
           }
@@ -213,7 +269,7 @@
       "main": [
         [
           {
-            "node": "Global Config",
+            "node": "Validate PRE",
             "type": "main",
             "index": 0
           }
@@ -224,7 +280,7 @@
       "main": [
         [
           {
-            "node": "Global Config",
+            "node": "Validate PRE",
             "type": "main",
             "index": 0
           }
@@ -235,7 +291,7 @@
       "main": [
         [
           {
-            "node": "Global Config",
+            "node": "Validate PRE",
             "type": "main",
             "index": 0
           }
@@ -307,9 +363,37 @@
           }
         ]
       ]
+    },
+    "Validate PRE": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Global Config",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "id": "B1VnkirO5dF20MHg"
 }

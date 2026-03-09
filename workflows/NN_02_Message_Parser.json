@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "jsCode": "/* ROBUST VERSION v1.2.1 - handles all Telegram input paths */\nconst input = $input.first()?.json;\n\n// Path 1: Execute Workflow from NN_01 (Telegram update body under input.body)\n// Path 2: Direct webhook call (body already unwrapped)\n// Path 3: Direct fields (chat_id, text at root)\nconst bodyLayer = input?.body || input || {};\n\n// Telegram update: {update_id, message:{chat:{id}, text, from:{first_name}}}\nconst message = bodyLayer.message || bodyLayer.channel_post || bodyLayer;\n\nconst chat_id = message.chat?.id || bodyLayer.chat_id || input?.chat_id;\nconst text = message.text || bodyLayer.text || input?.text;\n\nif (!chat_id || !text) {\n  return [{\n    json: {\n      success: false,\n      error_code: 'VALIDATION_ERROR',\n      error_message: 'Payload missing required chat_id or text fields.',\n      debug_received: JSON.stringify(input).substring(0, 200),\n      data: null,\n      _meta: { source: 'NN_02_Message_Parser', timestamp: new Date().toISOString(), version: '1.2.1' }\n    }\n  }];\n}\n\nconst username = message.from?.first_name || message.chat?.first_name || bodyLayer.username || 'Unknown';\n\n// SEC_02: Sanitize\nconst safeText = text.replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nconst safeUsername = username.replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 100);\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      chat_id: chat_id,\n      text: safeText,\n      username: safeUsername,\n      type: 'text'\n    },\n    _meta: { source: 'NN_02_Message_Parser', timestamp: new Date().toISOString(), version: '1.2.1' }\n  }\n}];"
+        "jsCode": "/* ROBUST VERSION v1.2.2 - handles all Telegram input paths */\nconst input = $input.first()?.json;\n\nconst bodyLayer = input?.body || input || {};\nconst message = bodyLayer.message || bodyLayer.channel_post || bodyLayer;\n\nconst chat_id = message.chat?.id || bodyLayer.chat_id || input?.chat_id;\nconst text = message.text || bodyLayer.text || input?.text;\n\nlet isValid = true;\nlet error_message = null;\n\nif (!chat_id || !text) {\n  isValid = false;\n  error_message = 'Payload missing required chat_id or text fields.';\n}\n\nconst username = message.from?.first_name || message.chat?.first_name || bodyLayer.username || 'Unknown';\n\n// SEC_02: Sanitize\nconst safeText = String(text || '').replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nconst safeUsername = String(username || '').replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 100);\n\nreturn [{\n  json: {\n    isValid,\n    error_message,\n    chat_id,\n    text: safeText,\n    username: safeUsername\n  }\n}];"
       },
       "id": "e6f42a9b-7c15-4a6c-b9b5-2d1b10a9f5d1",
       "name": "Extract & Validate (PRE)",
@@ -50,6 +50,75 @@
         -200,
         600
       ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid_cond_nn02",
+              "leftValue": "={{ $json.isValid === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if_valid_nn02",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        700,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      chat_id: $json.chat_id,\n      text: $json.text,\n      username: $json.username,\n      type: 'text'\n    },\n    _meta: { source: 'NN_02_Message_Parser', timestamp: new Date().toISOString(), version: '1.2.2' }\n  }\n}];"
+      },
+      "id": "format_success_nn02",
+      "name": "Format Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        950,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: 'VALIDATION_ERROR',\n    error_message: $json.error_message,\n    data: null,\n    _meta: { source: 'NN_02_Message_Parser', timestamp: new Date().toISOString(), version: '1.2.2' }\n  }\n}];"
+      },
+      "id": "format_invalid_nn02",
+      "name": "Format Invalid",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        950,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\n// Retorna esquema unificado para todos los workflows\n\nconst result = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'NN_02_MESSAGE_PARSER',\n      workflow_id: 'NN_02_MESSAGE_PARSER',\n      timestamp: new Date().toISOString(),\n      version: '4.3.1'\n    }\n  }\n}];"
+      },
+      "id": "standard_contract_1772984456921",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5000,
+        500
+      ]
     }
   ],
   "connections": {
@@ -85,9 +154,50 @@
           }
         ]
       ]
+    },
+    "Extract & Validate (PRE)": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Format Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Invalid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Invalid": {
+      "main": [
+        [
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
     "executionOrder": "v1"
-  }
+  },
+  "id": "f80XLogu45Zg1TSM"
 }
