@@ -176,24 +176,39 @@ app.get('/user-bookings/:chat_id', async (req: express.Request, res: express.Res
 });
 
 app.post('/create-booking', async (req: express.Request, res: express.Response): Promise<void> => {
+    const client = await pool.connect();
     try {
         const { chat_id, provider_id, service_id, start_time, user_email, user_name } = req.body;
-        await pool.query(`INSERT INTO public.users (chat_id, email, full_name) VALUES ($1::bigint, $2::varchar, $3::varchar) ON CONFLICT (chat_id) DO UPDATE SET email = $2::varchar, full_name = $3::varchar`, [chat_id, user_email, user_name]);
+        
+        await client.query('BEGIN');
+
+        // --- ADVISORY LOCK (Transaction level) ---
+        // Generates a 64-bit lock key using the hash of provider + start_time
+        // This ensures NO TWO REQUESTS can process the same slot simultaneously
+        await client.query(`SELECT pg_advisory_xact_lock(hashtext($1::text || $2::text)::bigint)`, [provider_id, start_time]);
+
+        await client.query(`INSERT INTO public.users (chat_id, email, full_name) VALUES ($1::bigint, $2::varchar, $3::varchar) ON CONFLICT (chat_id) DO UPDATE SET email = $2::varchar, full_name = $3::varchar`, [chat_id, user_email, user_name]);
 
         const overlapQuery = `SELECT 1 FROM public.bookings WHERE status = 'CONFIRMED' AND provider_id = $1::integer AND (start_time < ($2::timestamptz + interval '1 hour') AND end_time > $2::timestamptz) LIMIT 1`;
-        const resOverlap = await pool.query(overlapQuery, [provider_id, start_time]);
+        const resOverlap = await client.query(overlapQuery, [provider_id, start_time]);
+        
         if (resOverlap.rows.length > 0) {
+            await client.query('ROLLBACK');
             res.json({ success: false, error_code: 'SLOT_OCCUPIED', error_message: 'El horario ya está reservado.' });
             return;
         }
 
         const shortCode = `BKG-${generateShortCode()}`;
         const query = `INSERT INTO public.bookings (provider_id, service_id, user_id, start_time, end_time, status, short_code) VALUES ($1::integer, $2::integer, $3::bigint, $4::timestamptz, $4::timestamptz + interval '1 hour', 'CONFIRMED', $5::varchar) RETURNING id, short_code;`;
-        const resInsert = await pool.query(query, [provider_id, service_id, chat_id, start_time, shortCode]);
+        const resInsert = await client.query(query, [provider_id, service_id, chat_id, start_time, shortCode]);
 
+        await client.query('COMMIT');
         res.json({ success: true, data: { booking_id: resInsert.rows[0].id, booking_code: resInsert.rows[0].short_code }, _meta: { source: "DAL_Create", timestamp: new Date().toISOString() } });
     } catch (e: unknown) {
+        await client.query('ROLLBACK');
         res.status(500).json({ success: false, error_code: 'DB_ERROR', error_message: (e as Error).message });
+    } finally {
+        client.release();
     }
 });
 
@@ -222,27 +237,40 @@ app.post('/cancel-booking', async (req: express.Request, res: express.Response):
 });
 
 app.post('/reschedule-booking', async (req: express.Request, res: express.Response): Promise<void> => {
+    const client = await pool.connect();
     try {
         const { booking_id, chat_id, new_start_time, provider_id } = req.body;
         
+        await client.query('BEGIN');
+
+        // --- ADVISORY LOCK (Transaction level) ---
+        // Lock the NEW slot to prevent other users from taking it during this reschedule process
+        await client.query(`SELECT pg_advisory_xact_lock(hashtext($1::text || $2::text)::bigint)`, [provider_id, new_start_time]);
+
         const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(booking_id);
         const whereClause = isUUID ? "id = $2::uuid" : "short_code = $2::varchar";
 
-        const resOverlap = await pool.query(`SELECT 1 FROM public.bookings WHERE status = 'CONFIRMED' AND provider_id = $1::integer AND start_time < ($2::timestamptz + interval '1 hour') AND end_time > $2::timestamptz LIMIT 1`, [provider_id, new_start_time]);
+        const resOverlap = await client.query(`SELECT 1 FROM public.bookings WHERE status = 'CONFIRMED' AND provider_id = $1::integer AND start_time < ($2::timestamptz + interval '1 hour') AND end_time > $2::timestamptz LIMIT 1`, [provider_id, new_start_time]);
         if (resOverlap.rows.length > 0) {
+            await client.query('ROLLBACK');
             res.json({ success: false, error_code: 'SLOT_OCCUPIED', error_message: 'El nuevo horario ya está reservado.' });
             return;
         }
 
-        const resUpdate = await pool.query(`UPDATE public.bookings SET start_time = $1::timestamptz, end_time = $1::timestamptz + interval '1 hour' WHERE ${whereClause} AND user_id = $3::bigint RETURNING id, short_code;`, [new_start_time, booking_id, chat_id]);
+        const resUpdate = await client.query(`UPDATE public.bookings SET start_time = $1::timestamptz, end_time = $1::timestamptz + interval '1 hour' WHERE ${whereClause} AND user_id = $3::bigint RETURNING id, short_code;`, [new_start_time, booking_id, chat_id]);
         if (resUpdate.rows.length === 0) {
+            await client.query('ROLLBACK');
             res.json({ success: false, error_code: 'NOT_FOUND', error_message: 'Reserva no encontrada.' });
             return;
         }
         
+        await client.query('COMMIT');
         res.json({ success: true, data: { booking_id: resUpdate.rows[0].id, booking_code: resUpdate.rows[0].short_code }, _meta: { source: "DAL_Reschedule", timestamp: new Date().toISOString() } });
     } catch (e: unknown) {
+        await client.query('ROLLBACK');
         res.status(500).json({ success: false, error_code: 'DB_ERROR', error_message: (e as Error).message });
+    } finally {
+        client.release();
     }
 });
 
@@ -260,4 +288,4 @@ app.post('/mark-reminder-sent', async (req: express.Request, res: express.Respon
     } catch (e: unknown) { res.status(500).json({ success: false, error_message: (e as Error).message }); }
 });
 
-app.listen(3000, '0.0.0.0', () => console.log('🚀 Smart DAL Proxy Active'));
+app.listen(3000, '0.0.0.0', () => console.log('🚀 Smart DAL Proxy Active with Advisory Locks'));

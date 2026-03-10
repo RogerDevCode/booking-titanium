@@ -27,6 +27,13 @@ docker-compose/
 *.tmp
 logs/
 tmp/
+reports/
+execution_*.json
+final_check_*.json
+scripts-ts/recent_executions.json
+scripts-ts/server_*.json
+docs/rag_documents_export.json
+Telegram Desktop/
 reinstall.log
 npm-debug.log*
 yarn-debug.log*
