@@ -1,0 +1,75 @@
+{
+  "name": "DB_Get_User_Profile",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"chat_id\": 123456789}"
+      },
+      "id": "trigger",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ 'http://dal-service:3000/user/' + $json.chat_id }}",
+        "options": {
+          "neverError": true
+        }
+      },
+      "id": "call_dal",
+      "name": "Call DAL Get User",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        250,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $input.first().json;\nconst isRegistered = result.registered === true;\n\nreturn [{\n  json: {\n    success: result.success === true,\n    registered: isRegistered,\n    full_name: isRegistered ? result.data.full_name : null,\n    email: isRegistered ? result.data.email : null,\n    _meta: {\n      source: 'DB_Get_User_Profile',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Get_User_Profile',\n      version: '1.0.0'\n    }\n  }\n}];"
+      },
+      "id": "normalize",
+      "name": "Normalize Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Get User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Get User": {
+      "main": [
+        [
+          {
+            "node": "Normalize Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

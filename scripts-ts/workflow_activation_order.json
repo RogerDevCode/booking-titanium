@@ -156,5 +156,25 @@
     "name": "DB_Get_User_Bookings",
     "id": "rQKcHRQristrgJed",
     "order": 26
+  },
+  {
+    "name": "DB_Get_User_Profile",
+    "id": "mJMUeVZSi55z8Bu9",
+    "order": 27
+  },
+  {
+    "name": "DB_Update_User_Profile",
+    "id": "wcsRgox02YnwDuGG",
+    "order": 28
+  },
+  {
+    "name": "DB_Update_Reminders",
+    "id": "xm6as11jRYblmgEJ",
+    "order": 29
+  },
+  {
+    "name": "DB_Join_Waitlist",
+    "id": "FH8hRUv3dVgo8FB6",
+    "order": 30
   }
 ]

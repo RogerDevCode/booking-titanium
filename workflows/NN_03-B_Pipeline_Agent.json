@@ -52,7 +52,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const raw = $input.first()?.json || {};\nconst body = raw.body || {};\nconst data = raw.chat_id ? raw : (body.chat_id ? body : raw);\n\nconst chat_id = Number(data.chat_id ?? 0);\n\nreturn [{\n  json: {\n    chat_id: chat_id,\n    sessionId: String(chat_id),\n    text: String(data.text ?? '').trim(),\n    intent: 'general_chat',\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.2.0'\n    }\n  }\n}];"
+        "jsCode": "const raw = $input.first()?.json || {};\nconst body = raw.body || {};\nconst data = raw.chat_id ? raw : (body.chat_id ? body : raw);\n\nconst chat_id = Number(data.chat_id ?? 0);\nconst user_profile = data.user_profile || { registered: false, full_name: null, email: null };\n\nreturn [{\n  json: {\n    chat_id: chat_id,\n    sessionId: String(chat_id),\n    text: String(data.text ?? '').trim(),\n    user_profile: user_profile,\n    intent: 'general_chat',\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.5.0'\n    }\n  }\n}];"
       },
       "name": "Input_Clean",
       "type": "n8n-nodes-base.code",
@@ -212,7 +212,62 @@
     },
     {
       "parameters": {
-        "jsCode": "const llmOutput = String($input.first()?.json.text || '').toLowerCase().trim();\nconst allowed = ['create_booking', 'reschedule_booking', 'cancel_booking', 'check_availability', 'find_next', 'get_my_bookings', 'get_services', 'general_chat'];\n\nlet intent = 'general_chat';\nfor (const word of allowed) {\n  if (llmOutput.includes(word)) {\n    intent = word;\n    break;\n  }\n}\n\n// ✅ Recuperar chat_id del nodo Input_Clean para no perder el contexto\nconst cleanInput = $('Input_Clean').first().json;\n\nreturn [{\n  json: {\n    ...cleanInput,\n    intent,\n    raw_llm: llmOutput\n  }\n}];"
+        "promptType": "define",
+        "text": "=### TAREA\\nExtrae el nombre completo y el email del usuario para actualizar su perfil o registrarse. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"full_name\\\": \\\"Nombre Apellido\\\",\\n  \\\"email\\\": \\\"usuario@ejemplo.com\\\"\\n}"
+      },
+      "name": "Extract Params: update_profile",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        2400,
+        800
+      ],
+      "id": "update-prof-ext"
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\ntry {\n  params = JSON.parse(jsonMatch ? jsonMatch[0] : '{}');\n} catch(e) { params = {}; }\n\nconst cleanInput = $('Input_Clean').first().json;\n\nreturn [{ json: { \n  chat_id: cleanInput.chat_id,\n  full_name: params.full_name || cleanInput.user_profile?.full_name || 'Paciente',\n  email: params.email || cleanInput.user_profile?.email || ''\n} }];"
+      },
+      "name": "Parse: update_profile",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2650,
+        800
+      ],
+      "id": "update-prof-parse"
+    },
+    {
+      "parameters": {
+        "workflowId": "wcsRgox02YnwDuGG",
+        "mode": "each"
+      },
+      "name": "Execute: update_profile",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2900,
+        800
+      ],
+      "id": "update-prof-exec"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\"Eres la recepcionista. Has actualizado los datos del usuario.\\n\\nDATOS ACTUALIZADOS:\\n\" + JSON.stringify($json) + \"\\n\\nINSTRUCCIÓN: Responde en ESPAÑOL confirmando que su perfil ha sido actualizado. Sé amable.\""
+      },
+      "name": "Gen: update_profile",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        3150,
+        800
+      ],
+      "id": "update-prof-gen"
+    },
+    {
+      "parameters": {
+        "jsCode": "const llmOutput = String($input.first()?.json.text || '').toLowerCase().trim();\nconst allowed = ['create_booking', 'reschedule_booking', 'cancel_booking', 'check_availability', 'find_next', 'get_my_bookings', 'update_profile', 'manage_reminders', 'join_waitlist', 'get_services', 'general_chat'];\n\nlet intent = 'general_chat';\nfor (const word of allowed) {\n  if (llmOutput.includes(word)) {\n    intent = word;\n    break;\n  }\n}\n\n// ✅ Recuperar chat_id del nodo Input_Clean para no perder el contexto\nconst cleanInput = $('Input_Clean').first().json;\n\nreturn [{\n  json: {\n    ...cleanInput,\n    intent,\n    raw_llm: llmOutput\n  }\n}];"
       },
       "name": "Intent Normalizer",
       "type": "n8n-nodes-base.code",
@@ -367,6 +422,72 @@
                 },
                 "conditions": [
                   {
+                    "id": "sw-update-prof",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "update_profile",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "update_profile"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "sw-reminders",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "manage_reminders",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "manage_reminders"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "sw-waitlist",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "join_waitlist",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "join_waitlist"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
                     "id": "sw-05",
                     "leftValue": "={{ $json.intent }}",
                     "rightValue": "get_services",
@@ -492,7 +613,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=\"Eres la recepcionista de Booking Titanium. El usuario agendó un turno exitosamente.\\n\\nRESULTADO DE RESERVA:\\n\" + JSON.stringify($json) + \"\\n\\nMENSAJE DEL USUARIO:\\n\" + $node[\\\"Input_Clean\\\"].json[\\\"text\\\"] + \"\\n\\nINSTRUCCIÓN: Responde en ESPAÑOL confirmando los datos. Menciona SIEMPRE el 'Código de Reserva' (booking_code) que aparece en el resultado y dile al usuario que lo guarde para futuras consultas o cambios. Sé profesional y amable.\""
+        "text": "=\"Eres la recepcionista de Booking Titanium. El usuario agendó un turno exitosamente.\\n\\nUSUARIO ACTUAL: \" + JSON.stringify($('Input_Clean').first().json.user_profile) + \"\\n\\nRESULTADO DE RESERVA:\\n\" + JSON.stringify($json) + \"\\n\\nMENSAJE DEL USUARIO:\\n\" + $node[\\\"Input_Clean\\\"].json[\\\"text\\\"] + \"\\n\\nINSTRUCCIÓN: Responde en ESPAÑOL confirmando los datos. Saluda al usuario por su nombre si está registrado. Menciona SIEMPRE el 'Código de Reserva' (booking_code) que aparece en el resultado y dile al usuario que lo guarde. Sé profesional y amable.\""
       },
       "name": "Gen: create_booking",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -620,7 +741,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Eres la recepcionista. Consultaron disponibilidad.\\n\\nRESULTADO DE DISPONIBILIDAD:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPAÑOL (2 oraciones) indicando si hay turnos."
+        "text": "=Eres la recepcionista. Consultaron disponibilidad.\\n\\nRESULTADO DE DISPONIBILIDAD:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nINSTRUCCIÓN: Responde en ESPAÑOL (2 oraciones) indicando si hay turnos. Si NO hay turnos, ofrece amablemente al usuario anotarse en la LISTA DE ESPERA."
       },
       "name": "Gen: check_availability",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -684,7 +805,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Eres la recepcionista. Buscaron el próximo turno disponible.\\n\\nRESULTADO:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPAÑOL (2 oraciones) ofreciendo el turno encontrado."
+        "text": "=Eres la recepcionista. Buscaron el próximo turno disponible.\\n\\nRESULTADO:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nINSTRUCCIÓN: Responde en ESPAÑOL (2 oraciones) ofreciendo el turno encontrado. Si NO se encontró ningún turno próximo, ofrece amablemente al usuario anotarse en la LISTA DE ESPERA."
       },
       "name": "Gen: find_next",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -800,7 +921,62 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Eres la recepcionista amable de la clínica.\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde amablemente (2 oraciones). Si pregunta algo que no sabes, invita a consultar por turnos o especialidades."
+        "text": "=### TAREA\\nExtrae el médico (ID) y la fecha de interés para la lista de espera. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"preferred_date\\\": \\\"YYYY-MM-DD\\\"\\n}"
+      },
+      "name": "Extract Params: join_waitlist",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        2400,
+        1400
+      ],
+      "id": "waitlist-ext"
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\ntry {\n  params = JSON.parse(jsonMatch ? jsonMatch[0] : '{}');\n} catch(e) { params = {}; }\n\nconst cleanInput = $('Input_Clean').first().json;\n\nreturn [{ json: { \n  chat_id: cleanInput.chat_id,\n  provider_id: params.provider_id || 1,\n  service_id: params.service_id || 1,\n  preferred_date: params.preferred_date || new Date().toISOString().split('T')[0]\n} }];"
+      },
+      "name": "Parse: join_waitlist",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2650,
+        1400
+      ],
+      "id": "waitlist-parse"
+    },
+    {
+      "parameters": {
+        "workflowId": "FH8hRUv3dVgo8FB6",
+        "mode": "each"
+      },
+      "name": "Execute: join_waitlist",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2900,
+        1400
+      ],
+      "id": "waitlist-exec"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\"Eres la recepcionista. Has anotado al usuario en la lista de espera.\\n\\nDATOS:\\n\" + JSON.stringify($json) + \"\\n\\nINSTRUCCIÓN: Responde en ESPAÑOL confirmando que ha sido anotado en la lista de espera y que le avisaremos si se libera un cupo.\""
+      },
+      "name": "Gen: join_waitlist",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        3150,
+        1400
+      ],
+      "id": "waitlist-gen"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\"Eres la recepcionista amable de la clínica. \\n\\nUSUARIO ACTUAL: \" + JSON.stringify($('Input_Clean').first().json.user_profile) + \"\\n\\nMENSAJE DEL USUARIO:\\n\" + $('Input_Clean').first().json.text + \"\\n\\nResponde amablemente (2 oraciones). Saluda al usuario por su nombre si ya lo conoces. Si pregunta algo que no sabes, invita a consultar por turnos o especialidades.\""
       },
       "name": "Fallback Gen",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -814,7 +990,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const nodes = ['Gen: create_booking', 'Gen: cancel_booking', 'Gen: check_availability', 'Gen: find_next', 'Gen: reschedule_booking', 'Gen: get_my_bookings', 'Gen: get_services', 'Fallback Gen'];\n\nfor (const name of nodes) {\n  try {\n    if ($(name).isExecuted) {\n      const out = $(name).first().json;\n      if (out.success === false) throw out; // Redirigir errores al handler central\n      return [{ json: out }];\n    }\n  } catch (e) {\n    if (e.success === false) throw e;\n  }\n}\n\nthrow { success: false, error_code: 'NO_BRANCH_EXECUTED', error_message: 'Ninguna rama se ejecutó correctamente.' };"
+        "jsCode": "const nodes = ['Gen: create_booking', 'Gen: cancel_booking', 'Gen: check_availability', 'Gen: find_next', 'Gen: reschedule_booking', 'Gen: get_my_bookings', 'Gen: update_profile', 'Gen: join_waitlist', 'Gen: get_services', 'Fallback Gen'];\n\nfor (const name of nodes) {\n  try {\n    if ($(name).isExecuted) {\n      const out = $(name).first().json;\n      if (out.success === false) throw out; // Redirigir errores al handler central\n      return [{ json: out }];\n    }\n  } catch (e) {\n    if (e.success === false) throw e;\n  }\n}\n\nthrow { success: false, error_code: 'NO_BRANCH_EXECUTED', error_message: 'Ninguna rama se ejecutó correctamente.' };"
       },
       "name": "Merge All Branches",
       "type": "n8n-nodes-base.code",
@@ -2044,7 +2220,7 @@
       {
         "parameters": {
           "promptType": "define",
-          "text": "### TAREA\\nClasifica el mensaje en una de estas categorías:\\n\\n- create_booking: quiere agendar turno (ej: 'quiero un turno').\\n- cancel_booking: quiere cancelar un turno (ej: 'borra mi cita').\\n- check_availability: ver horarios o si hay lugar.\\n- find_next: buscar el primer turno libre.\\n- get_services: info sobre PRECIOS, especialidades, médicos, seguros, pagos, ubicación, resultados.\\n- general_chat: saludos, gracias, charla informal.\\n\\n### EJEMPLOS\\n\\\"¿Cuánto cuesta?\\\" -> get_services\\n\\\"¿Tienen cardiología?\\\" -> get_services\\n\\\"Hola\\\" -> general_chat\\n\\\"Aceptan OSDE?\\\" -> get_services\\n\\\"Quiero cancelar\\\" -> cancel_booking\\n\\n### MENSAJE\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde SOLO la categoría."
+          "text": "=### TAREA\\nClasifica el mensaje en una de estas categorías:\\n\\n- create_booking: quiere agendar turno (ej: 'quiero un turno').\\n- cancel_booking: quiere cancelar un turno (ej: 'borra mi cita').\\n- check_availability: ver horarios o si hay lugar.\\n- find_next: buscar el primer turno libre.\\n- get_my_bookings: el usuario quiere ver sus turnos.\\n- reschedule_booking: el usuario quiere CAMBIAR o REPROGRAMAR.\\n- update_profile: el usuario quiere cambiar su nombre, email o registrarse.\\n- manage_reminders: el usuario quiere cambiar cuándo se le notifica (ej: 'avísame 1 hora antes', 'quita el recordatorio de 6h').\\n- join_waitlist: el usuario acepta o pide entrar en lista de espera si no hay turnos.\\n- get_services: info sobre PRECIOS, especialidades, etc.\\n- general_chat: saludos, gracias, charla informal.\\n\\n### USUARIO ACTUAL\\n{{ JSON.stringify($('Input_Clean').first().json.user_profile) }}\\n\\n### MENSAJE\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde SOLO la categoría."
         },
         "name": "Intent Classifier LLM",
         "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -2080,7 +2256,7 @@
       },
       {
         "parameters": {
-          "jsCode": "const llmOutput = String($input.first()?.json.text || '').toLowerCase().trim();\nconst allowed = ['create_booking', 'cancel_booking', 'check_availability', 'find_next', 'get_services', 'general_chat'];\n\nlet intent = 'general_chat';\nfor (const word of allowed) {\n  if (llmOutput.includes(word)) {\n    intent = word;\n    break;\n  }\n}\n\nreturn [{\n  json: {\n    ...$json,\n    intent,\n    raw_llm: llmOutput\n  }\n}];"
+          "jsCode": "const llmOutput = String($input.first()?.json.text || '').toLowerCase().trim();\nconst allowed = ['create_booking', 'reschedule_booking', 'cancel_booking', 'check_availability', 'find_next', 'get_my_bookings', 'update_profile', 'get_services', 'general_chat'];\n\nlet intent = 'general_chat';\nfor (const word of allowed) {\n  if (llmOutput.includes(word)) {\n    intent = word;\n    break;\n  }\n}\n\n// ✅ Recuperar contexto del nodo Input_Clean\nconst cleanInput = $('Input_Clean').first().json;\n\nreturn [{\n  json: {\n    ...cleanInput,\n    intent,\n    raw_llm: llmOutput\n  }\n}];"
         },
         "name": "Intent Normalizer",
         "type": "n8n-nodes-base.code",
@@ -2878,6 +3054,16 @@
               "node": "Service_Topic_Extractor",
               "type": "ai_languageModel",
               "index": 0
+            },
+            {
+              "node": "Extract Params: update_profile",
+              "type": "ai_languageModel",
+              "index": 0
+            },
+            {
+              "node": "Extract Params: manage_reminders",
+              "type": "ai_languageModel",
+              "index": 0
             }
           ]
         ]
@@ -2936,6 +3122,34 @@
           ],
           [
             {
+              "node": "Execute: get_my_bookings",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Extract Params: reschedule_booking",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Extract Params: update_profile",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Extract Params: manage_reminders",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
               "node": "Service_Topic_Extractor",
               "type": "main",
               "index": 0
@@ -2980,6 +3194,16 @@
             },
             {
               "node": "Fallback Gen",
+              "type": "ai_languageModel",
+              "index": 0
+            },
+            {
+              "node": "Gen: update_profile",
+              "type": "ai_languageModel",
+              "index": 0
+            },
+            {
+              "node": "Gen: manage_reminders",
               "type": "ai_languageModel",
               "index": 0
             }
@@ -3295,6 +3519,94 @@
         ]
       },
       "Gen: get_services": {
+        "main": [
+          [
+            {
+              "node": "Merge All Branches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Params: update_profile": {
+        "main": [
+          [
+            {
+              "node": "Parse: update_profile",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse: update_profile": {
+        "main": [
+          [
+            {
+              "node": "Execute: update_profile",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute: update_profile": {
+        "main": [
+          [
+            {
+              "node": "Gen: update_profile",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gen: update_profile": {
+        "main": [
+          [
+            {
+              "node": "Merge All Branches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Params: manage_reminders": {
+        "main": [
+          [
+            {
+              "node": "Parse: manage_reminders",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse: manage_reminders": {
+        "main": [
+          [
+            {
+              "node": "Execute: manage_reminders",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute: manage_reminders": {
+        "main": [
+          [
+            {
+              "node": "Gen: manage_reminders",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gen: manage_reminders": {
         "main": [
           [
             {

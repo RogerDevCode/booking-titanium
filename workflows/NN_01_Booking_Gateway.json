@@ -1,4 +1,5 @@
 {
+  "name": "NN_01_Booking_Gateway",
   "nodes": [
     {
       "parameters": {},
@@ -43,7 +44,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// REGLA 1: NORMALIZACIÓN DE TIPOS\n// Extraer respetando la estructura de Telegram\nconst input = $input.first()?.json || {};\nconst bodyLayer = input.body || input;\nconst message = bodyLayer.message || bodyLayer.channel_post || bodyLayer;\n\nconst chat_id = message.chat?.id || bodyLayer.chat_id || input.chat_id || 0;\nconst text = message.text || bodyLayer.text || input.text || \"\";\n\nconst isValid = Boolean(chat_id && text);\n\nreturn [{\n  json: {\n    isValid,\n    ...input,\n    chat_id: Number(chat_id),\n    text: String(text).trim()\n  }\n}];"
+        "jsCode": "// REGLA 1: NORMALIZACIÓN DE TIPOS\nconst input = $input.first()?.json || {};\nconst bodyLayer = input.body || input;\nconst message = bodyLayer.message || bodyLayer.channel_post || bodyLayer;\n\nconst chat_id = message.chat?.id || bodyLayer.chat_id || input.chat_id || 0;\nconst text = message.text || bodyLayer.text || input.text || \"\";\n\nconst isValid = Boolean(chat_id && text);\n\nreturn [{\n  json: {\n    isValid,\n    ...input,\n    chat_id: Number(chat_id),\n    text: String(text).trim()\n  }\n}];"
       },
       "name": "Normalize Types",
       "type": "n8n-nodes-base.code",
@@ -56,13 +57,8 @@
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "f80XLogu45Zg1TSM",
-          "mode": "id"
-        },
-        "mode": "wait",
-        "options": {}
+        "workflowId": "f80XLogu45Zg1TSM",
+        "mode": "wait"
       },
       "name": "Parse Incoming Payload (NN_02)",
       "type": "n8n-nodes-base.executeWorkflow",
@@ -76,124 +72,40 @@
     {
       "parameters": {
         "conditions": {
-          "options": {
-            "typeValidation": "strict"
-          },
           "conditions": [
             {
-              "id": "parser_ok",
-              "leftValue": "={{ $json.success  === true }}",
+              "leftValue": "={{ $json.success }}",
               "rightValue": true,
               "operator": {
                 "type": "boolean",
-                "operation": "true",
-                "singleValue": true
+                "operation": "true"
               }
             }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
+          ]
+        }
       },
       "name": "Verify Parser (NN_02)",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        2400,
+        2500,
         512
       ],
       "id": "49a90c25-f800-4a0b-9ce6-0f68a25b2c3a"
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "mode": "list",
-          "value": "X3D2dWkBu8QLlNSm",
-          "cachedResultName": "NN_03-B_Pipeline_Agent"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {},
-          "matchingColumns": [],
-          "schema": [],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
-        },
-        "mode": "wait",
-        "options": {}
+        "workflowId": "mJMUeVZSi55z8Bu9",
+        "mode": "wait"
       },
-      "name": "Execute Pipeline Agent (NN_03-B)",
+      "name": "Identify User (DB)",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        2896,
-        848
+        2700,
+        400
       ],
-      "id": "3d01c246-414d-49ac-8dbb-edfb112c0f66"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "ai_ok",
-              "leftValue": "={{ $json.success  === true }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "name": "Verify AI (NN_03-B)",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        3088,
-        848
-      ],
-      "id": "0dac88b5-9963-4182-928a-9b1c9e7c6f89"
-    },
-    {
-      "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "WE7DxLKAECtsA8Up",
-          "mode": "id"
-        },
-        "mode": "wait",
-        "options": {}
-      },
-      "id": "6388afce-606e-49cc-8ab7-25773a557154",
-      "name": "Send Telegram Response (NN_04)",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        3568,
-        560
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "let nn02 = {};\nif ($('Parse Incoming Payload (NN_02)').isExecuted) {\n  nn02 = $('Parse Incoming Payload (NN_02)').first()?.json || {};\n}\n\nlet ai = {};\nif ($('Execute Pipeline Agent (NN_03-B)').isExecuted) {\n  ai = $('Execute Pipeline Agent (NN_03-B)').first()?.json || {};\n}\n\nlet tg = {};\nif ($('Send Telegram Response (NN_04)').isExecuted) {\n  tg = $('Send Telegram Response (NN_04)').first()?.json || {};\n}\n\n// Telegram is ok if we got message_id or delivery status SENT, or if Telegram node executed ok\nconst tgOk = !!(tg.success || tg.data?.message_id);\nconst isSuccess = !!(nn02.success && ai.success && (tgOk || !$('Send Telegram Response (NN_04)').isExecuted));\n\nlet errCode = null;\nlet errMsg = null;\nif (!nn02.success) { errCode = nn02.error_code || 'VALIDATION_ERROR'; errMsg = nn02.error_message; }\nelse if (!ai.success) { errCode = ai.error_code || 'AI_ERROR'; errMsg = ai.error_message; }\nelse if ($('Send Telegram Response (NN_04)').isExecuted && !tgOk) { errCode = tg.error_code || 'TELEGRAM_API_ERROR'; errMsg = tg.error_message || 'Telegram failed to send message'; }\n\nreturn [{ json: {\n  success: isSuccess,\n  error_code: isSuccess ? null : errCode,\n  error_message: isSuccess ? null : errMsg,\n  data: isSuccess ? {\n    message_sent: true,\n    chat_id: ai.data?.chat_id || nn02.data?.chat_id,\n    ai_response: ai.data?.ai_response,\n    intent: ai.data?.intent\n  } : null,\n  _meta: { source: 'NN_01_Booking_Gateway', workflow_id: 'NN_01', timestamp: new Date().toISOString(), version: '4.3.0' }\n} }];"
-      },
-      "id": "4f259c9b-ec55-4b5a-89f9-21e636e8d8b3",
-      "name": "Final Response",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        3744,
-        432
-      ]
+      "id": "identify_user"
     },
     {
       "parameters": {
@@ -210,39 +122,69 @@
               "name": "chat_id",
               "value": "={{ $('Parse Incoming Payload (NN_02)').first().json.data?.chat_id }}",
               "type": "number"
+            },
+            {
+              "id": "user_profile",
+              "name": "user_profile",
+              "value": "={{ $('Identify User (DB)').first().json }}",
+              "type": "object"
             }
           ]
-        },
-        "options": {}
+        }
       },
-      "id": "7ff0028c-86b0-438a-b14d-ea6674a191c4",
+      "id": "prepare_ai_input",
       "name": "Prepare AI Input",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2720,
-        848
+        2900,
+        400
       ]
     },
     {
       "parameters": {
-        "jsCode": "const nn02 = $('Parse Incoming Payload (NN_02)').first()?.json || {};\nconst ai = $('Execute Pipeline Agent (NN_03-B)').first()?.json || {};\n\nconst chat_id = nn02.data?.chat_id || ai.data?.chat_id;\nconst error_msg = ai.error_message || 'El servicio está congestionado o experimentó un error temporal. Por favor, intenta de nuevo en un momento.';\n\nreturn [{ json: {\n  chat_id: chat_id,\n  text: \"⚠️ Error del asistente:\\n\" + error_msg\n} }];"
+        "workflowId": "X3D2dWkBu8QLlNSm",
+        "mode": "wait"
       },
-      "id": "b9fbc74d-9a3b-4c5e-8b9a-112233445566",
-      "name": "Format Telegram Error",
+      "name": "Execute Pipeline Agent (NN_03-B)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        3100,
+        400
+      ],
+      "id": "3d01c246-414d-49ac-8dbb-edfb112c0f66"
+    },
+    {
+      "parameters": {
+        "workflowId": "WE7DxLKAECtsA8Up",
+        "mode": "wait"
+      },
+      "id": "send_tg",
+      "name": "Send Telegram Response (NN_04)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        3400,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: $input.first().json }];"
+      },
+      "id": "final_resp",
+      "name": "Final Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3408,
-        1040
+        3650,
+        400
       ]
     },
     {
       "parameters": {
         "conditions": {
-          "options": {
-            "typeValidation": "strict"
-          },
           "conditions": [
             {
               "id": "valid_cond_nn01",
@@ -250,12 +192,10 @@
               "rightValue": true,
               "operator": {
                 "type": "boolean",
-                "operation": "true",
-                "singleValue": true
+                "operation": "true"
               }
             }
-          ],
-          "combinator": "and"
+          ]
         }
       },
       "id": "if_valid_nn01",
@@ -265,32 +205,6 @@
       "position": [
         2150,
         512
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: \"INVALID_PAYLOAD\",\n    error_message: \"Payload is missing chat_id or text\",\n    data: null,\n    _meta: { source: \"NN_01_Booking_Gateway\", timestamp: new Date().toISOString(), version: \"4.3.1\" }\n  }\n}];"
-      },
-      "id": "format_invalid_nn01",
-      "name": "Format Invalid Gateway",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        2150,
-        700
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\n// Retorna esquema unificado para todos los workflows\n\nconst result = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'NN_01_BOOKING_GATEWAY',\n      workflow_id: 'NN_01_BOOKING_GATEWAY',\n      timestamp: new Date().toISOString(),\n      version: '4.3.1'\n    }\n  }\n}];"
-      },
-      "id": "standard_contract_1772984456921",
-      "name": "📤 Standard Contract Output",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        5000,
-        500
       ]
     }
   ],
@@ -339,6 +253,17 @@
         ]
       ]
     },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Parse Incoming Payload (NN_02)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Parse Incoming Payload (NN_02)": {
       "main": [
         [
@@ -354,54 +279,18 @@
       "main": [
         [
           {
+            "node": "Identify User (DB)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identify User (DB)": {
+      "main": [
+        [
+          {
             "node": "Prepare AI Input",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Final Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Execute Pipeline Agent (NN_03-B)": {
-      "main": [
-        [
-          {
-            "node": "Verify AI (NN_03-B)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Verify AI (NN_03-B)": {
-      "main": [
-        [
-          {
-            "node": "Send Telegram Response (NN_04)",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Format Telegram Error",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Send Telegram Response (NN_04)": {
-      "main": [
-        [
-          {
-            "node": "Final Response",
             "type": "main",
             "index": 0
           }
@@ -419,7 +308,7 @@
         ]
       ]
     },
-    "Format Telegram Error": {
+    "Execute Pipeline Agent (NN_03-B)": {
       "main": [
         [
           {
@@ -430,34 +319,11 @@
         ]
       ]
     },
-    "Is Valid?": {
-      "main": [
-        [
-          {
-            "node": "Parse Incoming Payload (NN_02)",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Format Invalid Gateway",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Format Invalid Gateway": {
+    "Send Telegram Response (NN_04)": {
       "main": [
         [
           {
             "node": "Final Response",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "📤 Standard Contract Output",
             "type": "main",
             "index": 0
           }
@@ -465,8 +331,8 @@
       ]
     }
   },
-  "pinData": {},
-  "meta": {
-    "instanceId": "dcff9bffd57bf60f63303c902ff8a9da3e3cc1df7b0fee28dae6d77c5d352c30"
-  }
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "MZfYRe4ZDgUeWW64"
 }
