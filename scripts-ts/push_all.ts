@@ -1,18 +1,18 @@
 import axios from 'axios';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as dotenv from 'dotenv';
 import { Watchdog, WATCHDOG_TIMEOUT } from './watchdog';
+import { N8NConfig } from './config';
 
 // Start watchdog timer
 const watchdog = new Watchdog(WATCHDOG_TIMEOUT);
 watchdog.start();
 
-// Load .env from parent directory
-dotenv.config({ path: path.join(__dirname, '../.env') });
+// Initialize config (loads .env automatically)
+const config = new N8NConfig();
 
-const API_URL = process.env.N8N_API_URL || 'https://n8n.stax.ink';
-const API_KEY = process.env.N8N_API_KEY || process.env.N8N_ACCESS_TOKEN;
+const API_URL = config.api_url;
+const API_KEY = config.api_key;
 
 // Fields to strip from nodes
 const STRIP_FIELDS = [

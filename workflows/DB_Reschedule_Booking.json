@@ -44,7 +44,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first().json.body || $input.first().json;\n\n// VRF — GUARD + VALIDATE\nconst isValidUUID = (v) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);\nconst bookingId = input.old_booking_id || input.booking_id;\n\nlet isValid = true;\nlet error_message = null;\n\nif (!bookingId || !isValidUUID(bookingId)) {\n  isValid = false;\n  error_message = 'Invalid or missing booking_id (UUID required)';\n}\nif (isValid && !input.new_start_time) {\n  isValid = false;\n  error_message = 'Missing required field: new_start_time';\n}\n\nreturn [{\n  json: {\n    isValid,\n    error_message,\n    chat_id: parseInt(input.chat_id) || null,\n    booking_id: bookingId,\n    old_booking_id: bookingId,\n    new_start_time: input.new_start_time,\n    provider_id: parseInt(input.provider_id) || 1,\n    service_id: parseInt(input.service_id) || 1,\n    user_email: input.user_email || '',\n    user_name: input.user_name || 'Paciente'\n  }\n}];"
+        "jsCode": "const input = $input.first().json.body || $input.first().json;\n\n// VRF — GUARD + VALIDATE\nconst isValidUUID = (v) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);\nconst bookingId = input.old_booking_id || input.booking_id;\n\nlet isValid = true;\nlet error_message = null;\n\nif (!bookingId || !isValidUUID(bookingId)) {\n  isValid = false;\n  error_message = 'Invalid or missing booking_id (UUID required)';\n}\nif (isValid && !input.new_start_time) {\n  isValid = false;\n  error_message = 'Missing required field: new_start_time';\n}\n\nconst chatId = parseInt(input.chat_id);\n\nreturn [{\n  json: {\n    isValid,\n    error_message,\n    chat_id: isNaN(chatId) ? null : chatId,\n    booking_id: bookingId,\n    old_booking_id: bookingId,\n    start_time: input.new_start_time,\n    provider_id: parseInt(input.provider_id) || 1,\n    service_id: parseInt(input.service_id) || 1,\n    user_email: input.user_email || '',\n    user_name: input.user_name || 'Paciente'\n  }\n}];"
       },
       "name": "Build Secure JSON",
       "type": "n8n-nodes-base.code",
@@ -83,27 +83,27 @@
           "mode": "id"
         },
         "mode": "wait",
-        "inputData": "={\n  \"chat_id\": {{ $node[\"Build Secure JSON\"].json.chat_id }},\n  \"start_time\": \"{{ $node[\"Build Secure JSON\"].json.new_start_time }}\",\n  \"provider_id\": {{ $node[\"Build Secure JSON\"].json.provider_id }},\n  \"service_id\": {{ $node[\"Build Secure JSON\"].json.service_id }},\n  \"user_email\": \"{{ $node[\"Build Secure JSON\"].json.user_email }}\",\n  \"user_name\": \"{{ $node[\"Build Secure JSON\"].json.user_name }}\"\n}",
+        "inputData": "={{ $json }}",
         "options": {}
       },
       "name": "Step 2: Create New",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        650,
+        750,
         432
       ],
       "id": "create_new"
     },
     {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      old_booking_id: $node[\"Build Secure JSON\"]?.json?.old_booking_id || $node[\"Build Secure JSON\"]?.json?.booking_id,\n      new_booking_id: $node[\"Step 2: Create New\"]?.json?.data?.booking_id || $node[\"Step 2: Create New\"]?.json?.booking_id || null\n    },\n    _meta: { source: \"DB_Reschedule_Booking\", timestamp: new Date().toISOString() }\n  }\n}];"
+        "jsCode": "// Format Reschedule Response\nconst cancelResult = $node[\"Step 1: Cancel Old\"]?.json || {};\nconst createResult = $node[\"Step 2: Create New\"]?.json || {};\n\nreturn [{\n  json: {\n    success: createResult.success === true,\n    error_code: createResult.error_code,\n    error_message: createResult.error_message,\n    data: {\n      old_booking_id: cancelResult.data?.booking_id,\n      old_booking_code: cancelResult.data?.booking_code,\n      new_booking_id: createResult.data?.booking_id,\n      new_booking_code: createResult.data?.booking_code,\n      status: createResult.success ? 'CONFIRMED' : 'FAILED'\n    },\n    _meta: { \n      source: \"DB_Reschedule_Booking\", \n      timestamp: new Date().toISOString(),\n      version: \"1.1.0\"\n    }\n  }\n}];"
       },
       "name": "Final Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        900,
+        1000,
         432
       ],
       "id": "final_res"
@@ -163,6 +163,19 @@
         5000,
         500
       ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const buildData = $('Build Secure JSON').first().json;\nreturn [{\n  json: {\n    chat_id: buildData.chat_id,\n    start_time: buildData.start_time,\n    provider_id: buildData.provider_id,\n    service_id: buildData.service_id,\n    user_name: buildData.user_name,\n    user_email: buildData.user_email\n  }\n}];"
+      },
+      "id": "prepare-create-input",
+      "name": "Prepare Create Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        550,
+        432
+      ]
     }
   ],
   "connections": {
@@ -214,7 +227,7 @@
       "main": [
         [
           {
-            "node": "Step 2: Create New",
+            "node": "Prepare Create Input",
             "type": "main",
             "index": 0
           }
@@ -260,6 +273,17 @@
           },
           {
             "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Create Input": {
+      "main": [
+        [
+          {
+            "node": "Step 2: Create New",
             "type": "main",
             "index": 0
           }

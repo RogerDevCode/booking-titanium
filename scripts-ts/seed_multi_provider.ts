@@ -8,17 +8,18 @@
  */
 
 import { Pool } from 'pg';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
+import { N8NConfig } from './config';
 
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+// Initialize config (loads .env automatically)
+const config = new N8NConfig();
+const DATABASE_URL = process.env.DATABASE_URL || process.env.REMOTE_NEON_DB_URL;
 
-const isLocal = process.env.DATABASE_URL?.includes('localhost') ||
-                process.env.DATABASE_URL?.includes('127.0.0.1') ||
-                process.env.DATABASE_URL?.includes('postgres:');
+const isLocal = DATABASE_URL?.includes('localhost') ||
+                DATABASE_URL?.includes('127.0.0.1') ||
+                DATABASE_URL?.includes('postgres:');
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: DATABASE_URL,
     ssl: isLocal ? false : { rejectUnauthorized: false },
     max: 5,
     idleTimeoutMillis: 30000,

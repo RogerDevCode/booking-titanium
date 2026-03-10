@@ -88,37 +88,73 @@
     "order": 14
   },
   {
-    "name": "BB_90_Reminder_Scheduler",
-    "id": "hGxHu9gLhhYdAGeW",
-    "order": 15,
-    "webhook_path": "bb-90-reminder"
-  },
-  {
     "name": "BB_00_Config",
     "id": "9aK8rsjujaBEDmDp",
-    "order": 16,
+    "order": 15,
     "webhook_path": "bb-00-config"
   },
   {
     "name": "FRONTEND_Landing_Page",
     "id": "EfQxqiSRjdJapQIY",
-    "order": 17,
+    "order": 16,
     "webhook_path": "titanium-landing",
     "production_url": "https://n8n.stax.ink/webhook/EfQxqiSRjdJapQIY/webhook/titanium-landing"
   },
   {
     "name": "DB_Get_Providers",
     "id": "cNC4U2Bg6HoX09YP",
-    "order": 18
+    "order": 17
   },
   {
     "name": "DB_Get_Services",
     "id": "N2mFFyKLf7365OB9",
-    "order": 19
+    "order": 18
   },
   {
     "name": "DB_Get_Providers_By_Service",
     "id": "koGljfSXUzYESNoh",
-    "order": 20
+    "order": 19
+  },
+  {
+    "name": "NN_03-B_Pipeline_Agent",
+    "id": "X3D2dWkBu8QLlNSm",
+    "order": 20,
+    "webhook_path": "nn-03-b-pipeline"
+  },
+  {
+    "name": "RAG_01_Document_Ingestion",
+    "id": "RAG_01_Document_Ingestion_ID",
+    "order": 21,
+    "webhook_path": "rag-ingest-document",
+    "description": "RAG document ingestion - converts documents to embeddings"
+  },
+  {
+    "name": "RAG_02_Document_Retrieval",
+    "id": "RAG_02_Document_Retrieval_ID",
+    "order": 22,
+    "webhook_path": "rag-search",
+    "description": "RAG document retrieval - searches embeddings and returns context"
+  },
+  {
+    "name": "DB_Inspector",
+    "id": "CnV39YbNpAqyZr1P",
+    "order": 23,
+    "webhook_path": "db-inspector-last"
+  },
+  {
+    "name": "DB_Debug",
+    "id": "1ACCUSFG0eB9dEi6",
+    "order": 24,
+    "webhook_path": "rag-search"
+  },
+  {
+    "name": "DB_Resolve_Service_ID",
+    "id": "YVrtyqLVCuykAKgB",
+    "order": 25
+  },
+  {
+    "name": "DB_Get_User_Bookings",
+    "id": "rQKcHRQristrgJed",
+    "order": 26
   }
 ]

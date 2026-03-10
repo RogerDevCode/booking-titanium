@@ -9,14 +9,14 @@
  * =============================================================================
  */
 
-import * as dotenv from 'dotenv';
 import axios, { AxiosInstance } from 'axios';
-import * as path from 'path';
+import { N8NConfig } from './config';
 
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+// Initialize config (loads .env automatically)
+const config = new N8NConfig();
 
-const N8N_API_URL = process.env.N8N_API_URL?.replace(/\/+$/, '') || 'https://n8n.stax.ink';
-const N8N_API_KEY = process.env.N8N_API_KEY;
+const N8N_API_URL = config.api_url;
+const N8N_API_KEY = config.api_key;
 
 const COLORS = {
     reset: '\x1b[0m',
@@ -43,12 +43,12 @@ function initApi() {
     }
 
     api = axios.create({
-        baseURL: N8N_API_URL,
-        headers: {
-            'X-N8N-API-KEY': N8N_API_KEY,
-            'Content-Type': 'application/json',
-        },
-        timeout: 30000,
+      baseURL: `${N8N_API_URL}/api/v1`,
+      headers: {
+        'X-N8N-API-KEY': N8N_API_KEY,
+        'Content-Type': 'application/json',
+      },
+      timeout: 30000,
     });
 }
 

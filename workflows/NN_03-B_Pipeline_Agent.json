@@ -20,7 +20,8 @@
     },
     {
       "parameters": {
-        "inputSource": "passthrough"
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n  \"chat_id\": 12345,\n  \"text\": \"Hola, quiero un turno\"\n}"
       },
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
@@ -46,12 +47,12 @@
         200
       ],
       "webhookId": "nn-03-b-pipeline",
-      "notes": "\ud83d\udce5 IN: { chat_id: number, text: string (2-500 chars) }",
+      "notes": "📥 IN: { chat_id: number, text: string (2-500 chars) }",
       "id": "c9a89d90-fa64-4b7d-ae1e-2f0cde133656"
     },
     {
       "parameters": {
-        "jsCode": "const raw = $input.first()?.json || {};\nconst body = raw.body || {};\nconst data = raw.chat_id ? raw : (body.chat_id ? body : raw);\n\nconst chat_id = Number(data.chat_id ?? 0);\n\nreturn [{\n  json: {\n    chat_id: chat_id,\n    sessionId: String(chat_id),\n    text: String(data.text ?? '').trim(),\n    intent: 'general_chat',\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
+        "jsCode": "const raw = $input.first()?.json || {};\nconst body = raw.body || {};\nconst data = raw.chat_id ? raw : (body.chat_id ? body : raw);\n\nconst chat_id = Number(data.chat_id ?? 0);\n\nreturn [{\n  json: {\n    chat_id: chat_id,\n    sessionId: String(chat_id),\n    text: String(data.text ?? '').trim(),\n    intent: 'general_chat',\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.2.0'\n    }\n  }\n}];"
       },
       "name": "Input_Clean",
       "type": "n8n-nodes-base.code",
@@ -106,7 +107,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: 'VALIDATION_ERROR',\n    error_message: 'Datos de entrada inv\u00e1lidos: chat_id debe ser num\u00e9rico y text entre 3-499 chars',\n    data: null,\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
+        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: 'VALIDATION_ERROR',\n    error_message: 'Datos de entrada inválidos: chat_id debe ser numérico y text entre 3-499 chars',\n    data: null,\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.2.0'\n    }\n  }\n}];"
       },
       "name": "Err: Validation",
       "type": "n8n-nodes-base.code",
@@ -119,7 +120,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const textLower = String($('Input_Clean').first().json.text || '').toLowerCase();\n\nconst PROFANITY_REGEX = /\\b(conchetumare|ctm|culiao|qliao|pichula|tula|zorra|maraco|maric\u00f3n|maricon|puta|mierda|fuck|shit|asshole|bitch|bastard|motherfucker|dick|cunt|pussy|prick|est\u00fapido|estupido|idiota|imb\u00e9cil|imbecil|gilipollas|huevon|weon)\\b/i;\n\nconst INJECTION_PHRASES = [\n  'ignore all previous instructions', 'disregard all rules', 'system prompt',\n  'jailbreak', 'dan mode', 'olvida todas las instrucciones'\n];\n\nconst OFFTOPIC_PHRASES = [\n  'escribe un poema', 'write a poem', 'cu\u00e9ntame un cuento', 'cuentame un cuento',\n  'tell me a story', 'genera c\u00f3digo', 'genera codigo', 'create code',\n  'hackear', 'hacking', 'pol\u00edtica', 'politica'\n];\n\nlet isBlocked = false;\n\nif (PROFANITY_REGEX.test(textLower)) isBlocked = true;\nif (!isBlocked) {\n  for (const phrase of INJECTION_PHRASES) {\n    if (textLower.includes(phrase)) { isBlocked = true; break; }\n  }\n}\nif (!isBlocked) {\n  for (const phrase of OFFTOPIC_PHRASES) {\n    if (textLower.includes(phrase)) { isBlocked = true; break; }\n  }\n}\n\nreturn [{ json: { ...$json, isBlocked } }];"
+        "jsCode": "const textLower = String($('Input_Clean').first().json.text || '').toLowerCase();\n\nconst PROFANITY_REGEX = /\\b(conchetumare|ctm|culiao|qliao|pichula|tula|zorra|maraco|maricón|maricon|puta|mierda|fuck|shit|asshole|bitch|bastard|motherfucker|dick|cunt|pussy|prick|estúpido|estupido|idiota|imbécil|imbecil|gilipollas|huevon|weon)\\b/i;\n\nconst INJECTION_PHRASES = [\n  'ignore all previous instructions', 'disregard all rules', 'system prompt',\n  'jailbreak', 'dan mode', 'olvida todas las instrucciones'\n];\n\nconst OFFTOPIC_PHRASES = [\n  'escribe un poema', 'write a poem', 'cuéntame un cuento', 'cuentame un cuento',\n  'tell me a story', 'genera código', 'genera codigo', 'create code',\n  'hackear', 'hacking', 'política', 'politica'\n];\n\nlet isBlocked = false;\n\nif (PROFANITY_REGEX.test(textLower)) isBlocked = true;\nif (!isBlocked) {\n  for (const phrase of INJECTION_PHRASES) {\n    if (textLower.includes(phrase)) { isBlocked = true; break; }\n  }\n}\nif (!isBlocked) {\n  for (const phrase of OFFTOPIC_PHRASES) {\n    if (textLower.includes(phrase)) { isBlocked = true; break; }\n  }\n}\n\nreturn [{ json: { ...$json, isBlocked } }];"
       },
       "name": "Rule Firewall",
       "type": "n8n-nodes-base.code",
@@ -161,7 +162,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: 'SECURITY_BLOCKED',\n    error_message: 'Mensaje bloqueado por reglas de seguridad',\n    data: null,\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
+        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: 'SECURITY_BLOCKED',\n    error_message: 'Mensaje bloqueado por reglas de seguridad',\n    data: null,\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.2.0'\n    }\n  }\n}];"
       },
       "name": "Err: Security",
       "type": "n8n-nodes-base.code",
@@ -175,7 +176,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "### TAREA\\nClasifica el mensaje en una de estas categor\u00edas:\\n\\n- create_booking: quiere agendar turno (ej: 'quiero un turno').\\n- cancel_booking: quiere cancelar un turno (ej: 'borra mi cita').\\n- check_availability: ver horarios o si hay lugar.\\n- find_next: buscar el primer turno libre.\\n- get_services: info sobre PRECIOS, especialidades, m\u00e9dicos, seguros, pagos, ubicaci\u00f3n, resultados.\\n- general_chat: saludos, gracias, charla informal.\\n\\n### EJEMPLOS\\n\\\"\u00bfCu\u00e1nto cuesta?\\\" -> get_services\\n\\\"\u00bfTienen cardiolog\u00eda?\\\" -> get_services\\n\\\"Hola\\\" -> general_chat\\n\\\"Aceptan OSDE?\\\" -> get_services\\n\\\"Quiero cancelar\\\" -> cancel_booking\\n\\n### MENSAJE\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde SOLO la categor\u00eda."
+        "text": "=### TAREA\\nClasifica el mensaje en una de estas categorías:\\n\\n- create_booking: quiere agendar turno (ej: 'quiero un turno').\\n- cancel_booking: quiere cancelar un turno (ej: 'borra mi cita').\\n- check_availability: ver horarios o si hay lugar.\\n- find_next: buscar el primer turno libre.\\n- get_my_bookings: el usuario quiere ver, consultar o listar sus turnos/reservas actuales.\\n- reschedule_booking: el usuario quiere CAMBIAR, REPROGRAMAR o MOVER un turno existente.\\n- get_services: info sobre PRECIOS, especialidades, médicos, seguros, pagos, ubicación, resultados.\\n- general_chat: saludos, gracias, charla informal.\\n\\n### EJEMPLOS\\n\\\"¿Cuánto cuesta?\\\" -> get_services\\n\\\"¿Tienen cardiología?\\\" -> get_services\\n\\\"Hola\\\" -> general_chat\\n\\\"Aceptan OSDE?\\\" -> get_services\\n\\\"Quiero cancelar\\\" -> cancel_booking\\n\\\"Cambia mi turno\\\" -> reschedule_booking\\n\\\"¿Cuáles son mis turnos?\\\" -> get_my_bookings\\n\\n### MENSAJE\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde SOLO la categoría."
       },
       "name": "Intent Classifier LLM",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -211,7 +212,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const llmOutput = String($input.first()?.json.text || '').toLowerCase().trim();\nconst allowed = ['create_booking', 'cancel_booking', 'check_availability', 'find_next', 'get_services', 'general_chat'];\n\nlet intent = 'general_chat';\nfor (const word of allowed) {\n  if (llmOutput.includes(word)) {\n    intent = word;\n    break;\n  }\n}\n\nreturn [{\n  json: {\n    ...$json,\n    intent,\n    raw_llm: llmOutput\n  }\n}];"
+        "jsCode": "const llmOutput = String($input.first()?.json.text || '').toLowerCase().trim();\nconst allowed = ['create_booking', 'reschedule_booking', 'cancel_booking', 'check_availability', 'find_next', 'get_my_bookings', 'get_services', 'general_chat'];\n\nlet intent = 'general_chat';\nfor (const word of allowed) {\n  if (llmOutput.includes(word)) {\n    intent = word;\n    break;\n  }\n}\n\n// ✅ Recuperar chat_id del nodo Input_Clean para no perder el contexto\nconst cleanInput = $('Input_Clean').first().json;\n\nreturn [{\n  json: {\n    ...cleanInput,\n    intent,\n    raw_llm: llmOutput\n  }\n}];"
       },
       "name": "Intent Normalizer",
       "type": "n8n-nodes-base.code",
@@ -322,6 +323,50 @@
                 },
                 "conditions": [
                   {
+                    "id": "sw-get-my",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "get_my_bookings",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "get_my_bookings"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "sw-reschedule",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "reschedule_booking",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "reschedule_booking"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
                     "id": "sw-05",
                     "leftValue": "={{ $json.intent }}",
                     "rightValue": "get_services",
@@ -398,7 +443,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "### TAREA\\nExtrae par\u00e1metros para agendar m\u00e9dico. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"start_time\\\": \\\"YYYY-MM-DDTHH:MM:SS\\\",\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"user_name\\\": \\\"Nombre\\\",\\n  \\\"user_email\\\": \\\"email@ejemplo.com\\\"\\n}"
+        "text": "=### TAREA\\nExtrae parámetros para agendar médico. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"start_time\\\": \\\"YYYY-MM-DDTHH:MM:SS\\\",\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"user_name\\\": \\\"Nombre\\\",\\n  \\\"user_email\\\": \\\"email@ejemplo.com\\\"\\n}"
       },
       "name": "Extract Params: create_booking",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -412,7 +457,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\n// SEC04/05 Robust validation\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoRegex = /^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?$/;\nparams.start_time = (params.start_time && isoRegex.test(String(params.start_time)))\n  ? params.start_time\n  : new Date().toISOString();\n\nconst sanitize = (v) => String(v || '').replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nparams.user_name = sanitize(params.user_name || 'Usuario');\n\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nparams.user_email = emailRegex.test(String(params.user_email))\n  ? String(params.user_email).substring(0, 254)\n  : 'sin-email@booking.com';\n\nreturn [{ json: params }];"
+        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detectó JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extraído es inválido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\n// SEC04/05 Robust validation\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoRegex = /^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?$/;\nparams.start_time = (params.start_time && isoRegex.test(String(params.start_time)))\n  ? params.start_time\n  : new Date().toISOString();\n\nconst sanitize = (v) => String(v || '').replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nparams.user_name = sanitize(params.user_name || 'Usuario');\n\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nparams.user_email = emailRegex.test(String(params.user_email))\n  ? String(params.user_email).substring(0, 254)\n  : 'sin-email@booking.com';\n\nreturn [{ json: params }];"
       },
       "name": "Parse: create_booking",
       "type": "n8n-nodes-base.code",
@@ -447,7 +492,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "Eres la recepcionista de Booking Titanium. El usuario agend\u00f3.\\n\\nRESULTADO DE RESERVA:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) confirmando los datos."
+        "text": "=\"Eres la recepcionista de Booking Titanium. El usuario agendó un turno exitosamente.\\n\\nRESULTADO DE RESERVA:\\n\" + JSON.stringify($json) + \"\\n\\nMENSAJE DEL USUARIO:\\n\" + $node[\\\"Input_Clean\\\"].json[\\\"text\\\"] + \"\\n\\nINSTRUCCIÓN: Responde en ESPAÑOL confirmando los datos. Menciona SIEMPRE el 'Código de Reserva' (booking_code) que aparece en el resultado y dile al usuario que lo guarde para futuras consultas o cambios. Sé profesional y amable.\""
       },
       "name": "Gen: create_booking",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -462,7 +507,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "### TAREA\\nExtrae el booking_id (UUID) para cancelar. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"booking_id\\\": \\\"UUID-AQU\u00cd\\\"\\n}"
+        "text": "=### TAREA\\nExtrae el ID de reserva (puede ser un UUID o un código corto tipo BKG-XXXX) para cancelar. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"booking_id\\\": \\\"ID-AQUÍ\\\"\\n}"
       },
       "name": "Extract Params: cancel_booking",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -476,7 +521,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\nconst bookingId = String(params.booking_id || '');\n\nif (!uuidRegex.test(bookingId)) {\n  throw {\n    success: false,\n    error_code: 'INVALID_BOOKING_ID',\n    error_message: 'No se encontr\u00f3 un ID de reserva v\u00e1lido (UUID) en tu mensaje.'\n  };\n}\n\nparams.booking_id = bookingId;\nreturn [{ json: params }];"
+        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detectó JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extraído es inválido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst bookingId = String(params.booking_id || '').trim();\nconst uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\nconst shortCodeRegex = /^BKG-[A-Z0-9]{6,10}$/i;\n\nif (!uuidRegex.test(bookingId) && !shortCodeRegex.test(bookingId)) {\n  // HARD FALLBACK: buscar código corto en el texto original si el LLM no lo puso en el JSON\n  const userText = $('Input_Clean').first().json.text;\n  const match = userText.match(/BKG-[A-Z0-9]{6,10}/i);\n  if (match) {\n    params.booking_id = match[0].toUpperCase();\n  } else {\n    throw {\n      success: false,\n      error_code: 'INVALID_BOOKING_ID',\n      error_message: 'No se encontró un código de reserva válido (ej: BKG-123456).'\n    };\n  }\n} else {\n  params.booking_id = bookingId.toUpperCase();\n}\n\nreturn [{ json: params }];"
       },
       "name": "Parse: cancel_booking",
       "type": "n8n-nodes-base.code",
@@ -511,7 +556,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "Eres la recepcionista. El usuario cancel\u00f3 su turno.\\n\\nRESULTADO DE CANCELACI\u00d3N:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) lamentando la cancelaci\u00f3n."
+        "text": "=\"Eres la recepcionista. El usuario canceló su turno.\\n\\nRESULTADO DE CANCELACIÓN:\\n\" + JSON.stringify($json) + \"\\n\\nMENSAJE DEL USUARIO:\\n\" + $node[\\\"Input_Clean\\\"].json[\\\"text\\\"] + \"\\n\\nINSTRUCCIÓN: Responde en ESPAÑOL confirmando la cancelación. Menciona el código de reserva que fue cancelado (booking_code) para dar seguridad al usuario.\""
       },
       "name": "Gen: cancel_booking",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -526,7 +571,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "### TAREA\\nExtrae par\u00e1metros de disponibilidad. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"date\\\": \\\"YYYY-MM-DD\\\"\\n}"
+        "text": "=### TAREA\\nExtrae parámetros de disponibilidad. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"date\\\": \\\"YYYY-MM-DD\\\"\\n}"
       },
       "name": "Extract Params: check_availability",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -540,7 +585,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoDateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nparams.date = (params.date && isoDateRegex.test(String(params.date)))\n  ? params.date\n  : new Date().toISOString().split('T')[0];\n\nreturn [{ json: params }];"
+        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detectó JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extraído es inválido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoDateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nparams.date = (params.date && isoDateRegex.test(String(params.date)))\n  ? params.date\n  : new Date().toISOString().split('T')[0];\n\nreturn [{ json: params }];"
       },
       "name": "Parse: check_availability",
       "type": "n8n-nodes-base.code",
@@ -575,7 +620,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "Eres la recepcionista. Consultaron disponibilidad.\\n\\nRESULTADO DE DISPONIBILIDAD:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) indicando si hay turnos."
+        "text": "=Eres la recepcionista. Consultaron disponibilidad.\\n\\nRESULTADO DE DISPONIBILIDAD:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPAÑOL (2 oraciones) indicando si hay turnos."
       },
       "name": "Gen: check_availability",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -590,7 +635,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "### TAREA\\nExtrae par\u00e1metros para pr\u00f3ximo turno libre. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"date\\\": \\\"YYYY-MM-DD\\\"\\n}"
+        "text": "=### TAREA\\nExtrae parámetros para próximo turno libre. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"date\\\": \\\"YYYY-MM-DD\\\"\\n}"
       },
       "name": "Extract Params: find_next",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -604,7 +649,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoDateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nparams.date = (params.date && isoDateRegex.test(String(params.date)))\n  ? params.date\n  : new Date().toISOString().split('T')[0];\n\nreturn [{ json: params }];"
+        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detectó JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extraído es inválido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoDateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nparams.date = (params.date && isoDateRegex.test(String(params.date)))\n  ? params.date\n  : new Date().toISOString().split('T')[0];\n\nreturn [{ json: params }];"
       },
       "name": "Parse: find_next",
       "type": "n8n-nodes-base.code",
@@ -639,7 +684,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "Eres la recepcionista. Buscaron el pr\u00f3ximo turno disponible.\\n\\nRESULTADO:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) ofreciendo el turno encontrado."
+        "text": "=Eres la recepcionista. Buscaron el próximo turno disponible.\\n\\nRESULTADO:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPAÑOL (2 oraciones) ofreciendo el turno encontrado."
       },
       "name": "Gen: find_next",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -668,7 +713,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\ntry { params = JSON.parse(jsonMatch ? jsonMatch[0] : '{}'); } catch(e) {}\n\nconst userText = $('Input_Clean').first().json.text.toLowerCase();\nlet q = params.query || '';\n\nif (userText.includes('cardio')) q = 'cardiologia';\nelse if (userText.includes('pediat')) q = 'pediatria';\nelse if (userText.includes('derma')) q = 'dermatologia';\nelse if (userText.includes('odont')) q = 'odontologia';\nelse if (userText.includes('segu') || userText.includes('osde')) q = 'seguros';\n\nif (!q) q = $('Input_Clean').first().json.text;\n\nreturn [{ json: {\n  query: q,\n  service_name: q,\n  provider_id: 1,\n  limit: 5,\n  similarity_threshold: 0.05\n} }];"
+        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\ntry {\n  params = JSON.parse(jsonMatch ? jsonMatch[0] : '{}');\n} catch(e) { params = {}; }\n\nconst userText = $('Input_Clean').first().json.text;\nconst userTextLower = userText.toLowerCase();\nlet q = params.query || \"\"; // Confiar en el LLM primero\n\n// #5 ✅ CORRECTO --- LLM tiene prioridad, keywords son fallback\nif (!q) {\n  const kws = [\n    { test: [\"cardio\",\"corazón\",\"arritmia\"], val: \"cardiologia\" },\n    { test: [\"pediat\",\"niño\",\"niña\",\"infantil\"], val: \"pediatria\" },\n    { test: [\"derma\",\"piel\",\"acné\"], val: \"dermatologia\" },\n    { test: [\"odont\",\"diente\",\"dental\",\"muela\"], val: \"odontologia\" },\n    { test: [\"segu\",\"osde\",\"prepaga\",\"cobertura\"], val: \"seguros\" },\n  ];\n\n  for (const { test, val } of kws) {\n    if (test.some(k => userTextLower.includes(k))) { \n      q = val; \n      break; \n    }\n  }\n}\n\n// Último recurso: texto completo del usuario\nif (!q || q.length < 2 || q.includes('normaliz') || q === 'unknown') {\n  q = userText;\n}\n\nreturn [{ json: {\n  query: q.toLowerCase().trim(),\n  service_name: q.toLowerCase().trim(),\n  provider_id: 1,\n  limit: 5,\n  similarity_threshold: 0.30 // #4 ✅ 30% --- balance recall/precision\n} }];"
       },
       "name": "Parse: get_services",
       "type": "n8n-nodes-base.code",
@@ -704,7 +749,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Analyze Resolve \u2014 Decidir estrategia RAG (SEC02)\nconst resolve = $input.first()?.json.data || {};\nconst userText = $('Input_Clean').first().json.text;\nconst parseData = $('Parse: get_services').first()?.json || {};\n\n// Si el match es d\u00e9bil o no encontrado, buscar en RAG sin filtro de service_id\nconst useFilter = resolve.resolved && resolve.match_type !== 'WEAK';\n\nreturn [{\n  json: {\n    query: resolve.resolved ? resolve.service_name : (parseData.query || userText),\n    provider_id: resolve.provider_id || 1,\n    service_id: useFilter ? resolve.service_id : null,\n    limit: 5,\n    similarity_threshold: 0.05,\n    sql_context: {\n      resolved: resolve.resolved,\n      match_type: resolve.match_type,\n      service_name: resolve.service_name,\n      price: resolve.price,\n      currency: resolve.currency || 'USD',\n      candidates: resolve.candidates || []\n    }\n  }\n}];"
+        "jsCode": "// Analyze Resolve — Decidir estrategia RAG (SEC02)\nconst resolve = $input.first()?.json.data || {};\nconst userText = $('Input_Clean').first().json.text;\nconst parseData = $('Parse: get_services').first()?.json || {};\n\n// Si el match es débil o no encontrado, buscar en RAG sin filtro de service_id\nconst useFilter = resolve.resolved && resolve.match_type !== 'WEAK';\n\nreturn [{\n  json: {\n    query: resolve.resolved ? resolve.service_name : (parseData.query || userText),\n    provider_id: resolve.provider_id || 1,\n    service_id: useFilter ? resolve.service_id : null,\n    limit: 5,\n    similarity_threshold: 0.05,\n    sql_context: {\n      resolved: resolve.resolved,\n      match_type: resolve.match_type,\n      service_name: resolve.service_name,\n      price: resolve.price,\n      currency: resolve.currency || 'USD',\n      candidates: resolve.candidates || []\n    }\n  }\n}];"
       },
       "name": "Analyze Resolve",
       "type": "n8n-nodes-base.code",
@@ -755,7 +800,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "Eres la recepcionista amable de la cl\u00ednica.\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde amablemente (2 oraciones). Si pregunta algo que no sabes, invita a consultar por turnos o especialidades."
+        "text": "=Eres la recepcionista amable de la clínica.\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde amablemente (2 oraciones). Si pregunta algo que no sabes, invita a consultar por turnos o especialidades."
       },
       "name": "Fallback Gen",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -769,7 +814,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const nodes = ['Gen: create_booking', 'Gen: cancel_booking', 'Gen: check_availability', 'Gen: find_next', 'Gen: get_services', 'Fallback Gen'];\n\nfor (const name of nodes) {\n  try {\n    if ($(name).isExecuted) {\n      const out = $(name).first().json;\n      if (out.success === false) throw out; // Redirigir errores al handler central\n      return [{ json: out }];\n    }\n  } catch (e) {\n    if (e.success === false) throw e;\n  }\n}\n\nthrow { success: false, error_code: 'NO_BRANCH_EXECUTED', error_message: 'Ninguna rama se ejecut\u00f3 correctamente.' };"
+        "jsCode": "const nodes = ['Gen: create_booking', 'Gen: cancel_booking', 'Gen: check_availability', 'Gen: find_next', 'Gen: reschedule_booking', 'Gen: get_my_bookings', 'Gen: get_services', 'Fallback Gen'];\n\nfor (const name of nodes) {\n  try {\n    if ($(name).isExecuted) {\n      const out = $(name).first().json;\n      if (out.success === false) throw out; // Redirigir errores al handler central\n      return [{ json: out }];\n    }\n  } catch (e) {\n    if (e.success === false) throw e;\n  }\n}\n\nthrow { success: false, error_code: 'NO_BRANCH_EXECUTED', error_message: 'Ninguna rama se ejecutó correctamente.' };"
       },
       "name": "Merge All Branches",
       "type": "n8n-nodes-base.code",
@@ -813,7 +858,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first()?.json || {};\nconst error = $input.params.error || {}; // Si viene de un onError\n\nconst success = input.success !== false && !error.message;\nconst errorCode = error.code || input.error_code || 'EXECUTION_ERROR';\nconst errorMessage = error.message || input.error_message || 'Error desconocido';\n\nreturn [{\n  json: {\n    success: false,\n    error_code: errorCode,\n    error_message: errorMessage,\n    data: null,\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
+        "jsCode": "// ✅ CORRECTO --- leer error del json del item entrante\nconst input = $input.first()?.json || {};\n\n// Los errores llegan como campos en el json, no en $input.params\nconst errorCode = input.error_code || input.code || \"EXECUTION_ERROR\";\nconst errorMessage = input.error_message || input.message || input.error || \"Error desconocido\";\n\nreturn [{\n  json: {\n    success: false,\n    error_code: errorCode,\n    error_message: errorMessage,\n    data: null,\n    _meta: {\n      source: \"NN_03-B_Pipeline_Agent\",\n      timestamp: new Date().toISOString(),\n      version: \"2.2.0\"\n    }\n  }\n}];"
       },
       "name": "Central Error Handler",
       "type": "n8n-nodes-base.code",
@@ -826,7 +871,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first()?.json || {};\nlet aiResp = input.text || input.output || input.ai_response || '';\nif (typeof aiResp === 'string') aiResp = aiResp.replace(/^[\\\"']|[\\\"']$/g, '').trim();\nif (!aiResp) aiResp = 'Lo siento, no pude procesar tu solicitud.';\n\nlet chatId = 0;\nlet intent = 'general_chat';\n\ntry { if ($('Input_Clean').isExecuted) chatId = $('Input_Clean').first().json.chat_id || 0; } catch(e) {}\ntry { if ($('Intent Normalizer').isExecuted) intent = $('Intent Normalizer').first().json.intent || 'general_chat'; } catch(e) {}\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      intent,\n      chat_id: chatId,\n      ai_response: aiResp\n    },\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      debug_topic: $('Parse: get_services').first().json.query,\n      version: '2.1.0'\n    }\n  }\n}];"
+        "jsCode": "const input = $input.first()?.json || {};\nlet aiResp = input.text || input.output || input.ai_response || '';\nif (typeof aiResp === 'string') aiResp = aiResp.replace(/^[\\\"']|[\\\"']$/g, '').trim();\nif (!aiResp) aiResp = 'Lo siento, no pude procesar tu solicitud.';\n\nlet chatId = 0;\ntry { \n  if ($('Input_Clean').isExecuted) {\n    chatId = $('Input_Clean').first().json.chat_id || 0; \n  }\n} catch(e) {}\n\nlet debugTopic = null;\ntry {\n  if ($('Parse: get_services').isExecuted) {\n    debugTopic = $('Parse: get_services').first()?.json?.query ?? null;\n  }\n} catch(e) { /* nodo no ejecutado en esta rama */ }\n\nlet intent = \"general_chat\";\ntry {\n  if ($('Intent Normalizer').isExecuted) {\n    intent = $('Intent Normalizer').first()?.json?.intent ?? \"general_chat\";\n  }\n} catch(e) {}\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      intent,\n      chat_id: chatId,\n      ai_response: aiResp\n    },\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      debug_topic: debugTopic,\n      version: '2.2.0'\n    }\n  }\n}];"
       },
       "name": "Format Response",
       "type": "n8n-nodes-base.code",
@@ -839,21 +884,21 @@
     },
     {
       "parameters": {
-        "jsCode": "// \ud83d\udce4 STANDARD CONTRACT OUTPUT (O02)\nreturn [{ json: $input.first()?.json || {} }];"
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\nreturn [{ json: $input.first()?.json || {} }];"
       },
-      "name": "\ud83d\udce4 Standard Contract Output",
+      "name": "📤 Standard Contract Output",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         4100,
         0
       ],
-      "notes": "\ud83d\udce4 OUT: Standard Contract",
+      "notes": "📤 OUT: Standard Contract",
       "id": "78d28c59-6721-45a4-af05-07042631009a"
     },
     {
       "parameters": {
-        "jsCode": "// Build Prompt: get_services\nconst sql = $('Analyze Resolve').first().json.sql_context || {};\nconst ragDocs = $json.data?.documents || [];\nconst userText = $('Input_Clean').first().json.text;\n\nlet prompt = `Eres la recepcionista amable de Booking Titanium. Responde la duda del usuario.\\n\\n`;\n\nif (sql.resolved) {\n  prompt += `### INFORMACI\u00d3N OFICIAL DEL SERVICIO\\n`;\n  prompt += `- Nombre: ${sql.service_name}\\n`;\n  prompt += `- Precio: ${sql.price || 'Consultar'} ${sql.currency || 'USD'}\\n\\n`;\n}\n\nif (ragDocs.length > 0) {\n  prompt += `### DOCUMENTACI\u00d3N ADICIONAL\\n`;\n  prompt += JSON.stringify(ragDocs) + `\\n\\n`;\n}\n\nprompt += `### MENSAJE DEL USUARIO\\n${userText}\\n\\n`;\nprompt += `INSTRUCCI\u00d3N: Responde de forma breve (m\u00e1ximo 3 oraciones), profesional y amable en ESPA\u00d1OL.`;\n\nreturn [{ json: { prompt } }];"
+        "jsCode": "// Build Prompt: get_services\nconst sql = $('Analyze Resolve').first().json.sql_context || {};\nconst ragDocs = $json.data?.documents || [];\nconst userText = $('Input_Clean').first().json.text;\n\nlet prompt = `Eres la recepcionista amable de Booking Titanium. Responde la duda del usuario.\\n\\n`;\n\nif (sql.resolved) {\n  prompt += `### INFORMACIÓN OFICIAL DEL SERVICIO\\n`;\n  prompt += `- Nombre: ${sql.service_name}\\n`;\n  prompt += `- Precio: ${sql.price || 'Consultar'} ${sql.currency || 'USD'}\\n\\n`;\n}\n\nif (ragDocs.length > 0) {\n  prompt += `### DOCUMENTACIÓN ADICIONAL\\n`;\n  prompt += JSON.stringify(ragDocs) + `\\n\\n`;\n}\n\nprompt += `### MENSAJE DEL USUARIO\\n${userText}\\n\\n`;\nprompt += `INSTRUCCIÓN: Responde de forma breve (máximo 3 oraciones), profesional y amable en ESPAÑOL.`;\n\nreturn [{ json: { prompt } }];"
       },
       "name": "Build Prompt: get_services",
       "type": "n8n-nodes-base.code",
@@ -863,6 +908,139 @@
         600
       ],
       "id": "build-prompt-get-svc"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\"### TAREA\\nIdentifica el ID de reserva (UUID o código BKG-XXXX) y la NUEVA fecha/hora solicitada.\\n\\n### MENSAJE DEL USUARIO\\n\" + $node[\\\"Input_Clean\\\"].json[\\\"text\\\"] + \"\\n\\nResponde SOLO un JSON con 'booking_id' y 'new_start_time'.\""
+      },
+      "name": "Extract Params: reschedule_booking",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        2400,
+        400
+      ],
+      "retryOnFail": true,
+      "id": "resched-ext-01"
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\ntry {\n  params = JSON.parse(jsonMatch ? jsonMatch[0] : '{}');\n} catch(e) { params = {}; }\n\nconst userText = $('Input_Clean').first().json.text;\nconst userTextLower = userText.toLowerCase();\nlet bookingId = params.booking_id || \"\";\n\n// HARD FALLBACK for UUID or Short Code\nconst uuidMatch = userText.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);\nconst shortMatch = userText.match(/BKG-[A-Z0-9]{6,10}/i);\n\nif (!bookingId || bookingId.includes('AQUÍ') || bookingId === 'UUID') {\n  if (uuidMatch) bookingId = uuidMatch[0];\n  else if (shortMatch) bookingId = shortMatch[0].toUpperCase();\n}\n\nif (!bookingId) {\n  return [{ json: { success: false, error_code: 'INVALID_BOOKING_ID', error_message: 'No se encontró un ID de reserva válido.' } }];\n}\n\nreturn [{ json: { \n  success: true,\n  booking_id: bookingId.toUpperCase(),\n  old_booking_id: bookingId.toUpperCase(),\n  new_start_time: params.new_start_time || new Date().toISOString(),\n  provider_id: params.provider_id || 1,\n  service_id: params.service_id || 1,\n  chat_id: $('Input_Clean').first().json.chat_id || 0,\n  user_name: $('Input_Clean').first().json.user_name || 'Paciente',\n  user_email: $('Input_Clean').first().json.user_email || ''\n} }];"
+      },
+      "name": "Parse: reschedule_booking",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2650,
+        400
+      ],
+      "id": "resched-parse-01"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "F2F5oQ7okPDKwg9E",
+          "mode": "id"
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "name": "Execute: reschedule_booking",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        3100,
+        400
+      ],
+      "id": "resched-exec-01",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\"Eres la recepcionista. El usuario reprogramó su turno.\\n\\nRESULTADO DE REPROGRAMACIÓN:\\n\" + JSON.stringify($json) + \"\\n\\nMENSAJE DEL USUARIO:\\n\" + $node[\\\"Input_Clean\\\"].json[\\\"text\\\"] + \"\\n\\nINSTRUCCIÓN: Responde en ESPAÑOL confirmando el cambio. Menciona el código anterior (old_booking_code) y el NUEVO código de reserva (new_booking_code). Pide al usuario que guarde el nuevo código.\""
+      },
+      "name": "Gen: reschedule_booking",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        3350,
+        400
+      ],
+      "retryOnFail": true,
+      "id": "resched-gen-01"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "resched-success-cond",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "resched-if-01",
+      "name": "Resched Success?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2850,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "rQKcHRQristrgJed",
+          "mode": "id"
+        },
+        "mode": "each",
+        "inputData": "={\n  \"chat_id\": {{ $('Input_Clean').first().json.chat_id }}\n}",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "name": "Execute: get_my_bookings",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2400,
+        -200
+      ],
+      "id": "get-my-exec-01",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\"Eres la recepcionista. El usuario consultó sus turnos.\\n\\nLISTA DE TURNOS:\\n\" + JSON.stringify($json) + \"\\n\\nUSUARIO: \" + $('Input_Clean').first().json.text + \"\\n\\nINSTRUCCIÓN: Responde en ESPAÑOL listando los turnos. Menciona SIEMPRE el 'Código de Reserva' (booking_code) de cada uno y la fecha/hora. Si no hay turnos, informa amablemente.\""
+      },
+      "name": "Gen: get_my_bookings",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        2700,
+        -200
+      ],
+      "retryOnFail": true,
+      "id": "get-my-gen-01"
     }
   ],
   "connections": {
@@ -1022,6 +1200,11 @@
             "node": "Service_Topic_Extractor",
             "type": "ai_languageModel",
             "index": 0
+          },
+          {
+            "node": "Extract Params: reschedule_booking",
+            "type": "ai_languageModel",
+            "index": 0
           }
         ]
       ]
@@ -1080,6 +1263,20 @@
         ],
         [
           {
+            "node": "Execute: get_my_bookings",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract Params: reschedule_booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
             "node": "Service_Topic_Extractor",
             "type": "main",
             "index": 0
@@ -1124,6 +1321,16 @@
           },
           {
             "node": "Fallback Gen",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Gen: reschedule_booking",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Gen: get_my_bookings",
             "type": "ai_languageModel",
             "index": 0
           }
@@ -1500,7 +1707,7 @@
       "main": [
         [
           {
-            "node": "\ud83d\udce4 Standard Contract Output",
+            "node": "📤 Standard Contract Output",
             "type": "main",
             "index": 0
           }
@@ -1511,7 +1718,7 @@
       "main": [
         [
           {
-            "node": "\ud83d\udce4 Standard Contract Output",
+            "node": "📤 Standard Contract Output",
             "type": "main",
             "index": 0
           }
@@ -1523,6 +1730,104 @@
         [
           {
             "node": "Gen: get_services",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Params: reschedule_booking": {
+      "main": [
+        [
+          {
+            "node": "Parse: reschedule_booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse: reschedule_booking": {
+      "main": [
+        [
+          {
+            "node": "Resched Success?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute: reschedule_booking": {
+      "main": [
+        [
+          {
+            "node": "Gen: reschedule_booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen: reschedule_booking": {
+      "main": [
+        [
+          {
+            "node": "Merge All Branches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resched Success?": {
+      "main": [
+        [
+          {
+            "node": "Execute: reschedule_booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute: get_my_bookings": {
+      "main": [
+        [
+          {
+            "node": "Gen: get_my_bookings",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Central Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen: get_my_bookings": {
+      "main": [
+        [
+          {
+            "node": "Merge All Branches",
             "type": "main",
             "index": 0
           }
@@ -1610,7 +1915,7 @@
           200
         ],
         "webhookId": "nn-03-b-pipeline",
-        "notes": "\ud83d\udce5 IN: { chat_id: number, text: string (2-500 chars) }",
+        "notes": "📥 IN: { chat_id: number, text: string (2-500 chars) }",
         "id": "c9a89d90-fa64-4b7d-ae1e-2f0cde133656"
       },
       {
@@ -1670,7 +1975,7 @@
       },
       {
         "parameters": {
-          "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: 'VALIDATION_ERROR',\n    error_message: 'Datos de entrada inv\u00e1lidos: chat_id debe ser num\u00e9rico y text entre 3-499 chars',\n    data: null,\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
+          "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: 'VALIDATION_ERROR',\n    error_message: 'Datos de entrada inválidos: chat_id debe ser numérico y text entre 3-499 chars',\n    data: null,\n    _meta: {\n      source: 'NN_03-B_Pipeline_Agent',\n      timestamp: new Date().toISOString(),\n      version: '2.1.0'\n    }\n  }\n}];"
         },
         "name": "Err: Validation",
         "type": "n8n-nodes-base.code",
@@ -1683,7 +1988,7 @@
       },
       {
         "parameters": {
-          "jsCode": "const textLower = String($('Input_Clean').first().json.text || '').toLowerCase();\n\nconst PROFANITY_REGEX = /\\b(conchetumare|ctm|culiao|qliao|pichula|tula|zorra|maraco|maric\u00f3n|maricon|puta|mierda|fuck|shit|asshole|bitch|bastard|motherfucker|dick|cunt|pussy|prick|est\u00fapido|estupido|idiota|imb\u00e9cil|imbecil|gilipollas|huevon|weon)\\b/i;\n\nconst INJECTION_PHRASES = [\n  'ignore all previous instructions', 'disregard all rules', 'system prompt',\n  'jailbreak', 'dan mode', 'olvida todas las instrucciones'\n];\n\nconst OFFTOPIC_PHRASES = [\n  'escribe un poema', 'write a poem', 'cu\u00e9ntame un cuento', 'cuentame un cuento',\n  'tell me a story', 'genera c\u00f3digo', 'genera codigo', 'create code',\n  'hackear', 'hacking', 'pol\u00edtica', 'politica'\n];\n\nlet isBlocked = false;\n\nif (PROFANITY_REGEX.test(textLower)) isBlocked = true;\nif (!isBlocked) {\n  for (const phrase of INJECTION_PHRASES) {\n    if (textLower.includes(phrase)) { isBlocked = true; break; }\n  }\n}\nif (!isBlocked) {\n  for (const phrase of OFFTOPIC_PHRASES) {\n    if (textLower.includes(phrase)) { isBlocked = true; break; }\n  }\n}\n\nreturn [{ json: { ...$json, isBlocked } }];"
+          "jsCode": "const textLower = String($('Input_Clean').first().json.text || '').toLowerCase();\n\nconst PROFANITY_REGEX = /\\b(conchetumare|ctm|culiao|qliao|pichula|tula|zorra|maraco|maricón|maricon|puta|mierda|fuck|shit|asshole|bitch|bastard|motherfucker|dick|cunt|pussy|prick|estúpido|estupido|idiota|imbécil|imbecil|gilipollas|huevon|weon)\\b/i;\n\nconst INJECTION_PHRASES = [\n  'ignore all previous instructions', 'disregard all rules', 'system prompt',\n  'jailbreak', 'dan mode', 'olvida todas las instrucciones'\n];\n\nconst OFFTOPIC_PHRASES = [\n  'escribe un poema', 'write a poem', 'cuéntame un cuento', 'cuentame un cuento',\n  'tell me a story', 'genera código', 'genera codigo', 'create code',\n  'hackear', 'hacking', 'política', 'politica'\n];\n\nlet isBlocked = false;\n\nif (PROFANITY_REGEX.test(textLower)) isBlocked = true;\nif (!isBlocked) {\n  for (const phrase of INJECTION_PHRASES) {\n    if (textLower.includes(phrase)) { isBlocked = true; break; }\n  }\n}\nif (!isBlocked) {\n  for (const phrase of OFFTOPIC_PHRASES) {\n    if (textLower.includes(phrase)) { isBlocked = true; break; }\n  }\n}\n\nreturn [{ json: { ...$json, isBlocked } }];"
         },
         "name": "Rule Firewall",
         "type": "n8n-nodes-base.code",
@@ -1739,7 +2044,7 @@
       {
         "parameters": {
           "promptType": "define",
-          "text": "### TAREA\\nClasifica el mensaje en una de estas categor\u00edas:\\n\\n- create_booking: quiere agendar turno (ej: 'quiero un turno').\\n- cancel_booking: quiere cancelar un turno (ej: 'borra mi cita').\\n- check_availability: ver horarios o si hay lugar.\\n- find_next: buscar el primer turno libre.\\n- get_services: info sobre PRECIOS, especialidades, m\u00e9dicos, seguros, pagos, ubicaci\u00f3n, resultados.\\n- general_chat: saludos, gracias, charla informal.\\n\\n### EJEMPLOS\\n\\\"\u00bfCu\u00e1nto cuesta?\\\" -> get_services\\n\\\"\u00bfTienen cardiolog\u00eda?\\\" -> get_services\\n\\\"Hola\\\" -> general_chat\\n\\\"Aceptan OSDE?\\\" -> get_services\\n\\\"Quiero cancelar\\\" -> cancel_booking\\n\\n### MENSAJE\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde SOLO la categor\u00eda."
+          "text": "### TAREA\\nClasifica el mensaje en una de estas categorías:\\n\\n- create_booking: quiere agendar turno (ej: 'quiero un turno').\\n- cancel_booking: quiere cancelar un turno (ej: 'borra mi cita').\\n- check_availability: ver horarios o si hay lugar.\\n- find_next: buscar el primer turno libre.\\n- get_services: info sobre PRECIOS, especialidades, médicos, seguros, pagos, ubicación, resultados.\\n- general_chat: saludos, gracias, charla informal.\\n\\n### EJEMPLOS\\n\\\"¿Cuánto cuesta?\\\" -> get_services\\n\\\"¿Tienen cardiología?\\\" -> get_services\\n\\\"Hola\\\" -> general_chat\\n\\\"Aceptan OSDE?\\\" -> get_services\\n\\\"Quiero cancelar\\\" -> cancel_booking\\n\\n### MENSAJE\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde SOLO la categoría."
         },
         "name": "Intent Classifier LLM",
         "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -1962,7 +2267,7 @@
       {
         "parameters": {
           "promptType": "define",
-          "text": "### TAREA\\nExtrae par\u00e1metros para agendar m\u00e9dico. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"start_time\\\": \\\"YYYY-MM-DDTHH:MM:SS\\\",\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"user_name\\\": \\\"Nombre\\\",\\n  \\\"user_email\\\": \\\"email@ejemplo.com\\\"\\n}"
+          "text": "### TAREA\\nExtrae parámetros para agendar médico. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"start_time\\\": \\\"YYYY-MM-DDTHH:MM:SS\\\",\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"user_name\\\": \\\"Nombre\\\",\\n  \\\"user_email\\\": \\\"email@ejemplo.com\\\"\\n}"
         },
         "name": "Extract Params: create_booking",
         "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -1976,7 +2281,7 @@
       },
       {
         "parameters": {
-          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\n// SEC04/05 Robust validation\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoRegex = /^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?$/;\nparams.start_time = (params.start_time && isoRegex.test(String(params.start_time)))\n  ? params.start_time\n  : new Date().toISOString();\n\nconst sanitize = (v) => String(v || '').replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nparams.user_name = sanitize(params.user_name || 'Usuario');\n\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nparams.user_email = emailRegex.test(String(params.user_email))\n  ? String(params.user_email).substring(0, 254)\n  : 'sin-email@booking.com';\n\nreturn [{ json: params }];"
+          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detectó JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extraído es inválido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\n// SEC04/05 Robust validation\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoRegex = /^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?$/;\nparams.start_time = (params.start_time && isoRegex.test(String(params.start_time)))\n  ? params.start_time\n  : new Date().toISOString();\n\nconst sanitize = (v) => String(v || '').replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nparams.user_name = sanitize(params.user_name || 'Usuario');\n\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nparams.user_email = emailRegex.test(String(params.user_email))\n  ? String(params.user_email).substring(0, 254)\n  : 'sin-email@booking.com';\n\nreturn [{ json: params }];"
         },
         "name": "Parse: create_booking",
         "type": "n8n-nodes-base.code",
@@ -2011,7 +2316,7 @@
       {
         "parameters": {
           "promptType": "define",
-          "text": "Eres la recepcionista de Booking Titanium. El usuario agend\u00f3.\\n\\nRESULTADO DE RESERVA:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) confirmando los datos."
+          "text": "Eres la recepcionista de Booking Titanium. El usuario agendó.\\n\\nRESULTADO DE RESERVA:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPAÑOL (2 oraciones) confirmando los datos."
         },
         "name": "Gen: create_booking",
         "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -2026,7 +2331,7 @@
       {
         "parameters": {
           "promptType": "define",
-          "text": "### TAREA\\nExtrae el booking_id (UUID) para cancelar. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"booking_id\\\": \\\"UUID-AQU\u00cd\\\"\\n}"
+          "text": "### TAREA\\nExtrae el booking_id (UUID) para cancelar. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"booking_id\\\": \\\"UUID-AQUÍ\\\"\\n}"
         },
         "name": "Extract Params: cancel_booking",
         "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -2040,7 +2345,7 @@
       },
       {
         "parameters": {
-          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\nconst bookingId = String(params.booking_id || '');\n\nif (!uuidRegex.test(bookingId)) {\n  throw {\n    success: false,\n    error_code: 'INVALID_BOOKING_ID',\n    error_message: 'No se encontr\u00f3 un ID de reserva v\u00e1lido (UUID) en tu mensaje.'\n  };\n}\n\nparams.booking_id = bookingId;\nreturn [{ json: params }];"
+          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detectó JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extraído es inválido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\nconst bookingId = String(params.booking_id || '');\n\nif (!uuidRegex.test(bookingId)) {\n  throw {\n    success: false,\n    error_code: 'INVALID_BOOKING_ID',\n    error_message: 'No se encontró un ID de reserva válido (UUID) en tu mensaje.'\n  };\n}\n\nparams.booking_id = bookingId;\nreturn [{ json: params }];"
         },
         "name": "Parse: cancel_booking",
         "type": "n8n-nodes-base.code",
@@ -2075,7 +2380,7 @@
       {
         "parameters": {
           "promptType": "define",
-          "text": "Eres la recepcionista. El usuario cancel\u00f3 su turno.\\n\\nRESULTADO DE CANCELACI\u00d3N:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) lamentando la cancelaci\u00f3n."
+          "text": "Eres la recepcionista. El usuario canceló su turno.\\n\\nRESULTADO DE CANCELACIÓN:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPAÑOL (2 oraciones) lamentando la cancelación."
         },
         "name": "Gen: cancel_booking",
         "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -2090,7 +2395,7 @@
       {
         "parameters": {
           "promptType": "define",
-          "text": "### TAREA\\nExtrae par\u00e1metros de disponibilidad. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"date\\\": \\\"YYYY-MM-DD\\\"\\n}"
+          "text": "### TAREA\\nExtrae parámetros de disponibilidad. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"date\\\": \\\"YYYY-MM-DD\\\"\\n}"
         },
         "name": "Extract Params: check_availability",
         "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -2104,7 +2409,7 @@
       },
       {
         "parameters": {
-          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoDateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nparams.date = (params.date && isoDateRegex.test(String(params.date)))\n  ? params.date\n  : new Date().toISOString().split('T')[0];\n\nreturn [{ json: params }];"
+          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detectó JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extraído es inválido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoDateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nparams.date = (params.date && isoDateRegex.test(String(params.date)))\n  ? params.date\n  : new Date().toISOString().split('T')[0];\n\nreturn [{ json: params }];"
         },
         "name": "Parse: check_availability",
         "type": "n8n-nodes-base.code",
@@ -2139,7 +2444,7 @@
       {
         "parameters": {
           "promptType": "define",
-          "text": "Eres la recepcionista. Consultaron disponibilidad.\\n\\nRESULTADO DE DISPONIBILIDAD:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) indicando si hay turnos."
+          "text": "Eres la recepcionista. Consultaron disponibilidad.\\n\\nRESULTADO DE DISPONIBILIDAD:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPAÑOL (2 oraciones) indicando si hay turnos."
         },
         "name": "Gen: check_availability",
         "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -2154,7 +2459,7 @@
       {
         "parameters": {
           "promptType": "define",
-          "text": "### TAREA\\nExtrae par\u00e1metros para pr\u00f3ximo turno libre. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"date\\\": \\\"YYYY-MM-DD\\\"\\n}"
+          "text": "### TAREA\\nExtrae parámetros para próximo turno libre. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"provider_id\\\": 1,\\n  \\\"service_id\\\": 1,\\n  \\\"date\\\": \\\"YYYY-MM-DD\\\"\\n}"
         },
         "name": "Extract Params: find_next",
         "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -2168,7 +2473,7 @@
       },
       {
         "parameters": {
-          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoDateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nparams.date = (params.date && isoDateRegex.test(String(params.date)))\n  ? params.date\n  : new Date().toISOString().split('T')[0];\n\nreturn [{ json: params }];"
+          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detectó JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extraído es inválido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\nconst pId = Number(params.provider_id);\nparams.provider_id = (Number.isInteger(pId) && pId > 0) ? pId : 1;\nconst sId = Number(params.service_id);\nparams.service_id = (Number.isInteger(sId) && sId > 0) ? sId : 1;\n\nconst isoDateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nparams.date = (params.date && isoDateRegex.test(String(params.date)))\n  ? params.date\n  : new Date().toISOString().split('T')[0];\n\nreturn [{ json: params }];"
         },
         "name": "Parse: find_next",
         "type": "n8n-nodes-base.code",
@@ -2203,7 +2508,7 @@
       {
         "parameters": {
           "promptType": "define",
-          "text": "Eres la recepcionista. Buscaron el pr\u00f3ximo turno disponible.\\n\\nRESULTADO:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPA\u00d1OL (2 oraciones) ofreciendo el turno encontrado."
+          "text": "Eres la recepcionista. Buscaron el próximo turno disponible.\\n\\nRESULTADO:\\n{{ JSON.stringify($json) }}\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde en ESPAÑOL (2 oraciones) ofreciendo el turno encontrado."
         },
         "name": "Gen: find_next",
         "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -2218,7 +2523,7 @@
       {
         "parameters": {
           "promptType": "define",
-          "text": "### TAREA\\nExtrae el tema central de salud o consulta administrativa para buscar en la base de conocimientos. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"query\\\": \\\"t\u00e9rmino de b\u00fasqueda\\\"\\n}"
+          "text": "### TAREA\\nExtrae el tema central de salud o consulta administrativa para buscar en la base de conocimientos. Responde SOLO JSON puro.\\n\\n### MENSAJE DEL USUARIO\\n{{ $('Input_Clean').first().json.text }}\\n\\n### FORMATO DE RESPUESTA ESPERADO\\n{\\n  \\\"query\\\": \\\"término de búsqueda\\\"\\n}"
         },
         "name": "Service_Topic_Extractor",
         "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -2232,7 +2537,7 @@
       },
       {
         "parameters": {
-          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detect\u00f3 JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extra\u00eddo es inv\u00e1lido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\n// Protect against instruction-repetition hallucinations\nlet rawQuery = String(params.query || '').toLowerCase().trim();\nif (rawQuery.includes('extrae') || rawQuery.includes('tarea') || rawQuery.includes('tipo') || rawQuery.length < 2 || rawQuery === 'null') {\n  params.query = $('Input_Clean').first().json.text;\n  params.service_name = $('Input_Clean').first().json.text;\n} else {\n  params.service_name = params.query;\n}\n\nparams.query = String(params.query).replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nparams.provider_id = 1;\nparams.limit = 5;\nparams.similarity_threshold = 0.05;\n\nreturn [{ json: params }];"
+          "jsCode": "const content = $json.text || '';\nconst jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\nlet params = {};\n\nif (!jsonMatch) {\n  throw { success: false, error_code: 'PARSE_ERROR', error_message: 'No se detectó JSON en la respuesta del modelo.' };\n}\n\ntry {\n  params = JSON.parse(jsonMatch[0]);\n} catch(e) {\n  throw { success: false, error_code: 'JSON_INVALID', error_message: 'El JSON extraído es inválido.' };\n}\n\nparams.chat_id = $('Input_Clean').first().json.chat_id || 0;\n\n// Protect against instruction-repetition hallucinations\nlet rawQuery = String(params.query || '').toLowerCase().trim();\nif (rawQuery.includes('extrae') || rawQuery.includes('tarea') || rawQuery.includes('tipo') || rawQuery.length < 2 || rawQuery === 'null') {\n  params.query = $('Input_Clean').first().json.text;\n  params.service_name = $('Input_Clean').first().json.text;\n} else {\n  params.service_name = params.query;\n}\n\nparams.query = String(params.query).replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nparams.provider_id = 1;\nparams.limit = 5;\nparams.similarity_threshold = 0.05;\n\nreturn [{ json: params }];"
         },
         "name": "Parse: get_services",
         "type": "n8n-nodes-base.code",
@@ -2268,7 +2573,7 @@
       },
       {
         "parameters": {
-          "jsCode": "// Analyze Resolve \u2014 Decidir estrategia RAG (SEC02)\nconst resolve = $input.first()?.json.data || {};\nconst userText = $('Input_Clean').first().json.text;\nconst parseData = $('Parse: get_services').first()?.json || {};\n\n// Si el match es d\u00e9bil o no encontrado, buscar en RAG sin filtro de service_id\nconst useFilter = resolve.resolved && resolve.match_type !== 'WEAK';\n\nreturn [{\n  json: {\n    query: resolve.resolved ? resolve.service_name : (parseData.query || userText),\n    provider_id: resolve.provider_id || 1,\n    service_id: useFilter ? resolve.service_id : null,\n    limit: 5,\n    similarity_threshold: 0.05,\n    sql_context: {\n      resolved: resolve.resolved,\n      match_type: resolve.match_type,\n      service_name: resolve.service_name,\n      price: resolve.price,\n      currency: resolve.currency || 'USD',\n      candidates: resolve.candidates || []\n    }\n  }\n}];"
+          "jsCode": "// Analyze Resolve — Decidir estrategia RAG (SEC02)\nconst resolve = $input.first()?.json.data || {};\nconst userText = $('Input_Clean').first().json.text;\nconst parseData = $('Parse: get_services').first()?.json || {};\n\n// Si el match es débil o no encontrado, buscar en RAG sin filtro de service_id\nconst useFilter = resolve.resolved && resolve.match_type !== 'WEAK';\n\nreturn [{\n  json: {\n    query: resolve.resolved ? resolve.service_name : (parseData.query || userText),\n    provider_id: resolve.provider_id || 1,\n    service_id: useFilter ? resolve.service_id : null,\n    limit: 5,\n    similarity_threshold: 0.05,\n    sql_context: {\n      resolved: resolve.resolved,\n      match_type: resolve.match_type,\n      service_name: resolve.service_name,\n      price: resolve.price,\n      currency: resolve.currency || 'USD',\n      candidates: resolve.candidates || []\n    }\n  }\n}];"
         },
         "name": "Analyze Resolve",
         "type": "n8n-nodes-base.code",
@@ -2304,7 +2609,7 @@
       {
         "parameters": {
           "promptType": "define",
-          "text": "=\"### SISTEMA DE VERDAD: RECEPCIONISTA TITANIUM\\nEres la recepcionista amable. Usa las siguientes fuentes con prioridad estricta.\\n\\n### HECHOS CONFIRMADOS (SQL - Verdad Absoluta)\\n\" + ($json.sql_context?.resolved ? '- Servicio: ' + $json.sql_context.service_name + '\\n- Precio: ' + ($json.sql_context.price || 'Consultar') + ' ' + ($json.sql_context.currency || 'USD') : 'Servicio no encontrado en lista oficial.') + \"\\n\\n### CONTEXTO ADICIONAL (RAG - Conocimiento)\\n\" + JSON.stringify($json.data?.documents || []) + \"\\n\\n### CONSULTA USUARIO\\n\" + $('Input_Clean').first().json.text + \"\\n\\nINSTRUCCI\u00d3N: Responde en ESPA\u00d1OL de forma amable y profesional. Si el hecho SQL contradice al RAG, usa SIEMPRE el dato SQL.\""
+          "text": "=\"### SISTEMA DE VERDAD: RECEPCIONISTA TITANIUM\\nEres la recepcionista amable. Usa las siguientes fuentes con prioridad estricta.\\n\\n### HECHOS CONFIRMADOS (SQL - Verdad Absoluta)\\n\" + ($json.sql_context?.resolved ? '- Servicio: ' + $json.sql_context.service_name + '\\n- Precio: ' + ($json.sql_context.price || 'Consultar') + ' ' + ($json.sql_context.currency || 'USD') : 'Servicio no encontrado en lista oficial.') + \"\\n\\n### CONTEXTO ADICIONAL (RAG - Conocimiento)\\n\" + JSON.stringify($json.data?.documents || []) + \"\\n\\n### CONSULTA USUARIO\\n\" + $('Input_Clean').first().json.text + \"\\n\\nINSTRUCCIÓN: Responde en ESPAÑOL de forma amable y profesional. Si el hecho SQL contradice al RAG, usa SIEMPRE el dato SQL.\""
         },
         "name": "Gen: get_services",
         "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -2319,7 +2624,7 @@
       {
         "parameters": {
           "promptType": "define",
-          "text": "Eres la recepcionista amable de la cl\u00ednica.\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde amablemente (2 oraciones). Si pregunta algo que no sabes, invita a consultar por turnos o especialidades."
+          "text": "Eres la recepcionista amable de la clínica.\\n\\nMENSAJE DEL USUARIO:\\n{{ $('Input_Clean').first().json.text }}\\n\\nResponde amablemente (2 oraciones). Si pregunta algo que no sabes, invita a consultar por turnos o especialidades."
         },
         "name": "Fallback Gen",
         "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -2333,7 +2638,7 @@
       },
       {
         "parameters": {
-          "jsCode": "const nodes = ['Gen: create_booking', 'Gen: cancel_booking', 'Gen: check_availability', 'Gen: find_next', 'Gen: get_services', 'Fallback Gen'];\n\nfor (const name of nodes) {\n  try {\n    if ($(name).isExecuted) {\n      const out = $(name).first().json;\n      if (out.success === false) throw out; // Redirigir errores al handler central\n      return [{ json: out }];\n    }\n  } catch (e) {\n    if (e.success === false) throw e;\n  }\n}\n\nthrow { success: false, error_code: 'NO_BRANCH_EXECUTED', error_message: 'Ninguna rama se ejecut\u00f3 correctamente.' };"
+          "jsCode": "const nodes = ['Gen: create_booking', 'Gen: cancel_booking', 'Gen: check_availability', 'Gen: find_next', 'Gen: get_services', 'Fallback Gen'];\n\nfor (const name of nodes) {\n  try {\n    if ($(name).isExecuted) {\n      const out = $(name).first().json;\n      if (out.success === false) throw out; // Redirigir errores al handler central\n      return [{ json: out }];\n    }\n  } catch (e) {\n    if (e.success === false) throw e;\n  }\n}\n\nthrow { success: false, error_code: 'NO_BRANCH_EXECUTED', error_message: 'Ninguna rama se ejecutó correctamente.' };"
         },
         "name": "Merge All Branches",
         "type": "n8n-nodes-base.code",
@@ -2403,16 +2708,16 @@
       },
       {
         "parameters": {
-          "jsCode": "// \ud83d\udce4 STANDARD CONTRACT OUTPUT (O02)\nreturn [{ json: $input.first()?.json || {} }];"
+          "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\nreturn [{ json: $input.first()?.json || {} }];"
         },
-        "name": "\ud83d\udce4 Standard Contract Output",
+        "name": "📤 Standard Contract Output",
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
           4100,
           0
         ],
-        "notes": "\ud83d\udce4 OUT: Standard Contract",
+        "notes": "📤 OUT: Standard Contract",
         "id": "78d28c59-6721-45a4-af05-07042631009a"
       }
     ],
@@ -3051,7 +3356,7 @@
         "main": [
           [
             {
-              "node": "\ud83d\udce4 Standard Contract Output",
+              "node": "📤 Standard Contract Output",
               "type": "main",
               "index": 0
             }
@@ -3062,7 +3367,7 @@
         "main": [
           [
             {
-              "node": "\ud83d\udce4 Standard Contract Output",
+              "node": "📤 Standard Contract Output",
               "type": "main",
               "index": 0
             }

@@ -447,11 +447,51 @@ COMPORTAMIENTO:
   → Conflicto entre tiers: Tier 1 prevalece siempre.
 
 ────────────────────────────────────────────────────────────
-§9. CONTEXTO ACTUAL (2026-03-04)
+§9. CONTEXTO ACTUAL (2026-03-08)
 ────────────────────────────────────────────────────────────
 ⚠️ Sección temporal. Revisar periódicamente.
 
 [ESTADO]
+
+[WORKFLOWS ACTUALES - IDs y Nombres]
+  Fuente de verdad: scripts-ts/workflow_activation_order.json
+  
+  NN Workflows (Telegram + AI Agent):
+    NN_00_Global_Error_Handler    → B1VnkirO5dF20MHg
+    NN_01_Booking_Gateway         → MZfYRe4ZDgUeWW64
+    NN_02_Message_Parser          → f80XLogu45Zg1TSM
+    NN_03_AI_Agent                → PTJmDjgXfi14rdRW
+    NN_03-B_Pipeline_Agent        → X3D2dWkBu8QLlNSm
+    NN_04_Telegram_Sender         → WE7DxLKAECtsA8Up
+    NN_05_Reminder_Cron           → trmFIo0zClyF38L8
+  
+  DB Workflows (PostgreSQL Neon):
+    DB_Get_Availability           → zdUslfT9C0sTI83H
+    DB_Create_Booking             → ilA6a6sM5CvDsSBi
+    DB_Cancel_Booking             → mf4qnUG7UlrAKpQU
+    DB_Reschedule_Booking         → F2F5oQ7okPDKwg9E
+    DB_Find_Next_Available        → oi5AiSoJRbzDf2A8
+    DB_Get_Providers              → cNC4U2Bg6HoX09YP
+    DB_Get_Services               → N2mFFyKLf7365OB9
+    DB_Get_Providers_By_Service   → koGljfSXUzYESNoh
+  
+  Google Workflows:
+    GCAL_Create_Event             → SAx7al0OwTqzs4XJ
+    GCAL_Delete_Event             → a2biGljAt5Cqig1C
+    GMAIL_Send_Confirmation       → uHSnVdLiMkEmpJZE
+  
+  BB Workflows (Base):
+    BB_00_Config                  → 9aK8rsjujaBEDmDp
+  
+  Frontend:
+    FRONTEND_Landing_Page         → EfQxqiSRjdJapQIY
+  
+  RAG Workflows:
+    RAG_01_Document_Ingestion     → RAG_01_Document_Ingestion_ID
+    RAG_02_Document_Retrieval     → RAG_02_Document_Retrieval_ID
+
+[ESTADO GENERAL]
+  → Total workflows: 22 (21 activos, 1 inactivo: NN_03_AI_Agent) - BB_90_Reminder_Scheduler eliminado del servidor
   → E2E Telegram ↔ AI Agent (NN_03) operativo con Llama 3.3 70B Versatile (Groq).
   → Qwen 2.5 32B descontinuado temporalmente de Groq API.
   → Llama 70B previene fugas de sintaxis <function=> en el chat.

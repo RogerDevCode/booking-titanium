@@ -5,9 +5,10 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as dotenv from 'dotenv';
+import { N8NConfig } from './config';
 
-dotenv.config({ path: path.join(__dirname, '../.env') });
+// Initialize config (loads .env automatically)
+const config = new N8NConfig();
 
 // Terminal colors
 const C = {

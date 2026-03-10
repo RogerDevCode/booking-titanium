@@ -39,10 +39,11 @@ export const WORKFLOW_IDS: Readonly<WorkflowIdMapping> = Object.freeze({
  * Load environment variables from .env file
  * Only sets variables that are NOT already defined in environment
  *
- * @param envPath - Path to .env file. Defaults to scripts-ts/.env
+ * @param envPath - Path to .env file. Defaults to project root/.env (SSOT)
  */
 export function loadEnvFile(envPath?: string): void {
-  const resolvedPath = envPath ?? path.join(__dirname, '.env');
+  // Default to project root .env (single source of truth)
+  const resolvedPath = envPath ?? path.join(__dirname, '../.env');
 
   if (!fs.existsSync(resolvedPath)) {
     return;

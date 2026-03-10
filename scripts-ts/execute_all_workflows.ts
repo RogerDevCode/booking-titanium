@@ -18,7 +18,6 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as dotenv from 'dotenv';
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import { Watchdog, withWatchdog, WATCHDOG_TIMEOUT } from './watchdog';
 import { N8NConfig, WORKFLOWS_DIR } from './config';
@@ -28,7 +27,7 @@ const EXECUTION_TIMEOUT = parseInt(process.env.EXECUTION_TIMEOUT || '300', 10);
 const watchdog = new Watchdog(EXECUTION_TIMEOUT);
 watchdog.start();
 
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+// Note: .env is loaded automatically by config.ts (N8NConfig constructor)
 
 // SSOT nodes file path
 const SSOT_NODES_PATH = path.resolve(
