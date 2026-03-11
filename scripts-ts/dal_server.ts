@@ -43,12 +43,14 @@ async function logAudit(client: any, entity_type: string, entity_id: string, act
 }
 
 // --- HELPER: Input Validation ---
-function validateInput(name: string, email: string) {
+// FIX P0-02: email vacío ('') ahora está explícitamente rechazado cuando se provee
+function validateInput(name: string, email: string, requireEmail = false) {
     const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.]{2,100}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
     if (name && !nameRegex.test(name)) throw new Error("Invalid name format. Only letters and spaces allowed.");
-    if (email && !emailRegex.test(email)) throw new Error("Invalid email format.");
+    if (requireEmail && (!email || email.trim() === '')) throw new Error("Email is required for booking.");
+    if (email && email.trim() !== '' && !emailRegex.test(email.trim())) throw new Error("Invalid email format.");
 }
 
 // --- HELPER: Get Slots for a Specific Day ---
@@ -198,7 +200,21 @@ app.get('/user/:chat_id', async (req: express.Request, res: express.Response): P
         const result = await pool.query(query, [chat_id]);
         
         if (result.rows.length > 0) {
-            res.json({ success: true, registered: true, data: result.rows[0] });
+            const user = result.rows[0];
+            
+            // Fetch active bookings for this user
+            const bookingsQuery = `
+                SELECT b.short_code as booking_id, b.start_time, p.name as provider, s.name as service
+                FROM public.bookings b
+                JOIN public.providers p ON b.provider_id = p.id
+                JOIN public.services s ON b.service_id = s.id
+                WHERE b.user_id = $1::bigint AND b.status NOT IN ('CANCELLED', 'NO_SHOW') AND b.start_time >= NOW()
+                ORDER BY b.start_time ASC
+            `;
+            const bookingsResult = await pool.query(bookingsQuery, [chat_id]);
+            user.active_bookings = bookingsResult.rows;
+
+            res.json({ success: true, registered: true, data: user });
         } else {
             res.json({ success: true, registered: false, data: null });
         }
@@ -245,15 +261,17 @@ app.post('/create-booking', async (req: express.Request, res: express.Response):
     try {
         const { chat_id, provider_id, service_id, start_time, user_email, user_name, reminders } = req.body;
         
-        // P0-01: Validate future date
-        const startTimeDt = DateTime.fromISO(start_time);
-        if (startTimeDt < DateTime.now()) {
-            res.status(400).json({ success: false, error_code: 'INVALID_DATE', error_message: "No se pueden realizar reservas en el pasado." });
+        // FIX P0-01: Validar fecha futura con timezone explícito y buffer mínimo de 2h
+        const TZ = 'America/Santiago';
+        const startTimeDt = DateTime.fromISO(start_time, { zone: TZ });
+        const nowWithBuffer = DateTime.now().setZone(TZ).plus({ hours: 2 });
+        if (!startTimeDt.isValid || startTimeDt < nowWithBuffer) {
+            res.status(400).json({ success: false, error_code: 'INVALID_DATE', error_message: "La reserva debe realizarse con al menos 2 horas de anticipación." });
             return;
         }
 
-        // P0-02: Validate inputs
-        validateInput(user_name, user_email);
+        // FIX P0-02: Validate inputs — requireEmail=true para crear citas
+        validateInput(user_name, user_email, true);
 
         await client.query('BEGIN');
         await client.query(`SELECT pg_advisory_xact_lock(hashtext($1::text || $2::text)::bigint)`, [provider_id, start_time]);
@@ -337,9 +355,12 @@ app.post('/reschedule-booking', async (req: express.Request, res: express.Respon
     try {
         const { booking_id, chat_id, new_start_time, provider_id } = req.body;
         
-        // P0-01: Validate future date
-        if (DateTime.fromISO(new_start_time) < DateTime.now()) {
-            res.status(400).json({ success: false, error_code: 'INVALID_DATE', error_message: "No se puede reprogramar a una fecha pasada." });
+        // FIX P0-01: Validar fecha futura con timezone explícito y buffer mínimo de 2h
+        const TZ_RESCHEDULE = 'America/Santiago';
+        const newStartDt = DateTime.fromISO(new_start_time, { zone: TZ_RESCHEDULE });
+        const nowWithBuffer2h = DateTime.now().setZone(TZ_RESCHEDULE).plus({ hours: 2 });
+        if (!newStartDt.isValid || newStartDt < nowWithBuffer2h) {
+            res.status(400).json({ success: false, error_code: 'INVALID_DATE', error_message: "La nueva fecha debe ser al menos 2 horas en el futuro." });
             return;
         }
 
@@ -399,6 +420,33 @@ app.post('/update-booking-status', async (req: express.Request, res: express.Res
     } catch (e: unknown) {
         await client.query('ROLLBACK');
         res.status(500).json({ success: false, error_code: 'DB_ERROR', error_message: (e as Error).message });
+    } finally { client.release(); }
+});
+
+app.post('/update-gcal-event-id', async (req: express.Request, res: express.Response): Promise<void> => {
+    const client = await pool.connect();
+    try {
+        const { booking_id, gcal_event_id } = req.body;
+        if (!booking_id || !gcal_event_id) {
+            res.status(400).json({ success: false, error_message: "booking_id and gcal_event_id are required" });
+            return;
+        }
+
+        await client.query('BEGIN');
+        const result = await client.query(
+            `UPDATE public.bookings SET gcal_event_id = $1 WHERE id = $2 RETURNING *;`,
+            [gcal_event_id, booking_id]
+        );
+        if (result.rows.length === 0) {
+            await client.query('ROLLBACK');
+            res.json({ success: false, error_message: 'Booking not found' });
+            return;
+        }
+        await client.query('COMMIT');
+        res.json({ success: true, data: result.rows[0] });
+    } catch (e: unknown) {
+        await client.query('ROLLBACK');
+        res.status(500).json({ success: false, error_message: (e as Error).message });
     } finally { client.release(); }
 });
 
@@ -494,4 +542,4 @@ app.get('/waitlist/candidates/:booking_id', async (req: express.Request, res: ex
     } catch (e: unknown) { res.status(500).json({ success: false, error_message: (e as Error).message }); }
 });
 
-app.listen(3000, '0.0.0.0', () => console.log('🚀 Smart DAL Proxy Active with Advisory Locks, 3-Level Reminders, Audit Logging, Waitlist & Stats (v1.5.2)'));
+app.listen(3000, '0.0.0.0', () => console.log('🚀 Smart DAL Proxy Active with Advisory Locks, 3-Level Reminders, Audit Logging, Waitlist & Stats (v1.5.3 — P0/P1 fixes)'));

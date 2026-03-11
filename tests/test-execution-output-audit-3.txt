@@ -537,3 +537,199 @@ See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode de
 
       at tests/qa-edge-cases.test.ts:604:17
 
+  console.log
+       ✓ Successes: 1
+
+      at tests/qa-edge-cases.test.ts:626:17
+
+  console.log
+       ✓ Failures: 9
+
+      at tests/qa-edge-cases.test.ts:627:17
+
+  console.log
+       ✓ Advisory Lock working: Only 1 booking(s) succeeded
+
+      at tests/qa-edge-cases.test.ts:631:17
+
+  console.log
+       ✓ SLOT_OCCUPIED errors: 9
+
+      at tests/qa-edge-cases.test.ts:635:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768292
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768293
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768294
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768295
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768296
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768297
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768298
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768299
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768300
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768301
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    
+       ⚡ Launching 5 concurrent find-next-available requests...
+
+      at tests/qa-edge-cases.test.ts:647:17
+
+  console.log
+       ✓ All 5 requests succeeded
+
+      at tests/qa-edge-cases.test.ts:663:17
+
+  console.log
+       ✓ Unique dates returned: 1
+
+      at tests/qa-edge-cases.test.ts:668:17
+
+  console.log
+    
+       👤 Test User: 5391769292
+
+      at tests/qa-edge-cases.test.ts:682:17
+
+  console.log
+       📅 Test Day: 2026-03-13
+
+      at tests/qa-edge-cases.test.ts:683:17
+
+  console.log
+       1️⃣  Registering user...
+
+      at tests/qa-edge-cases.test.ts:686:17
+
+  console.log
+       ✓ User registered: QA Integration Test User
+
+      at tests/qa-edge-cases.test.ts:694:17
+
+  console.log
+       2️⃣  Checking availability...
+
+      at tests/qa-edge-cases.test.ts:697:17
+
+  console.log
+       ✓ Found 34 available slots
+
+      at tests/qa-edge-cases.test.ts:706:17
+
+  console.log
+       3️⃣  Creating booking...
+
+      at tests/qa-edge-cases.test.ts:714:17
+
+  console.log
+       ✓ Booking created: BKG-6PUSTX
+
+      at tests/qa-edge-cases.test.ts:727:17
+
+  console.log
+       4️⃣  Verifying user bookings...
+
+      at tests/qa-edge-cases.test.ts:730:17
+
+  console.log
+       ✓ User has 1 booking(s)
+
+      at tests/qa-edge-cases.test.ts:736:17
+
+  console.log
+       5️⃣  Cancelling booking...
+
+      at tests/qa-edge-cases.test.ts:739:17
+
+  console.log
+       ✓ Booking cancelled successfully
+
+      at tests/qa-edge-cases.test.ts:747:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391769292
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+       ✅ E2E Flow completed successfully
+
+      at tests/qa-edge-cases.test.ts:751:17
+
+PASS tests/qa-edge-cases.test.ts (98.503 s)
+  📋 QA-EDGE-01: Situaciones Límite
+    Edge Case 1.1: Reserva en el pasado
+      ✓ RECHAZA reserva con start_time en el pasado (1220 ms)
+      ✓ RECHAZA reserva para hoy en hora ya pasada (con buffer) (6 ms)
+    Edge Case 1.2: Cancelación de cita COMPLETED
+      ✓ RECHAZA cancelación de reserva con estado COMPLETED (568 ms)
+    Edge Case 1.3: Email inválido
+      ✓ RECHAZA reserva con email inválido (formato incorrecto) (166 ms)
+      ✓ ACEPTA reserva con email vacío (asigna fallback si no es nulo) (1879 ms)
+    Edge Case 1.4: Médico inexistente
+      ✓ RECHAZA reserva con provider_id inexistente (1333 ms)
+      ✓ RECHAZA disponibilidad para service_id inexistente (184 ms)
+    Edge Case 1.5: Usuario en múltiples listas de espera
+      ✓ PERMITE usuario en 2 listas de espera (sin colisión de horas) (1966 ms)
+  🛡️ QA-PARANOID-02: Seguridad e Integridad
+    Paranoid 2.1: Inyección SQL
+      ✓ SANITIZA intento de SQL injection en user_name (178 ms)
+      ✓ SANITIZA intento de SQL injection en email (174 ms)
+    Paranoid 2.2: Colisión de Identidad
+      ✓ ACTUALIZA usuario existente (ON CONFLICT UPDATE) en lugar de fallar (1019 ms)
+    Paranoid 2.3: Validación de tipos de datos
+      ✓ RECHAZA chat_id como string (debe ser number) (719 ms)
+      ✓ RECHAZA start_time inválido (no ISO8601) (921 ms)
+      ✓ RECHAZA reminders como string (debe ser array) (1386 ms)
+  📊 QA-CAPACITY-03: Capacidad - Reservar Todo un Día
+    ✓ RESERVA todos los slots disponibles de un día y verifica respuesta para nueva reserva (60566 ms)
+  ⚡ QA-CONCURRENCY-04: Condiciones de Carrera
+    ✓ MANEJA 10 peticiones simultáneas para el mismo slot (solo 1 debe tener éxito) (8308 ms)
+    ✓ MANEJA 5 peticiones simultáneas de FIND_NEXT_AVAILABLE (todos deben recibir datos consistentes) (1450 ms)
+  🔗 QA-INTEGRATION-05: Flujo Completo E2E
+    ✓ EJECUTA flujo completo: Registro -> Disponibilidad -> Reserva -> Confirmación (4185 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       18 passed, 18 total
+Snapshots:   0 total
+Time:        98.7 s
+Ran all test suites matching tests/qa-edge-cases.test.ts.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?

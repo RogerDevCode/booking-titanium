@@ -1,0 +1,370 @@
+{
+  "name": "SEED_Book_Tomorrow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "seed-tomorrow",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "manual_trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "seed-tomorrow"
+    },
+    {
+      "parameters": {
+        "jsCode": "const tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\nconst date = tomorrow.toISOString().split('T')[0];\nconst providers = [1, 2, 3, 4, 6, 9, 10];\nreturn providers.map((pid, i) => ({\n  json: { provider_id: pid, service_id: 1, date, seed_index: i }\n}));"
+      },
+      "id": "build_config",
+      "name": "Build Seed Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/availability",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "provider_id",
+              "value": "={{ $json.provider_id }}"
+            },
+            {
+              "name": "service_id",
+              "value": "={{ $json.service_id }}"
+            },
+            {
+              "name": "date",
+              "value": "={{ $json.date }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "get_availability",
+      "name": "Get Availability (DAL)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        500,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $input.item.json || {};\nconst slots = result.data?.slots || result.data?.available_slots || [];\nconst provId = $('Build Seed Config').item.json.provider_id;\nconst serviceId = $('Build Seed Config').item.json.service_id;\n\nif (slots.length === 0) return [];\n\nreturn slots.map((slot, i) => ({\n  json: {\n    provider_id: provId,\n    service_id: serviceId,\n    start_time: slot.start_time,\n    display_time: slot.display_time,\n    chat_id: 9300000 + provId * 1000 + i,\n    user_name: `Seed Test ${String.fromCharCode(64+(provId%26||1))} ${String.fromCharCode(65+(i%26))}`,\n    user_email: `seed${9300000 + provId * 1000 + i}@qa.local`,\n    slot_index: i\n  }\n}));"
+      },
+      "id": "extract_slots",
+      "name": "Extract Slots",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/create-booking",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $json.chat_id }}"
+            },
+            {
+              "name": "provider_id",
+              "value": "={{ $json.provider_id }}"
+            },
+            {
+              "name": "service_id",
+              "value": "={{ $json.service_id }}"
+            },
+            {
+              "name": "start_time",
+              "value": "={{ $json.start_time }}"
+            },
+            {
+              "name": "user_name",
+              "value": "={{ $json.user_name }}"
+            },
+            {
+              "name": "user_email",
+              "value": "={{ $json.user_email }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "create_booking",
+      "name": "Create Booking (DAL)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1000,
+        0
+      ]
+    },
+     {
+       "parameters": {
+         "jsCode": "const booking = $input.item.json || {};\nconst slot = $('Extract Slots').item.json;\nif (!booking.success || !booking.data?.booking_id) return [];\n\n// Calculate end time (start + 40 minutes based on slot duration)\nconst startTime = new Date(slot.start_time);\nconst endTime = new Date(startTime.getTime() + 40 * 60 * 1000); // 40 minutes in ms\n\nreturn [{\n  json: {\n    ...slot,\n    booking_id: booking.data.booking_id,\n    booking_code: booking.data.booking_code,\n    summary: `Cita — ${slot.user_name}`,\n    description: `Reserva ${booking.data.booking_code}\\nProveedor: ${slot.provider_id}`,\n    start_time: startTime.toISOString(),\n    end_time: endTime.toISOString()\n  }\n}];"
+       },
+       "id": "check_booking",
+       "name": "Check Result",
+       "type": "n8n-nodes-base.code",
+       "typeVersion": 2,
+       "position": [
+         144,
+         0
+       ]
+     },
+      "id": "check_booking",
+      "name": "Check Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1250,
+        0
+      ]
+    },
+    {
+       "parameters": {
+         "method": "POST",
+         "url": "http://n8n:5678/webhook/gcal-create-event",
+         "sendBody": true,
+         "options": {
+           "response": {
+             "response": {
+               "responseFormat": "json"
+             }
+           }
+         },
+         "bodyParameters": {
+           "parameters": [
+             {
+               "name": "booking_id",
+               "value": "={{ $json.booking_id }}"
+             },
+             {
+               "name": "booking_code",
+               "value": "={{ $json.booking_code }}"
+             },
+             {
+               "name": "summary",
+               "value": "={{ $json.summary }}"
+             },
+             {
+               "name": "description",
+               "value": "={{ $json.description }}"
+             },
+             {
+               "name": "start_time",
+               "value": "={{ $json.start_time }}"
+             },
+             {
+               "name": "end_time",
+               "value": "={{ $json.end_time }}"
+             }
+           ]
+         }
+       },
+      "id": "create_gcal",
+      "name": "Create GCAL Event",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1500,
+        0
+      ]
+    },
+     {
+       "parameters": {
+         "jsCode": "const items = $input.all();\nconst total = items.length;\nconst ok = items.filter(i => i.json?.success !== false).length;\nreturn [{ json: { success: true, summary: `Seed completado`, gcal_events: ok } }];"
+       },
+       "id": "summary",
+       "name": "Summary",
+       "type": "n8n-nodes-base.code",
+       "typeVersion": 2,
+       "position": [
+         1750,
+         0
+       ]
+     },
+     {
+       "parameters": {
+         "method": "POST",
+         "url": "http://dal-service:3000/update-gcal-event-id",
+         "sendBody": true,
+         "options": {
+           "response": {
+             "response": {
+               "responseFormat": "json"
+             }
+           }
+         },
+         "bodyParameters": {
+           "parameters": [
+             {
+               "name": "booking_id",
+               "value": "={{ $json.booking_id }}"
+             },
+             {
+               "name": "gcal_event_id",
+               "value": "={{ $json.data?.gcal_event_id }}"
+             }
+           ]
+         }
+       },
+       "id": "update_db_with_gcal_id",
+       "name": "Update DB with GCAL ID",
+       "type": "n8n-nodes-base.httpRequest",
+       "typeVersion": 4.4,
+       "position": [
+         1500,
+         0
+       ]
+     }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build Seed Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Seed Config": {
+      "main": [
+        [
+          {
+            "node": "Get Availability (DAL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Availability (DAL)": {
+      "main": [
+        [
+          {
+            "node": "Extract Slots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Slots": {
+      "main": [
+        [
+          {
+            "node": "Create Booking (DAL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Booking (DAL)": {
+      "main": [
+        [
+          {
+            "node": "Check Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Result": {
+      "main": [
+        [
+          {
+            "node": "Create GCAL Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+     "Create GCAL Event": {
+       "main": [
+         [
+           {
+             "node": "Update DB with GCAL ID",
+             "type": "main",
+             "index": 0
+           }
+         ]
+       ]
+     },
+      "Update DB with GCAL ID": {
+        "parameters": {
+          "method": "POST",
+          "url": "http://dal-service:3000/update-gcal-event-id",
+          "sendBody": true,
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "json"
+              }
+            }
+          },
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "booking_id",
+                "value": "={{ $json.booking_id }}"
+              },
+              {
+                "name": "gcal_event_id",
+                "value": "={{ $json.data?.gcal_event_id }}"
+              }
+            ]
+          }
+        },
+        "id": "update_db_with_gcal_id",
+        "name": "Update DB with GCAL ID",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1500,
+          0
+        ]
+      },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

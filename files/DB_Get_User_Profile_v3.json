@@ -1,0 +1,100 @@
+{
+  "name": "DB_Get_User_Profile",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"chat_id\": 123456789}"
+      },
+      "id": "trigger",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ 'http://dal-service:3000/user/' + $json.chat_id }}",
+        "options": {
+          "neverError": true
+        }
+      },
+      "id": "call_dal",
+      "name": "Call DAL Get User",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        250,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format user profile con message legible para el LLM\nconst result = $input.first().json;\nconst isRegistered = result.registered === true;\nconst isSuccess    = result.success === true;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message: isSuccess && isRegistered\n      ? `Usuario encontrado: ${result.data?.full_name || result.full_name}.`\n      : (isSuccess ? 'Usuario no registrado en el sistema.' : 'No se pudo obtener el perfil del usuario.'),\n    error_code:    isSuccess ? null : 'DAL_ERROR',\n    error_message: isSuccess ? null : 'Failed to fetch user profile',\n    data: isSuccess ? {\n      registered:   isRegistered,\n      user_id:      result.data?.user_id   || null,\n      full_name:    result.data?.full_name  || result.full_name  || null,\n      email:        result.data?.email      || result.email      || null,\n      phone:        result.data?.phone      || null,\n      active_bookings: result.data?.active_bookings || []\n    } : null,\n    _meta: { source: 'DB_Get_User_Profile', timestamp: new Date().toISOString(), version: '3.0.0' }\n  }\n}];"
+      },
+      "id": "normalize",
+      "name": "Normalize Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT — Tool-compatible (v3.0.0)\n// El AI Agent lee \"message\" como respuesta legible y \"data\" para detalles.\nconst result = $input.first()?.json || {};\nconst isSuccess = result.success !== false;\n\n// Construir mensaje legible para el LLM\nlet message = result.message || result.data?.message || null;\nif (!message) {\n  message = isSuccess\n    ? 'Operación completada con éxito.'\n    : (result.error_message || result.error_code || 'Error desconocido.');\n}\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message,\n    error_code:    isSuccess ? null : (result.error_code    || 'UNKNOWN_ERROR'),\n    error_message: isSuccess ? null : (result.error_message || message),\n    data:          result.data || null,\n    _meta: {\n      source:    'DB_GET_USER_PROFILE',\n      timestamp: new Date().toISOString(),\n      version:   '3.0.0'\n    }\n  }\n}];"
+      },
+      "id": "sco_1773232708992_fydu",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        0
+      ],
+      "notes": "📤 OUT: Standard Contract — Tool-compatible v3.0.0"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Get User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Get User": {
+      "main": [
+        [
+          {
+            "node": "Normalize Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Response": {
+      "main": [
+        [
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

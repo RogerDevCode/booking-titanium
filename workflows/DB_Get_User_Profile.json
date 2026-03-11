@@ -17,6 +17,20 @@
     },
     {
       "parameters": {
+        "jsCode": "// FIX BLOQUEO D — Validar chat_id antes de llamar al DAL\n// Previene error: invalid input syntax for type bigint: \"null\"\nconst raw = $input.first()?.json || {};\nconst chatId = Number(raw.chat_id);\n\nif (!chatId || isNaN(chatId) || chatId <= 0) {\n  // Retornar respuesta controlada sin llamar al DAL\n  return [{\n    json: {\n      _skip_dal: true,\n      success: true,\n      registered: false,\n      data: null,\n      message: 'El usuario es nuevo (no registrado). No tiene perfil ni citas activas en la base de datos.'\n    }\n  }];\n}\n\nreturn [{ json: { ...raw, chat_id: chatId, _skip_dal: false } }];"
+      },
+      "id": "validate_chat_id",
+      "name": "Validate chat_id",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        0
+      ],
+      "notes": "FIX Bloqueo D: previene bigint null error si el LLM pasa chat_id inválido"
+    },
+    {
+      "parameters": {
         "url": "={{ 'http://dal-service:3000/user/' + $json.chat_id }}",
         "options": {
           "neverError": true
@@ -27,27 +41,103 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        250,
+        500,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "const result = $input.first().json;\nconst isRegistered = result.registered === true;\n\nreturn [{\n  json: {\n    success: result.success === true,\n    registered: isRegistered,\n    full_name: isRegistered ? result.data.full_name : null,\n    email: isRegistered ? result.data.email : null,\n    _meta: {\n      source: 'DB_Get_User_Profile',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Get_User_Profile',\n      version: '1.0.0'\n    }\n  }\n}];"
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $('Validate chat_id').item.json._skip_dal }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if_skip_dal",
+      "name": "Skip DAL?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        500,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Respuesta directa para chat_id inválido (usuario nuevo asumido)\nconst validated = $('Validate chat_id').item.json;\nreturn [{\n  json: {\n    success: true,\n    message: validated.message || 'El usuario es nuevo (no registrado). No tiene perfil ni citas activas en la base de datos.',\n    error_code: null,\n    error_message: null,\n    data: { registered: false, active_bookings: [] },\n    _meta: { source: 'DB_Get_User_Profile', timestamp: new Date().toISOString(), version: '3.0.2' }\n  }\n}];"
+      },
+      "id": "direct_new_user",
+      "name": "Direct: New User",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format user profile con message legible para el LLM\nconst result = $input.first().json;\nconst isRegistered = result.registered === true;\nconst isSuccess    = result.success === true;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message: isSuccess && isRegistered\n      ? `Perfil encontrado. Nombre: ${result.data?.full_name || result.full_name}. Email: ${result.data?.email || result.email}.`\n      : (isSuccess ? 'El usuario es nuevo (no registrado). No tiene perfil ni citas activas en la base de datos.' : 'Error técnico al obtener el perfil.'),\n    error_code:    isSuccess ? null : 'DAL_ERROR',\n    error_message: isSuccess ? null : 'Failed to fetch user profile',\n    data: isSuccess ? {\n      registered:   isRegistered,\n      user_id:      result.data?.user_id   || null,\n      full_name:    result.data?.full_name  || result.full_name  || null,\n      email:        result.data?.email      || result.email      || null,\n      phone:        result.data?.phone      || null,\n      active_bookings: result.data?.active_bookings || []\n    } : null,\n    _meta: { source: 'DB_Get_User_Profile', timestamp: new Date().toISOString(), version: '3.0.2' }\n  }\n}];"
       },
       "id": "normalize",
       "name": "Normalize Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        500,
+        750,
         0
       ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT — Tool-compatible (v3.0.0)\nconst result = $input.first()?.json || {};\nconst isSuccess = result.success !== false;\n\nlet message = result.message || result.data?.message || null;\nif (!message) {\n  message = isSuccess\n    ? 'Operación completada con éxito.'\n    : (result.error_message || result.error_code || 'Error desconocido.');\n}\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message,\n    error_code:    isSuccess ? null : (result.error_code    || 'UNKNOWN_ERROR'),\n    error_message: isSuccess ? null : (result.error_message || message),\n    data:          result.data || null,\n    _meta: {\n      source:    'DB_GET_USER_PROFILE',\n      timestamp: new Date().toISOString(),\n      version:   '3.0.2'\n    }\n  }\n}];"
+      },
+      "id": "sco_1773232708992_fydu",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1050,
+        0
+      ],
+      "notes": "📤 OUT: Standard Contract — Tool-compatible v3.0.2"
     }
   ],
   "connections": {
     "Execute Workflow Trigger": {
       "main": [
+        [
+          {
+            "node": "Validate chat_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate chat_id": {
+      "main": [
+        [
+          {
+            "node": "Skip DAL?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip DAL?": {
+      "main": [
+        [
+          {
+            "node": "Direct: New User",
+            "type": "main",
+            "index": 0
+          }
+        ],
         [
           {
             "node": "Call DAL Get User",
@@ -62,6 +152,28 @@
         [
           {
             "node": "Normalize Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Direct: New User": {
+      "main": [
+        [
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Response": {
+      "main": [
+        [
+          {
+            "node": "📤 Standard Contract Output",
             "type": "main",
             "index": 0
           }

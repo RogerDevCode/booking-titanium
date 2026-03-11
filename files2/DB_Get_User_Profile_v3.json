@@ -1,0 +1,100 @@
+{
+  "name": "DB_Get_User_Profile",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"chat_id\": 123456789}"
+      },
+      "id": "trigger",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ 'http://dal-service:3000/user/' + $json.chat_id }}",
+        "options": {
+          "neverError": true
+        }
+      },
+      "id": "call_dal",
+      "name": "Call DAL Get User",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        250,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format user profile — Tool-compatible v3.1.0\n// CRÍTICO: el LLM debe recibir instrucciones imperativas, no datos ambiguos.\nconst result = $input.first().json;\nconst isRegistered = result.registered === true;\nconst isSuccess    = result.success === true;\n\n// Casos posibles:\n// A) Usuario encontrado → dar datos + mensaje amable\n// B) Usuario no encontrado (nuevo) → instrucción imperativa para el LLM\n// C) Error real del DAL → mensaje de error técnico\nlet message;\nlet success;\nlet data;\nlet error_code = null;\nlet error_message = null;\n\nif (!isSuccess) {\n  // Caso C: error real del DAL\n  success = false;\n  error_code    = 'DAL_ERROR';\n  error_message = 'Failed to fetch user profile';\n  message = 'No se pudo consultar el perfil del usuario por un error interno. Informa al usuario que hay un problema técnico momentáneo e invítalo a intentar de nuevo en unos minutos.';\n  data = null;\n} else if (isRegistered) {\n  // Caso A: usuario existe\n  success = true;\n  const name = result.data?.full_name || result.full_name || 'Paciente';\n  message = `Usuario registrado encontrado. Nombre: ${name}. Email: ${result.data?.email || result.email || 'no disponible'}. Puedes usar estos datos para crear reservas sin pedirlos de nuevo.`;\n  data = {\n    registered:      true,\n    user_id:         result.data?.user_id        || null,\n    full_name:       result.data?.full_name       || result.full_name  || null,\n    email:           result.data?.email           || result.email      || null,\n    phone:           result.data?.phone           || null,\n    active_bookings: result.data?.active_bookings || []\n  };\n} else {\n  // Caso B: usuario nuevo — instrucción imperativa para el LLM\n  success = true;  // No es un error, es un estado válido del sistema\n  message = 'USUARIO NUEVO (no registrado). Instrucción: Salúdalo con calidez, dile que es su primera vez en la clínica y pídele su nombre completo y email para poder agendar su cita. NO menciones errores técnicos ni problemas de base de datos.';\n  data = {\n    registered:      false,\n    user_id:         null,\n    full_name:       null,\n    email:           null,\n    phone:           null,\n    active_bookings: []\n  };\n}\n\nreturn [{\n  json: {\n    success,\n    message,\n    error_code,\n    error_message,\n    data,\n    _meta: { source: 'DB_Get_User_Profile', timestamp: new Date().toISOString(), version: '3.1.0' }\n  }\n}];"
+      },
+      "id": "normalize",
+      "name": "Normalize Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT — Tool-compatible (v3.0.0)\n// El AI Agent lee \"message\" como respuesta legible y \"data\" para detalles.\nconst result = $input.first()?.json || {};\nconst isSuccess = result.success !== false;\n\n// Construir mensaje legible para el LLM\nlet message = result.message || result.data?.message || null;\nif (!message) {\n  message = isSuccess\n    ? 'Operación completada con éxito.'\n    : (result.error_message || result.error_code || 'Error desconocido.');\n}\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message,\n    error_code:    isSuccess ? null : (result.error_code    || 'UNKNOWN_ERROR'),\n    error_message: isSuccess ? null : (result.error_message || message),\n    data:          result.data || null,\n    _meta: {\n      source:    'DB_GET_USER_PROFILE',\n      timestamp: new Date().toISOString(),\n      version:   '3.0.0'\n    }\n  }\n}];"
+      },
+      "id": "sco_1773232708992_fydu",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        0
+      ],
+      "notes": "📤 OUT: Standard Contract — Tool-compatible v3.0.0"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Get User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Get User": {
+      "main": [
+        [
+          {
+            "node": "Normalize Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Response": {
+      "main": [
+        [
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -176,5 +176,28 @@
     "name": "DB_Join_Waitlist",
     "id": "FH8hRUv3dVgo8FB6",
     "order": 30
+  },
+  {
+    "name": "NN_03-C_Agent_V3",
+    "id": "OnHBt710KnrC9DE8",
+    "order": 31,
+    "webhook_path": "nn-03-c-agent"
+  },
+  {
+    "name": "SEED_Book_Tomorrow",
+    "id": "HxMojMqbRiNgquvd",
+    "order": 32,
+    "webhook_path": "seed-tomorrow"
+  },
+  {
+    "name": "DB_Update_Gcal_Event_ID",
+    "id": "DB_Update_Gcal_Event_ID",
+    "order": 33
+  },
+  {
+    "name": "GCAL_Delete_Events_For_Tomorrow",
+    "id": "vvatFsBtr87mHdMX",
+    "order": 34,
+    "webhook_path": "gcal-delete-events-for-tomorrow"
   }
 ]

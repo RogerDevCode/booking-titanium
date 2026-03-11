@@ -1,0 +1,79 @@
+{
+  "name": "DB_Update_Gcal_Event_ID",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"booking_id\": \"ae2ce85d-74ad-4226-99a0-d85bae0aca91\", \"gcal_event_id\": \"vlqk549lvn47qccu29ratbdtfo\"}"
+      },
+      "id": "trigger",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/update-gcal-event-id",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {
+          "neverError": true
+        }
+      },
+      "id": "call_dal",
+      "name": "Call DAL Update Gcal Event ID",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        250,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $input.first().json;\n\nreturn [{\n  json: {\n    success: result.success === true,\n    data: result.data || null,\n    error_code: result.error_code || null,\n    error_message: result.error_message || null,\n    _meta: {\n      source: 'DB_Update_Gcal_Event_ID',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Update_Gcal_Event_ID',\n      version: '1.0.0'\n    }\n  }\n}];"
+      },
+      "id": "normalize",
+      "name": "Normalize Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Update Gcal Event ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Update Gcal Event ID": {
+      "main": [
+        [
+          {
+            "node": "Normalize Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

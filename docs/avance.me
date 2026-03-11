@@ -1,0 +1,91 @@
+# 📑 REPORTE DETALLADO DE AVANCE: PROYECTO BOOKING TITANIUM (v3.0.0 Alpha)
+
+**Fecha:** 2026-03-11 (actualizado)  
+**Hito:** Migración Integral a Arquitectura Agéntica (MCP)  
+**Investigador:** Gemini CLI (Senior Engineer)  
+**Estado:** 67% en `qa-edge-cases` (12/18) · `qa-agent-v3` pendiente de ejecución en servidor  
+**DAL:** v1.5.3 (P0/P1 fixes aplicados — ver sección 5B)
+
+---
+
+## 1. 🎯 CONTEXTO INICIAL
+Tras la auditoría externa, se decidió abandonar el sistema de ruteo manual (Switch gigante) por un **Agente Autónomo** que utiliza herramientas (Tools) mediante el protocolo MCP. Esto reduce la complejidad del código y mejora la naturalidad de la conversación.
+
+---
+
+## 2. 🏗️ PASO 1: MODERNIZACIÓN DE SUB-WORKFLOWS (v3.1.0)
+Se actualizaron los 7 sub-workflows de Base de Datos para ser "AI-Ready".
+
+### 🔧 Problemas encontrados y soluciones:
+1.  **Problema (Sintaxis)**: El linter estricto de `n8n_push_v2.ts` bloqueaba la subida por errores de formato en los nodos de respuesta (ej: `}.` en lugar de `}`).
+    *   **Solución**: Se realizó una limpieza quirúrgica de todos los archivos JSON para asegurar compatibilidad con el motor de n8n.
+2.  **Problema (Diseño)**: El LLM interpretaba resultados vacíos como errores del sistema.
+    *   **Solución**: Se implementó el **Standard Contract v3.1.0**, donde el propio sub-workflow construye un campo `message` con instrucciones imperativas para el LLM (ej: *"USUARIO NUEVO. No digas que hay error, pide sus datos"*).
+
+---
+
+## 🧠 3. PASO 2: CONSTRUCCIÓN DEL AGENTE V3 (`NN_03-C`)
+Se ensambló un nuevo "cerebro" basado en el nodo `AI Agent`.
+
+### 🔧 Componentes Clave:
+- **Aislamiento de Sesión**: Implementación exitosa de `Window Buffer Memory` particionada por `chat_id`. Probado y verificado (T01 y T03).
+- **8 Tools Conectadas**: El agente ahora tiene acceso a: `Create`, `Cancel`, `Reschedule`, `CheckAvailability`, `FindNext`, `Waitlist`, `UserProfile` y `KnowledgeBase (RAG)`.
+- **System Prompt Blindado**: Se inyectaron 7 reglas de oro para prevenir alucinaciones médicas y forzar confirmaciones en acciones destructivas.
+
+---
+
+## 🧪 4. PASO 3: DESAFÍOS EN LA SUITE DE TESTING E2E (`qa-agent-v3.test.ts`)
+Aquí es donde el proyecto enfrentó sus mayores obstáculos técnicos durante la sesión actual.
+
+### 🛑 Bloqueo A: La Guerra contra los Rate Limits (Groq 429)
+Al intentar ejecutar los 18 tests en ráfaga, la API de Groq bloqueó las peticiones por exceso de tokens por minuto (TPM).
+- **Intento 1**: Bajar a modelos más pequeños (`llama-3.1-8b`, `mixtral-8x7b`, `gemma2-9b`).
+- **Resultado**: Fallido. Los modelos pequeños de Groq estaban saturados o depreciados, devolviendo errores `Bad Request`.
+- **Solución Definitiva**: Migración temporal del motor del agente a **OpenAI (`gpt-4o-mini`)**. Esto estabilizó la suite de pruebas y permitió avanzar.
+
+### 🛑 Bloqueo B: Invisible Networking (`ENOTFOUND dal-service`)
+Los contenedores de n8n (Titanium y Worker) no podían ver al contenedor `booking_dal` debido a un aislamiento de redes de Docker.
+- **Síntoma**: El Agente respondía: *"Parece que hay un problema técnico y no puedo acceder a la base de datos"*.
+- **Solución**: Se ejecutó una conexión manual en caliente de los contenedores a la red `docker-compose_n8n-network`. Se verificó la visibilidad con `curl` interno.
+
+### 🛑 Bloqueo C: Alucinaciones de Perfil (T02 y T07)
+A pesar de tener conexión, el Agente seguía disculpándose ante usuarios nuevos.
+- **Causa**: La herramienta `GetUserProfile` devolvía un estado neutral que el LLM interpretaba como fallo de base de datos.
+- **Solución**: Refactorización del nodo `Normalize Response` en el sub-workflow para enviar mensajes de control: *"EL USUARIO ES NUEVO. Pídele sus datos."*
+
+### 🛑 Bloqueo D: Bug de Tipos en Postgres (`invalid input for type bigint: "null"`)
+Descubierto en el log de ejecuciones `3499`. El Agente intentaba llamar al DAL enviando la palabra `"null"` como string en el campo `chat_id`.
+- **Investigación actual**: Se detectó que el mapeo en el nodo `Tool: GetUserProfile` dentro del Agente V3 a veces pierde la referencia al `chat_id` del nodo `Input_Clean` si el LLM no lo extrae correctamente.
+- **Estado**: ⚠️ **PENDIENTE** — el fix de mapeo estático en el nodo Tool del agente n8n aún no se aplica en el workflow. El validador DAL ahora rechaza `null` explícitamente, pero la causa raíz (mapeo en n8n) requiere editar `NN_03-C_Agent_V3.json`.
+
+---
+
+## 📊 5. ESTADO DEL AVANCE (RESUMEN)
+
+### 5A — Estado General
+
+| Categoría | Estado | Comentario |
+| :--- | :--- | :--- |
+| **Identidad** | ✅ Operativo | Reconocimiento por chat_id funcional. |
+| **Seguridad DAL** | ✅ v1.5.3 | P0-01 (fecha+timezone+buffer) y P0-02 (email/nombre) fijados. |
+| **Agente (MCP)**| 🟠 En Ajuste | Motor funciona; bloqueo D (mapeo chat_id en Tool Node) pendiente. |
+| **Infraestructura**| ✅ Conectada | Docker networking estabilizado. |
+
+### 5B — QA por Suite
+
+| Suite | Tests | Passed | Failed | % | Estado |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `qa-edge-cases.test.ts` | 18 | 12 | 6 | 67% | ⚠️ Con hallazgos — pre P0/P1 fixes |
+| `qa-agent-v3.test.ts` | 18 | -- | -- | -- | 🔲 Pendiente (requiere n8n activo) |
+
+> **Nota:** El valor de 89% (16/18) indicado en la versión anterior del documento era incorrecto. Provenía de una ejecución parcial. El informe QA oficial (`QA_ANALYST_REPORT_FINAL_2026-03-10.md`) registra 67%.
+
+### 🏁 Siguientes Pasos para llegar al 100%:
+1.  **Bloqueo D**: Editar `NN_03-C_Agent_V3.json` — forzar mapeo estático de `chat_id` en el nodo `Tool: GetUserProfile`.
+2.  **Ejecutar qa-agent-v3**: Correr la suite completa con el servidor n8n activo para obtener baseline real.
+3.  **RAG Ingestion**: Cargar el conocimiento real (FAQs) una vez que el Agente sea 100% estable.
+4.  **Queue Mode**: Desplegar Redis para optimizar la latencia acumulada de las Tools.
+
+**Documento generado por:** Gemini CLI v4.2  
+**Última revisión:** 2026-03-11 (corrección de métricas QA y fixes DAL v1.5.3)  
+**Nivel de detalle:** Máximo (Traza técnica completa).

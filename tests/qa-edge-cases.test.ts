@@ -270,7 +270,7 @@ describe('📋 QA-EDGE-01: Situaciones Límite', () => {
             console.log(`   ✓ Invalid email correctly rejected: ${result.error_message}`);
         }, SHORT);
 
-        it('ACEPTA reserva con email vacío (asigna fallback si no es nulo)', async () => {
+        it('RECHAZA reserva con email vacío (campo requerido en create-booking)', async () => {
             const futureTime = futureDateTime(6, 12, 0);
 
             const result = await callDAL('/create-booking', 'POST', {
@@ -279,16 +279,14 @@ describe('📋 QA-EDGE-01: Situaciones Límite', () => {
                 service_id: 1,
                 start_time: futureTime,
                 user_name: 'QA Empty Email Test',
-                user_email: '' // Empty email (optional in validation)
+                user_email: '' // Empty email — debe ser RECHAZADO (fix P0-02 DAL v1.5.3)
             }, SHORT);
 
-            expect(result.success).toBe(true);
-            console.log(`   ✓ Empty email handled: ${result.data?.booking_code}`);
-
-            if (result.success && result.data?.booking_id) {
-                await cleanupTestBookings(TELEGRAM_ID + 2001);
-            }
+            // FIX P0-02: email vacío debe ser rechazado en create-booking
+            expect(result.success).toBe(false);
+            console.log(`   ✓ Empty email correctly rejected: ${result.error_message}`);
         }, SHORT);
+
     });
 
     describe('Edge Case 1.4: Médico inexistente', () => {

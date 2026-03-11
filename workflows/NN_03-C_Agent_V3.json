@@ -1,0 +1,843 @@
+{
+  "name": "NN_03-C_Agent_V3",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"chat_id\": 12345, \"text\": \"Hola, quiero un turno\"}"
+      },
+      "id": "ewt_nn03c",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -400,
+        -200
+      ],
+      "notes": "📥 IN sub-workflow: { chat_id: number, text: string }"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nn-03-c-agent",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook_nn03c",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -400,
+        0
+      ],
+      "webhookId": "nn-03-c-agent",
+      "notes": "📥 IN: { chat_id: number, text: string (2-500 chars) }"
+    },
+    {
+      "parameters": {},
+      "id": "manual_nn03c",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first()?.json || {};\nconst body = raw.body || {};\nconst data = raw.chat_id ? raw : (body.chat_id ? body : raw);\nconst chat_id = Number(data.chat_id ?? 0);\nreturn [{\n  json: {\n    chat_id,\n    sessionId: String(chat_id),\n    text: String(data.text ?? '').trim(),\n    _meta: { source: 'NN_03-C_Agent', timestamp: new Date().toISOString(), version: '3.0.0' }\n  }\n}];"
+      },
+      "id": "input_clean_nn03c",
+      "name": "Input_Clean",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const chatIdStr = String($json.chat_id ?? '');\nconst chat_id_valid = chatIdStr.length > 0 && [...chatIdStr].every(c => c >= '0' && c <= '9');\nconst text = String($('Input_Clean').first().json.text ?? '').trim();\nconst text_valid = text.length > 2 && text.length < 500;\nreturn [{ json: { ...$json, isValid: chat_id_valid && text_valid } }];"
+      },
+      "id": "payload_val_nn03c",
+      "name": "Payload Validation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "iv-cond",
+              "leftValue": "={{ $json.isValid === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "is_valid_nn03c",
+      "name": "Is Valid Payload?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { success: false, error_code: 'VALIDATION_ERROR',\n  error_message: 'chat_id debe ser numérico y text entre 3-499 chars',\n  data: null, _meta: { source: 'NN_03-C_Agent', timestamp: new Date().toISOString(), version: '3.0.0' }\n} }];"
+      },
+      "id": "err_val_nn03c",
+      "name": "Err: Validation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const textLower = String($('Input_Clean').first().json.text || '').toLowerCase();\nconst PROFANITY = /\\b(conchetumare|ctm|culiao|qliao|pichula|tula|zorra|maraco|maricón|maricon|puta|mierda|fuck|shit|asshole|bitch|bastard|motherfucker|dick|cunt|pussy|prick|estúpido|estupido|idiota|imbécil|imbecil|gilipollas|huevon|weon)\\b/i;\nconst INJECTION = ['ignore all previous instructions','disregard all rules','system prompt','jailbreak','dan mode','olvida todas las instrucciones'];\nconst OFFTOPIC  = ['escribe un poema','write a poem','cuéntame un cuento','tell me a story','genera código','create code','hackear','hacking'];\nlet isBlocked = PROFANITY.test(textLower);\nif (!isBlocked) for (const p of INJECTION) if (textLower.includes(p)) { isBlocked = true; break; }\nif (!isBlocked) for (const p of OFFTOPIC)  if (textLower.includes(p)) { isBlocked = true; break; }\nreturn [{ json: { ...$json, isBlocked } }];"
+      },
+      "id": "rule_fw_nn03c",
+      "name": "Rule Firewall",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "is-cond",
+              "leftValue": "={{ $json.isBlocked === false }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "is_safe_nn03c",
+      "name": "Is Safe by Rules?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        920,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { success: false, error_code: 'SECURITY_BLOCKED',\n  error_message: 'Mensaje bloqueado por reglas de seguridad',\n  data: null, _meta: { source: 'NN_03-C_Agent', timestamp: new Date().toISOString(), version: '3.0.0' }\n} }];"
+      },
+      "id": "err_sec_nn03c",
+      "name": "Err: Security",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        920,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Input_Clean').first().json.text }}",
+        "systemMessage": "Eres la recepcionista médica de Booking Titanium, una clínica especializada.\nHablas exclusivamente en ESPAÑOL. Eres amable, profesional y concisa (máximo 3 oraciones por respuesta).\n\nFECHA Y HORA ACTUAL: {{ $now.format('dddd DD [de] MMMM [de] YYYY, HH:mm') }}\n\n═══════════════════════════════════════════════\nREGLAS ESTRICTAS — DEBES SEGUIRLAS SIN EXCEPCIÓN\n═══════════════════════════════════════════════\n\nREGLA 1 — ANTI-ALUCINACIÓN:\nNUNCA inventes provider_id, service_id, precios, horarios ni datos de contacto.\nSi el usuario no especifica médico, servicio, fecha u hora para una reserva,\nPREGÚNTALE antes de llamar CreateBooking. Usa ConsultKnowledgeBase para obtener IDs reales.\n\nREGLA 2 — CONFIRMACIÓN DESTRUCTIVA:\nAntes de llamar CancelBooking, SIEMPRE muestra al usuario el detalle de la cita\n(fecha, hora, médico) y pregunta explícitamente: \"¿Confirmas que deseas cancelar esta cita?\".\nSolo ejecutar si el usuario responde afirmativamente en el siguiente mensaje.\n\nREGLA 3 — ORDEN OBLIGATORIO PARA RESERVAS:\n1. Obtener especialidad/médico → ConsultKnowledgeBase (para IDs reales)\n2. Verificar disponibilidad → CheckAvailability o FindNextAvailable\n3. Confirmar datos con el usuario\n4. Crear reserva → CreateBooking\n\nREGLA 4 — RAG SIN RESULTADOS:\nSi ConsultKnowledgeBase devuelve message con \"NO_RAG_RESULTS\" o data.rag_documents vacío\ny data.sql_context.resolved es false, responde honestamente:\n\"No tengo esa información disponible en este momento. Te recomiendo contactar a la clínica directamente.\"\nNUNCA inventes precios, coberturas de seguros ni instrucciones médicas.\n\nREGLA 5 — SIN DISPONIBILIDAD:\nSi CheckAvailability o FindNextAvailable no encuentran turnos libres,\nSIEMPRE ofrecer la lista de espera antes de cerrar la conversación.\n\nREGLA 6 — USUARIOS NUEVOS O SIN CITAS:\nSi GetUserProfile indica que el usuario no está registrado o no tiene citas activas, NO digas que hay un problema técnico. Asume que es un usuario nuevo y solicítale amablemente sus datos.\n\nREGLA 7 — FUERA DE SCOPE:\nSi el usuario pide diagnósticos, recetas, consejos médicos o temas que no son\nagendar/cancelar/consultar disponibilidad/información de la clínica, responde:\n\"Para eso necesitarás hablar directamente con el médico. ¿Te agendo una consulta?\"",
+        "hasOutputParser": false,
+        "options": {
+          "maxIterations": 5
+        }
+      },
+      "id": "ai_agent_nn03c",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1200,
+        0
+      ],
+      "notes": "Tools Agent — Llama 3.3 70B — maxIterations: 5"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "id": "openai_agent_nn03c",
+      "name": "OpenAI (Agent LLM)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        280
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "gjFJosmeTXLpisjl",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Input_Clean').first().json.chat_id }}",
+        "contextWindowLength": 10
+      },
+      "id": "memory_nn03c",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1200,
+        -240
+      ],
+      "notes": "Session ID = chat_id — aislamiento por usuario"
+    },
+    {
+      "parameters": {
+        "name": "CreateBooking",
+        "description": "Usa esta herramienta para crear una nueva cita médica. SOLO llámala cuando tengas confirmados: provider_id (integer), service_id (integer), start_time (ISO8601 ej: 2026-03-15T10:30:00), user_name y user_email. Si falta algún dato, pregunta al usuario antes de llamar esta herramienta. SIEMPRE verifica disponibilidad con CheckAvailability antes.",
+        "workflowId": {
+          "__rl": true,
+          "value": "ilA6a6sM5CvDsSBi",
+          "mode": "id"
+        },
+        "responsePropertyName": "message",
+        "fields": {
+          "values": [
+            {
+              "name": "provider_id",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"provider_id\",  \"ID numérico del médico/proveedor\",  \"number\") }}"
+            },
+            {
+              "name": "service_id",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"service_id\",   \"ID numérico del servicio/especialidad\", \"number\") }}"
+            },
+            {
+              "name": "start_time",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"start_time\",   \"Fecha y hora ISO8601 ej: 2026-03-15T10:30:00\", \"string\") }}"
+            },
+            {
+              "name": "user_name",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"user_name\",    \"Nombre completo del paciente\", \"string\") }}"
+            },
+            {
+              "name": "user_email",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"user_email\",   \"Email del paciente\", \"string\") }}"
+            },
+            {
+              "name": "chat_id",
+              "value": "={{ $('Input_Clean').first().json.chat_id }}"
+            }
+          ]
+        }
+      },
+      "id": "tool_create_nn03c",
+      "name": "Tool: CreateBooking",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        -900
+      ]
+    },
+    {
+      "parameters": {
+        "name": "CancelBooking",
+        "description": "Usa esta herramienta para cancelar una cita existente. OBLIGATORIO: antes de ejecutar, muestra al usuario el detalle de la cita y pide confirmación explícita. Solo llama esta herramienta después de que el usuario confirme. Esta acción es IRREVERSIBLE.",
+        "workflowId": {
+          "__rl": true,
+          "value": "mf4qnUG7UlrAKpQU",
+          "mode": "id"
+        },
+        "responsePropertyName": "message",
+        "fields": {
+          "values": [
+            {
+              "name": "booking_id",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"booking_id\", \"ID de la reserva. Formato BKG-XXXXXX o UUID\", \"string\") }}"
+            },
+            {
+              "name": "chat_id",
+              "value": "={{ $('Input_Clean').first().json.chat_id }}"
+            }
+          ]
+        }
+      },
+      "id": "tool_cancel_nn03c",
+      "name": "Tool: CancelBooking",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        -700
+      ]
+    },
+    {
+      "parameters": {
+        "name": "RescheduleBooking",
+        "description": "Usa esta herramienta para reprogramar una cita a un nuevo horario, sin cancelarla explícitamente. Verifica disponibilidad del nuevo slot con CheckAvailability antes de llamar esta herramienta. Confirmar el nuevo horario con el usuario antes de ejecutar.",
+        "workflowId": {
+          "__rl": true,
+          "value": "F2F5oQ7okPDKwg9E",
+          "mode": "id"
+        },
+        "responsePropertyName": "message",
+        "fields": {
+          "values": [
+            {
+              "name": "booking_id",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"booking_id\",     \"ID de la cita a reprogramar\", \"string\") }}"
+            },
+            {
+              "name": "new_start_time",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"new_start_time\", \"Nuevo horario ISO8601\", \"string\") }}"
+            },
+            {
+              "name": "chat_id",
+              "value": "={{ $('Input_Clean').first().json.chat_id }}"
+            }
+          ]
+        }
+      },
+      "id": "tool_reschedule_nn03c",
+      "name": "Tool: RescheduleBooking",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        -500
+      ]
+    },
+    {
+      "parameters": {
+        "name": "CheckAvailability",
+        "description": "Usa esta herramienta cuando el usuario mencione una fecha específica y quiera saber si hay turnos disponibles ese día. Diferencia clave: úsala cuando el usuario tiene una fecha concreta (\"el martes\", \"el 15 de marzo\", \"esta semana\"). Si no hay fecha específica, usa FindNextAvailable en su lugar.",
+        "workflowId": {
+          "__rl": true,
+          "value": "zdUslfT9C0sTI83H",
+          "mode": "id"
+        },
+        "responsePropertyName": "message",
+        "fields": {
+          "values": [
+            {
+              "name": "date",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"date\",        \"Fecha en formato YYYY-MM-DD\", \"string\") }}"
+            },
+            {
+              "name": "provider_id",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"provider_id\", \"Opcional: ID del médico. Omitir si no se especificó\", \"number\") }}"
+            },
+            {
+              "name": "service_id",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"service_id\",  \"Opcional: ID del servicio. Omitir si no se especificó\", \"number\") }}"
+            }
+          ]
+        }
+      },
+      "id": "tool_check_nn03c",
+      "name": "Tool: CheckAvailability",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "name": "FindNextAvailable",
+        "description": "Usa esta herramienta cuando el usuario NO tiene una fecha específica y quiere saber cuándo es el próximo turno disponible (\"lo antes posible\", \"¿cuándo tienen lugar?\", \"el turno más cercano\"). Diferencia clave con CheckAvailability: úsala cuando NO hay fecha concreta.",
+        "workflowId": {
+          "__rl": true,
+          "value": "oi5AiSoJRbzDf2A8",
+          "mode": "id"
+        },
+        "responsePropertyName": "message",
+        "fields": {
+          "values": [
+            {
+              "name": "provider_id",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"provider_id\", \"Opcional: ID del médico\", \"number\") }}"
+            },
+            {
+              "name": "service_id",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"service_id\",  \"Opcional: ID del servicio\", \"number\") }}"
+            },
+            {
+              "name": "from_date",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"from_date\",   \"Opcional: buscar desde esta fecha YYYY-MM-DD. Default: hoy\", \"string\") }}"
+            }
+          ]
+        }
+      },
+      "id": "tool_find_nn03c",
+      "name": "Tool: FindNextAvailable",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "name": "ManageWaitlist",
+        "description": "Usa esta herramienta para agregar al usuario a la lista de espera cuando no hay disponibilidad inmediata. Ofrecer proactivamente después de CheckAvailability o FindNextAvailable sin resultados. Confirmar el email del usuario antes de ejecutar.",
+        "workflowId": {
+          "__rl": true,
+          "value": "FH8hRUv3dVgo8FB6",
+          "mode": "id"
+        },
+        "responsePropertyName": "message",
+        "fields": {
+          "values": [
+            {
+              "name": "service_id",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"service_id\",  \"ID del servicio para el que espera turno\", \"number\") }}"
+            },
+            {
+              "name": "user_name",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"user_name\",   \"Nombre del paciente\", \"string\") }}"
+            },
+            {
+              "name": "user_email",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"user_email\",  \"Email para notificación\", \"string\") }}"
+            },
+            {
+              "name": "provider_id",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"provider_id\", \"Opcional: médico de preferencia\", \"number\") }}"
+            },
+            {
+              "name": "chat_id",
+              "value": "={{ $('Input_Clean').first().json.chat_id }}"
+            }
+          ]
+        }
+      },
+      "id": "tool_waitlist_nn03c",
+      "name": "Tool: ManageWaitlist",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "name": "GetUserProfile",
+        "description": "Usa esta herramienta para obtener el nombre, email y citas activas del usuario. Llamar al inicio de la conversación si el usuario no se presentó. También usarla cuando el usuario diga \"mi turno\" o \"mi cita\" sin especificar un booking_id, para listar sus citas activas.",
+        "workflowId": {
+          "__rl": true,
+          "value": "mJMUeVZSi55z8Bu9",
+          "mode": "id"
+        },
+        "responsePropertyName": "message",
+        "fields": {
+          "values": [
+            {
+              "name": "chat_id",
+              "value": "={{ $('Input_Clean').first().json.chat_id }}"
+            }
+          ]
+        }
+      },
+      "id": "tool_profile_nn03c",
+      "name": "Tool: GetUserProfile",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "name": "ConsultKnowledgeBase",
+        "description": "Usa esta herramienta para responder preguntas sobre: precios, especialidades disponibles, médicos, seguros aceptados, ubicación de la clínica, preparación para estudios, o cualquier información general. También úsala para obtener provider_id y service_id reales antes de crear una cita. Si la respuesta incluye \"NO_RAG_RESULTS\", admite honestamente que no tienes esa información.",
+        "workflowId": {
+          "__rl": true,
+          "value": "YVrtyqLVCuykAKgB",
+          "mode": "id"
+        },
+        "responsePropertyName": "message",
+        "fields": {
+          "values": [
+            {
+              "name": "query",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"query\",       \"Pregunta del usuario en lenguaje natural\", \"string\") }}"
+            },
+            {
+              "name": "provider_id",
+              "value": "={{ /*n8n-auto*/ $fromAI(\"provider_id\", \"Opcional: limitar búsqueda a un provider\", \"number\") }}"
+            }
+          ]
+        }
+      },
+      "id": "tool_knowledge_nn03c",
+      "name": "Tool: ConsultKnowledgeBase",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first()?.json || {};\n// El AI Agent devuelve su respuesta en .output o .text\nlet aiResp = input.output || input.text || input.ai_response || '';\nif (typeof aiResp === 'string') aiResp = aiResp.replace(/^[\\\"']|[\\\"']$/g, '').trim();\nif (!aiResp) aiResp = 'Lo siento, no pude procesar tu solicitud en este momento.';\n\nlet chatId = 0;\ntry { chatId = $('Input_Clean').first().json.chat_id || 0; } catch(e) {}\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      chat_id:      chatId,\n      ai_response:  aiResp\n    },\n    _meta: {\n      source:    'NN_03-C_Agent',\n      timestamp: new Date().toISOString(),\n      version:   '3.0.0'\n    }\n  }\n}];"
+      },
+      "id": "format_resp_nn03c",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1700,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first()?.json || {};\n// Fix v2.2: leer error del json, NO de $input.params.error (API inexistente)\nconst errorCode    = input.error_code    || input.code    || 'EXECUTION_ERROR';\nconst errorMessage = input.error_message || input.message || 'Error desconocido';\n\nreturn [{\n  json: {\n    success: false,\n    error_code:    errorCode,\n    error_message: errorMessage,\n    data: null,\n    _meta: {\n      source:    'NN_03-C_Agent',\n      timestamp: new Date().toISOString(),\n      version:   '3.0.0'\n    }\n  }\n}];"
+      },
+      "id": "ceh_nn03c",
+      "name": "Central Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT v3.0.0\nreturn [{ json: $input.first()?.json || {} }];"
+      },
+      "id": "sco_nn03c",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        100
+      ],
+      "notes": "📤 OUT: Standard Contract v3.0.0"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Input_Clean",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Input_Clean",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Input_Clean",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input_Clean": {
+      "main": [
+        [
+          {
+            "node": "Payload Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payload Validation": {
+      "main": [
+        [
+          {
+            "node": "Is Valid Payload?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid Payload?": {
+      "main": [
+        [
+          {
+            "node": "Rule Firewall",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Err: Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Err: Validation": {
+      "main": [
+        [
+          {
+            "node": "Central Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rule Firewall": {
+      "main": [
+        [
+          {
+            "node": "Is Safe by Rules?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Safe by Rules?": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Err: Security",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Err: Security": {
+      "main": [
+        [
+          {
+            "node": "Central Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI (Agent LLM)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: CreateBooking": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: CancelBooking": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: RescheduleBooking": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: CheckAvailability": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: FindNextAvailable": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: ManageWaitlist": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: GetUserProfile": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: ConsultKnowledgeBase": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Central Error Handler": {
+      "main": [
+        [
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "dcff9bffd57bf60f63303c902ff8a9da3e3cc1df7b0fee28dae6d77c5d352c30",
+    "templateCredsSetupCompleted": true
+  }
+}
