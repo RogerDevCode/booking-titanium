@@ -1,33 +1,30 @@
 import { Pool } from 'pg';
 import * as dotenv from 'dotenv';
-import * as path from 'path';
+dotenv.config();
 
-dotenv.config({ path: path.join(__dirname, '../.env') });
+const dbUser = process.env.REMOTE_NEON_DB_USER;
+const dbPass = process.env.REMOTE_NEON_DB_PASSWORD;
+const dbHost = process.env.REMOTE_NEON_DB_HOST;
+const dbPort = process.env.REMOTE_NEON_DB_PORT;
+const dbName = process.env.REMOTE_NEON_DB_DATABASE;
 
-const dbConfig: any = {
-    host: process.env.REMOTE_NEON_DB_HOST || process.env.DB_POSTGRESDB_HOST || 'localhost',
-    port: parseInt(process.env.REMOTE_NEON_DB_PORT || process.env.DB_POSTGRESDB_PORT || '5432'),
-    database: process.env.REMOTE_NEON_DB_DATABASE || process.env.DB_POSTGRESDB_DATABASE || 'n8n_subscribers',
-    user: process.env.REMOTE_NEON_DB_USER || process.env.DB_POSTGRESDB_USER || 'n8n_user',
-    password: process.env.REMOTE_NEON_DB_PASSWORD || process.env.DB_POSTGRESDB_PASSWORD || 'password',
-};
+const url = `postgres://${dbUser}:${dbPass}@${dbHost}:${dbPort}/${dbName}`;
 
-// Use SSL if connecting to Neon
-if (dbConfig.host.includes('neon.tech')) {
-    dbConfig.ssl = { rejectUnauthorized: false };
+const pool = new Pool({
+  connectionString: url,
+  ssl: { rejectUnauthorized: false }
+});
+
+async function run() {
+  const client = await pool.connect();
+  try {
+    // Clean seed bookings (user_id >= 9600000 for new seed, 9300000 for old seed)
+    const r1 = await client.query(`DELETE FROM bookings WHERE user_id >= 9300000 AND user_id < 9900000`);
+    const r2 = await client.query(`DELETE FROM users WHERE chat_id >= 9300000 AND chat_id < 9900000`);
+    console.log(`Deleted ${r1.rowCount} bookings and ${r2.rowCount} users.`);
+  } finally {
+    client.release();
+    pool.end();
+  }
 }
-
-const pool = new Pool(dbConfig);
-
-async function clean() {
-    try {
-        const res = await pool.query("DELETE FROM public.bookings WHERE user_id >= 9100000;");
-        console.log(`Successfully deleted ${res.rowCount} seed bookings.`);
-    } catch (e) {
-        console.error('Error deleting seed bookings:', e);
-    } finally {
-        await pool.end();
-    }
-}
-
-clean();
+run().catch(console.error);
