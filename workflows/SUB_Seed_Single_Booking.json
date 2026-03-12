@@ -1,0 +1,62 @@
+{
+  "name": "SUB_Seed_Single_Booking",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "trigger",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/create-booking",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": {{ $json.chat_id }},\n  \"provider_id\": {{ $json.provider_id }},\n  \"service_id\": {{ $json.service_id }},\n  \"start_time\": \"{{ $json.start_time }}\",\n  \"user_name\": \"{{ $json.user_name }}\",\n  \"user_email\": \"{{ $json.user_email }}\"\n}"
+      },
+      "id": "dal_create",
+      "name": "Create Booking (DAL)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [250, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://n8n:5678/webhook/gcal-create-event",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"calendar_id\": \"{{ $input.first().json.calendar_id }}\",\n  \"booking_id\": \"{{ $json.data?.booking_id || $json.booking_id }}\",\n  \"booking_code\": \"{{ $json.data?.booking_code || $json.booking_code }}\",\n  \"summary\": \"Cita Seed: {{ $input.first().json.user_name }}\",\n  \"start_time\": \"{{ $input.first().json.start_time }}\",\n  \"end_time\": \"{{ new Date(new Date($input.first().json.start_time).getTime() + 30*60000).toISOString() }}\",\n  \"user_name\": \"{{ $input.first().json.user_name }}\",\n  \"user_email\": \"{{ $input.first().json.user_email }}\",\n  \"service_name\": \"Consulta Seed\"\n}"
+      },
+      "id": "gcal_create",
+      "name": "Create GCAL Event",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [500, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/update-gcal-event-id",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"booking_id\": \"{{ $('Create Booking (DAL)').first().json.data?.booking_id || $('Create Booking (DAL)').first().json.booking_id }}\",\n  \"gcal_event_id\": \"{{ $json.data?.gcal_event_id || $json.gcal_event_id }}\"\n}"
+      },
+      "id": "dal_update",
+      "name": "Update DB with GCAL ID",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [750, 0]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": { "main": [[{ "node": "Create Booking (DAL)", "type": "main", "index": 0 }]] },
+    "Create Booking (DAL)": { "main": [[{ "node": "Create GCAL Event", "type": "main", "index": 0 }]] },
+    "Create GCAL Event": { "main": [[{ "node": "Update DB with GCAL ID", "type": "main", "index": 0 }]] }
+  }
+}
