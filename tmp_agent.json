@@ -1,0 +1,17 @@
+ID: OnHBt710KnrC9DE8
+Name: NN_03-C_Agent_V3
+Active: Yes
+Created: 2026-03-11T13:53:47.929Z
+Updated: 2026-03-11T15:59:20.151Z
+Trigger Count: 1
+Nodes: 24
+Node types:
+  - @n8n/n8n-nodes-langchain.agent: 1
+  - @n8n/n8n-nodes-langchain.lmChatGroq: 1
+  - @n8n/n8n-nodes-langchain.memoryBufferWindow: 1
+  - @n8n/n8n-nodes-langchain.toolWorkflow: 8
+  - n8n-nodes-base.code: 8
+  - n8n-nodes-base.executeWorkflowTrigger: 1
+  - n8n-nodes-base.if: 2
+  - n8n-nodes-base.manualTrigger: 1
+  - n8n-nodes-base.webhook: 1

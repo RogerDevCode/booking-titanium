@@ -1,0 +1,549 @@
+{
+  "name": "WF2_Booking_Orchestrator",
+  "nodes": [
+    {
+      "id": "77ce45e4-7ac9-427e-adbf-475880d66370",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1008,
+        112
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking-orchestrator",
+        "responseMode": "lastNode",
+        "options": {
+          "allowedMethods": [
+            "POST"
+          ]
+        }
+      },
+      "webhookId": "booking-orchestrator"
+    },
+    {
+      "id": "afba31a8-777c-43b3-b60f-0e124ad76d47",
+      "name": "Generate Idempotency Key",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -752,
+        112
+      ],
+      "parameters": {
+        "jsCode": "// Idempotency Check v2.0 - Context Preservation Pattern\nconst rawInput = $input.first().json;\nconst input = rawInput.body || rawInput;\n\n// Validación de input requerido (SEC02 - PRE validation)\nconst required = ['provider_id', 'service_id', 'start_time'];\nfor (const field of required) {\n  if (!input[field]) {\n    throw new Error(`Missing required field: ${field}`);\n  }\n}\n\n// Generar idempotency_key determinístico\nconst idempotencyKey = `booking_${input.provider_id}_${input.service_id}_${input.start_time}_${input.customer_id || input.chat_id || 'anonymous'}`;\n\n// Sanitizar string (SEC05)\nconst sanitizedKey = idempotencyKey\n  .replace(/[^a-zA-Z0-9_:-]/g, '_')\n  .substring(0, 255);\n\n// Construir contexto único que viajará por todo el workflow\nconst ctx = {\n  // Datos originales de input\n  provider_id: input.provider_id,\n  service_id: input.service_id,\n  start_time: input.start_time,\n  end_time: input.end_time || null,\n  customer_id: input.customer_id || null,\n  chat_id: input.chat_id || null,\n  user_id: input.user_id || null,\n  \n  // Idempotency\n  idempotency_key: sanitizedKey,\n  \n  // Metadata\n  _idempotency: {\n    key: sanitizedKey,\n    created_at: new Date().toISOString()\n  },\n  _meta: {\n    source: 'WF2_BOOKING_ORCHESTRATOR',\n    version: '2.0.0',\n    started_at: new Date().toISOString()\n  }\n};\n\nreturn [{ json: { ctx } }];"
+      }
+    },
+    {
+      "id": "8407a32f-09b1-48f4-8b2a-030ad20c10ae",
+      "name": "Check Idempotency DB",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -496,
+        112
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT b.id as booking_id, b.status, b.gcal_event_id FROM (SELECT 1) dummy LEFT JOIN bookings b ON b.idempotency_key = $1::text AND b.status != 'CANCELLED' LIMIT 1;",
+        "options": {
+          "queryReplacement": "={{ $json.ctx.idempotency_key }}"
+        }
+      },
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "id": "899458e8-72b3-4ddb-b5b1-a7ab9c39853a",
+      "name": "Is Duplicate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -256,
+        112
+      ],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value": "={{ Array.isArray($json) && $json.length > 0 && !!$json[0]?.id }}",
+              "operation": "true"
+            }
+          ],
+          "conditions": [
+            {
+              "id": "is_dup",
+              "leftValue": "={{ $json._is_duplicate }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "00ab33b4-e6e2-435f-9026-cad0a17ef025",
+      "name": "Return Duplicate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        208
+      ],
+      "parameters": {
+        "jsCode": "// DUPLICATE BRANCH - Return existing booking\nconst existing = $input.first().json[0] || $input.first().json;\nconst ctx = $input.first().json.ctx || {};\n\n// Preservar contexto completo incluso en rama de duplicado\nctx._idempotency.is_duplicate = true;\nctx._idempotency.existing_booking_id = existing.id;\n\nreturn [{\n  json: {\n    ctx,\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      booking_id: existing.id,\n      status: existing.status,\n      gcal_event_id: existing.gcal_event_id,\n      is_duplicate: true,\n      message: 'Booking already exists (idempotent retry)'\n    },\n    _meta: {\n      source: 'WF2_BOOKING_ORCHESTRATOR',\n      timestamp: new Date().toISOString(),\n      version: '2.0.0',\n      idempotency: 'duplicate'\n    }\n  }\n}];"
+      }
+    },
+    {
+      "id": "6eaacd95-3ef4-4c2f-9f71-932cb0426ae8",
+      "name": "Merge Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// MERGE CONTEXT - After Is Duplicate? (false branch)\n// Este nodo asegura que el contexto viaje intacto por la rama de no-duplicado\nconst ctx = $input.first().json.ctx;\n\n// Agregar flag de que es una nueva reserva (no duplicada)\nctx._idempotency.is_duplicate = false;\n\nreturn [{ json: { ctx } }];"
+      }
+    },
+    {
+      "id": "183d1702-7945-4e67-82a5-0834196acd10",
+      "name": "Check Availability",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        256,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n.stax.ink/webhook/db-get-availability-test",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "provider_id",
+              "value": "={{ $json.ctx.provider_id }}"
+            },
+            {
+              "name": "service_id",
+              "value": "={{ $json.ctx.service_id }}"
+            },
+            {
+              "name": "start_time",
+              "value": "={{ $json.ctx.start_time }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      }
+    },
+    {
+      "id": "f331380b-ad51-40d5-b100-7964578400ab",
+      "name": "Is Available?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        512,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value": "={{ !!$json.success }}",
+              "operation": "true"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "470292c8-5c71-4fc7-a8cb-51a00253d256",
+      "name": "Error - No Availability",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        112
+      ],
+      "parameters": {
+        "jsCode": "// NOT AVAILABLE BRANCH - Preserve context and return error\nconst ctx = $input.first().json.ctx;\nconst availabilityResult = $input.first().json;\n\nctx._meta.failed_at = 'Check Availability';\n\nreturn [{\n  json: {\n    ctx,\n    success: false,\n    error_code: 'NO_AVAILABILITY',\n    error_message: 'No availability found for requested time slot',\n    data: null,\n    _meta: {\n      source: 'WF2_BOOKING_ORCHESTRATOR',\n      timestamp: new Date().toISOString(),\n      version: '2.0.0'\n    }\n  }\n}];"
+      }
+    },
+    {
+      "id": "e7461f8e-9c30-4b75-8950-27fbeddef967",
+      "name": "Acquire Lock",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        768,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n.stax.ink/webhook/acquire-lock",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "provider_id",
+              "value": "={{ $json.ctx.provider_id }}"
+            },
+            {
+              "name": "start_time",
+              "value": "={{ $json.ctx.start_time }}"
+            },
+            {
+              "name": "lock_duration_minutes",
+              "value": "5"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "e81ddf87-5080-4974-8e9e-4ca380716f6b",
+      "name": "Check Circuit Breaker",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1024,
+        0
+      ],
+      "parameters": {
+        "url": "https://n8n.stax.ink/webhook/circuit-breaker/check",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "service_id",
+              "value": "google_calendar"
+            },
+            {
+              "name": "action",
+              "value": "check"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      }
+    },
+    {
+      "id": "6541f01d-f356-483e-a5c7-369366f939b4",
+      "name": "Is GCal Available?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1280,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value": "={{ !!$json.data.allowed }}",
+              "operation": "true"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "f455dccf-fb4d-4c05-831e-95311d02d450",
+      "name": "Error - Circuit Breaker",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1536,
+        112
+      ],
+      "parameters": {
+        "jsCode": "// CIRCUIT BREAKER OPEN - Preserve context and return error\nconst ctx = $input.first().json.ctx;\n\nctx._meta.failed_at = 'Circuit Breaker';\n\nreturn [{\n  json: {\n    ctx,\n    success: false,\n    error_code: 'CIRCUIT_BREAKER_OPEN',\n    error_message: 'Google Calendar service is temporarily unavailable',\n    data: null,\n    _meta: {\n      source: 'WF2_BOOKING_ORCHESTRATOR',\n      timestamp: new Date().toISOString(),\n      version: '2.0.0'\n    }\n  }\n}];"
+      }
+    },
+    {
+      "id": "93363698-a849-4b0c-ba72-a9dea3385b22",
+      "name": "Create GCal Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1536,
+        0
+      ],
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "dev.n8n.stax@gmail.com",
+          "mode": "list",
+          "cachedResultName": "dev.n8n.stax@gmail.com"
+        }
+      },
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "OsRBfz3Cs7Ph5uV5",
+          "name": "Google Calendar account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "5d1a1dbb-b1c1-49dd-9a4d-a01625dd3e05",
+      "name": "Record GCal Success",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1792,
+        0
+      ],
+      "parameters": {
+        "url": "https://n8n.stax.ink/webhook/circuit-breaker/record",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "service_id",
+              "value": "google_calendar"
+            },
+            {
+              "name": "success",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "5e1b0db0-cbfc-4e02-b4dd-9df329b609f5",
+      "name": "Create DB Booking",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2048,
+        0
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO bookings (provider_id, service_id, start_time, end_time, idempotency_key, gcal_event_id, user_id, status, created_at) VALUES ($1::int, $2::int, $3::timestamp, ($3::timestamp + INTERVAL '1 hour'), $4::text, $5::text, $6::bigint, 'CONFIRMED', NOW()) RETURNING id;",
+        "options": {
+          "queryReplacement": "={{ $json.ctx.provider_id }}, {{ $json.ctx.service_id }}, {{ $json.ctx.start_time }}, {{ $json.ctx.idempotency_key }}, {{ $json.id || $json.eventId }}, {{ $json.ctx.user_id || $json.ctx.chat_id }}"
+        }
+      },
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "id": "1d8790ca-0db7-4c2b-94fb-ab3e77eff5e5",
+      "name": "Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2304,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Standard Contract Output - Booking Success v2.0\nconst db = $('Create DB Booking').first()?.json || {};\nconst ctx = $('Generate Idempotency Key').first()?.json?.ctx || {};\n\n// Construir output sin JSON.stringify - objeto nativo\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      booking_id: db.id,\n      idempotency_key: ctx.idempotency_key,\n      provider_id: ctx.provider_id,\n      service_id: ctx.service_id,\n      start_time: ctx.start_time,\n      status: 'CONFIRMED',\n      is_duplicate: ctx._idempotency?.is_duplicate || false\n    },\n    _meta: {\n      source: 'WF2_BOOKING_ORCHESTRATOR',\n      timestamp: new Date().toISOString(),\n      version: '2.0.0'\n    }\n  }\n}];"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Generate Idempotency Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Idempotency Key": {
+      "main": [
+        [
+          {
+            "node": "Check Idempotency DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Idempotency DB": {
+      "main": [
+        [
+          {
+            "node": "Is Duplicate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Duplicate?": {
+      "main": [
+        [
+          {
+            "node": "Return Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Context": {
+      "main": [
+        [
+          {
+            "node": "Check Availability",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Availability": {
+      "main": [
+        [
+          {
+            "node": "Is Available?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Available?": {
+      "main": [
+        [
+          {
+            "node": "Acquire Lock",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error - No Availability",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Acquire Lock": {
+      "main": [
+        [
+          {
+            "node": "Check Circuit Breaker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Circuit Breaker": {
+      "main": [
+        [
+          {
+            "node": "Is GCal Available?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is GCal Available?": {
+      "main": [
+        [
+          {
+            "node": "Create GCal Event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error - Circuit Breaker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create GCal Event": {
+      "main": [
+        [
+          {
+            "node": "Record GCal Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record GCal Success": {
+      "main": [
+        [
+          {
+            "node": "Create DB Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create DB Booking": {
+      "main": [
+        [
+          {
+            "node": "Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "tags": [],
+  "pinData": null,
+  "versionId": "849355a4-7c3e-4a7c-8e37-22a85739cf23"
+}

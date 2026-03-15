@@ -1,0 +1,224 @@
+{
+  "name": "DB_Find_Next_Available",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"provider_id\": 1, \"service_id\": 1, \"from_date\": \"2026-03-11\"}"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        400
+      ],
+      "id": "trigger"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "id": "manual"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "db-find-next-available",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        600
+      ],
+      "webhookId": "db-find-next-available",
+      "id": "webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/find-next-available",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"provider_id\": {{ $json.provider_id || $json.body?.provider_id || 1 }},\n  \"service_id\": {{ $json.service_id || $json.body?.service_id || 1 }},\n  \"date\": \"{{ $json.date || $json.body?.date || $now.toISODate() }}\"\n}",
+        "options": {
+          "timeout": 15000,
+          "maxRetries": 3,
+          "retryWait": {
+            "type": "exponentialBackoff",
+            "base": 1000
+          }
+        }
+      },
+      "name": "Call DAL Smart Lookup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        500,
+        500
+      ],
+      "id": "call_dal_smart"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format find-next response — Tool-compatible v3.1.0\nconst dalResponse = $input.first()?.json || {};\nconst isSuccess = dalResponse.success !== false;\nconst slot = dalResponse.data?.next_slot || dalResponse.data?.slots?.[0] || null;\nconst hasSlot = !!slot?.start_time;\n\nlet message;\nif (!isSuccess) {\n  message = dalResponse.error_message || 'Error buscando disponibilidad. Informa al usuario e invítalo a intentarlo en unos minutos.';\n} else if (hasSlot) {\n  const provName = slot.provider_name ? ` con ${slot.provider_name}` : '';\n  message = `Próximo turno disponible: ${slot.start_time}${provName}. Pregunta al usuario si desea confirmar este horario.`;\n} else {\n  message = 'NO HAY TURNOS DISPONIBLES en los próximos 30 días. Instrucción: Informa al usuario y ofrécele unirse a la lista de espera usando ManageWaitlist para ser notificado cuando haya disponibilidad.';\n}\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message,\n    error_code:    isSuccess ? null : (dalResponse.error_code    || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || 'Operation failed'),\n    data: dalResponse.data || null,\n    _meta: { source: 'DB_Find_Next_Available', timestamp: new Date().toISOString(), version: '3.1.0' }\n  }\n}];"
+      },
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        400
+      ],
+      "id": "format_out_smart"
+    },
+    {
+      "parameters": {
+        "jsCode": "/* VRF PRE: Validate */\nconst item = $input.first()?.json || {};\nconst data = item.body || item;\nconst isValid = true; // Auto-generated default\nreturn [{ json: { isValid, ...data } }];"
+      },
+      "id": "validate_pre_auto",
+      "name": "Validate PRE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid_cond_auto",
+              "leftValue": "={{ $json.isValid === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if_valid_auto",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        200,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT — Tool-compatible (v3.0.0)\n// El AI Agent lee \"message\" como respuesta legible y \"data\" para detalles.\nconst result = $input.first()?.json || {};\nconst isSuccess = result.success !== false;\n\n// Construir mensaje legible para el LLM\nlet message = result.message || result.data?.message || null;\nif (!message) {\n  message = isSuccess\n    ? 'Operación completada con éxito.'\n    : (result.error_message || result.error_code || 'Error desconocido.');\n}\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message,\n    error_code:    isSuccess ? null : (result.error_code    || 'UNKNOWN_ERROR'),\n    error_message: isSuccess ? null : (result.error_message || message),\n    data:          result.data || null,\n    _meta: {\n      source:    'DB_FIND_NEXT_AVAILABLE',\n      timestamp: new Date().toISOString(),\n      version:   '3.0.0'\n    }\n  }\n}];"
+      },
+      "id": "standard_contract_1772984456914",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5000,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate PRE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate PRE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate PRE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Smart Lookup": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate PRE": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Smart Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Output": {
+      "main": [
+        [
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "oi5AiSoJRbzDf2A8"
+}

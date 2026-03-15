@@ -1,0 +1,6341 @@
+{
+  "_meta": {
+    "generatedAt": "2026-03-02T16:24:17.486Z",
+    "n8nVersion": "2.10.2",
+    "n8nUrl": "https://n8n.stax.ink",
+    "method": "docker cp+exec (n8n_titanium)",
+    "container": "n8n_titanium",
+    "totalNodes": 543
+  },
+  "nodes": [
+    {
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "displayName": "AI Agent",
+      "latestVersion": 3.1,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5,
+        1.6,
+        1.7,
+        1.8,
+        1.9,
+        2,
+        2.1,
+        2.2,
+        2.3,
+        3,
+        3.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "displayName": "AI Agent Tool",
+      "latestVersion": 3,
+      "availableVersions": [
+        2.2,
+        3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "displayName": "Anthropic",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "displayName": "Basic LLM Chain",
+      "latestVersion": 1.9,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5,
+        1.6,
+        1.7,
+        1.8,
+        1.9
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "displayName": "Question and Answer Chain",
+      "latestVersion": 1.7,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5,
+        1.6,
+        1.7
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "displayName": "Summarization Chain",
+      "latestVersion": 2.1,
+      "availableVersions": [
+        1,
+        2,
+        2.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "displayName": "Chat",
+      "latestVersion": 1.2,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "displayName": "Chat Trigger",
+      "latestVersion": 1.4,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.code",
+      "displayName": "LangChain Code",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.documentBinaryInputLoader",
+      "displayName": "Binary Input Loader",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "displayName": "Default Data Loader",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.documentGithubLoader",
+      "displayName": "GitHub Document Loader",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.documentJsonInputLoader",
+      "displayName": "JSON Input Loader",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.embeddingsAwsBedrock",
+      "displayName": "Embeddings AWS Bedrock",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.embeddingsAzureOpenAi",
+      "displayName": "Embeddings Azure OpenAI",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.embeddingsCohere",
+      "displayName": "Embeddings Cohere",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "displayName": "Embeddings Google Gemini",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleVertex",
+      "displayName": "Embeddings Google Vertex",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.embeddingsHuggingFaceInference",
+      "displayName": "Embeddings Hugging Face Inference",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.embeddingsLemonade",
+      "displayName": "Embeddings Lemonade",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+      "displayName": "Embeddings Mistral Cloud",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "displayName": "Embeddings Ollama",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "displayName": "Embeddings OpenAI",
+      "latestVersion": 1.2,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "displayName": "Google Gemini",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "displayName": "Guardrails",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "displayName": "Information Extractor",
+      "latestVersion": 1.2,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "displayName": "Anthropic Chat Model",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatAwsBedrock",
+      "displayName": "AWS Bedrock Chat Model",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "displayName": "Azure OpenAI Chat Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatCohere",
+      "displayName": "Cohere Chat Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "displayName": "DeepSeek Chat Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "displayName": "Google Gemini Chat Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "displayName": "Google Vertex Chat Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "displayName": "Groq Chat Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatLemonade",
+      "displayName": "Lemonade Chat Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "displayName": "Mistral Cloud Chat Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "displayName": "Ollama Chat Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "displayName": "OpenAI Chat Model",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "displayName": "OpenRouter Chat Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatVercelAiGateway",
+      "displayName": "Vercel AI Gateway Chat Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatXAiGrok",
+      "displayName": "xAI Grok Chat Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmCohere",
+      "displayName": "Cohere Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmLemonade",
+      "displayName": "Lemonade Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "displayName": "Ollama Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmOpenAi",
+      "displayName": "OpenAI Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmOpenHuggingFaceInference",
+      "displayName": "Hugging Face Inference Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.manualChatTrigger",
+      "displayName": "Manual Chat Trigger",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.mcpClient",
+      "displayName": "MCP Client",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "displayName": "MCP Client Tool",
+      "latestVersion": 1.2,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "displayName": "MCP Server Trigger",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        1.1,
+        2
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "displayName": "Simple Memory",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.memoryChatRetriever",
+      "displayName": "Chat Messages Retriever",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.memoryManager",
+      "displayName": "Chat Memory Manager",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "displayName": "MongoDB Chat Memory",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.memoryMotorhead",
+      "displayName": "Motorhead",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "displayName": "Postgres Chat Memory",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "displayName": "Redis Chat Memory",
+      "latestVersion": 1.5,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.memoryXata",
+      "displayName": "Xata",
+      "latestVersion": 1.4,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.memoryZep",
+      "displayName": "Zep",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.microsoftAgent365Trigger",
+      "displayName": "Microsoft Agent 365 Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.modelSelector",
+      "displayName": "Model Selector",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "displayName": "Ollama",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "displayName": "OpenAI",
+      "latestVersion": 2.1,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5,
+        1.6,
+        1.7,
+        1.8,
+        2,
+        2.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.openAiAssistant",
+      "displayName": "OpenAI Assistant",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "displayName": "Auto-fixing Output Parser",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.outputParserItemList",
+      "displayName": "Item List Output Parser",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "displayName": "Structured Output Parser",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.rerankerCohere",
+      "displayName": "Reranker Cohere",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.retrieverContextualCompression",
+      "displayName": "Contextual Compression Retriever",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.retrieverMultiQuery",
+      "displayName": "MultiQuery Retriever",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "displayName": "Vector Store Retriever",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.retrieverWorkflow",
+      "displayName": "Workflow Retriever",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+      "displayName": "Sentiment Analysis",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "displayName": "Text Classifier",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "displayName": "Character Text Splitter",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "displayName": "Recursive Character Text Splitter",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.textSplitterTokenSplitter",
+      "displayName": "Token Splitter",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "displayName": "Calculator",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "displayName": "Code Tool",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.toolExecutor",
+      "displayName": "Tool Executor",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "displayName": "HTTP Request Tool",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.toolSearXng",
+      "displayName": "SearXNG",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "displayName": "SerpApi (Google Search)",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "displayName": "Think Tool",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "displayName": "Vector Store Question Answer Tool",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "displayName": "Wikipedia",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.toolWolframAlpha",
+      "displayName": "Wolfram|Alpha",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "displayName": "Call n8n Sub-Workflow Tool",
+      "latestVersion": 2.2,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        2,
+        2.1,
+        2.2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreAzureAISearch",
+      "displayName": "Azure AI Search Vector Store",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreChromaDB",
+      "displayName": "Chroma Vector Store",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "displayName": "Simple Vector Store",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemoryInsert",
+      "displayName": "In Memory Vector Store Insert",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemoryLoad",
+      "displayName": "In Memory Vector Store Load",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMilvus",
+      "displayName": "Milvus Vector Store",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMongoDBAtlas",
+      "displayName": "MongoDB Atlas Vector Store",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "displayName": "Postgres PGVector Store",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "displayName": "Pinecone Vector Store",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePineconeInsert",
+      "displayName": "Pinecone: Insert",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePineconeLoad",
+      "displayName": "Pinecone: Load",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "displayName": "Qdrant Vector Store",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreRedis",
+      "displayName": "Redis Vector Store",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "displayName": "Supabase Vector Store",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabaseInsert",
+      "displayName": "Supabase: Insert",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabaseLoad",
+      "displayName": "Supabase: Load",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreWeaviate",
+      "displayName": "Weaviate Vector Store",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreZep",
+      "displayName": "Zep Vector Store",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreZepInsert",
+      "displayName": "Zep Vector Store: Insert",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreZepLoad",
+      "displayName": "Zep Vector Store: Load",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.actionNetwork",
+      "displayName": "Action Network",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.activeCampaign",
+      "displayName": "ActiveCampaign",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.activeCampaignTrigger",
+      "displayName": "ActiveCampaign Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.acuitySchedulingTrigger",
+      "displayName": "Acuity Scheduling Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.adalo",
+      "displayName": "Adalo",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.affinity",
+      "displayName": "Affinity",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.affinityTrigger",
+      "displayName": "Affinity Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.aggregate",
+      "displayName": "Aggregate",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.agileCrm",
+      "displayName": "Agile CRM",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.airtable",
+      "displayName": "Airtable",
+      "latestVersion": 2.1,
+      "availableVersions": [
+        1,
+        2,
+        2.1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.airtableTrigger",
+      "displayName": "Airtable Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.airtop",
+      "displayName": "Airtop",
+      "latestVersion": 1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.aiTransform",
+      "displayName": "AI Transform",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.amqp",
+      "displayName": "AMQP Sender",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.amqpTrigger",
+      "displayName": "AMQP Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.apiTemplateIo",
+      "displayName": "APITemplate.io",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.asana",
+      "displayName": "Asana",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.asanaTrigger",
+      "displayName": "Asana Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.autopilot",
+      "displayName": "Autopilot",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.autopilotTrigger",
+      "displayName": "Autopilot Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsCertificateManager",
+      "displayName": "AWS Certificate Manager",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsCognito",
+      "displayName": "AWS Cognito",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsComprehend",
+      "displayName": "AWS Comprehend",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsDynamoDb",
+      "displayName": "AWS DynamoDB",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsElb",
+      "displayName": "AWS ELB",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsIam",
+      "displayName": "AWS IAM",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsLambda",
+      "displayName": "AWS Lambda",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsRekognition",
+      "displayName": "AWS Rekognition",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsS3",
+      "displayName": "AwsS3",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsSes",
+      "displayName": "AWS SES",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsSns",
+      "displayName": "AWS SNS",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsSnsTrigger",
+      "displayName": "AWS SNS Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsSqs",
+      "displayName": "AWS SQS",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsTextract",
+      "displayName": "AWS Textract",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.awsTranscribe",
+      "displayName": "AWS Transcribe",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.azureCosmosDb",
+      "displayName": "Azure Cosmos DB",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.azureStorage",
+      "displayName": "Azure Storage",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.bambooHr",
+      "displayName": "BambooHR",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.bannerbear",
+      "displayName": "Bannerbear",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.baserow",
+      "displayName": "Baserow",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.beeminder",
+      "displayName": "Beeminder",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.bitbucketTrigger",
+      "displayName": "Bitbucket Trigger",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.bitly",
+      "displayName": "Bitly",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.bitwarden",
+      "displayName": "Bitwarden",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.box",
+      "displayName": "Box",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.boxTrigger",
+      "displayName": "Box Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.Brandfetch",
+      "displayName": "Brandfetch",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.bubble",
+      "displayName": "Bubble",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.calendlyTrigger",
+      "displayName": "Calendly Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.calTrigger",
+      "displayName": "Cal.com Trigger",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.chargebee",
+      "displayName": "Chargebee",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.chargebeeTrigger",
+      "displayName": "Chargebee Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.circleCi",
+      "displayName": "CircleCI",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.ciscoWebex",
+      "displayName": "Webex by Cisco",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.ciscoWebexTrigger",
+      "displayName": "Webex by Cisco Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.citrixAdc",
+      "displayName": "Netscaler ADC",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.clearbit",
+      "displayName": "Clearbit",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.clickUp",
+      "displayName": "ClickUp",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.clickUpTrigger",
+      "displayName": "ClickUp Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.clockify",
+      "displayName": "Clockify",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.clockifyTrigger",
+      "displayName": "Clockify Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.cloudflare",
+      "displayName": "Cloudflare",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.cockpit",
+      "displayName": "Cockpit",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.coda",
+      "displayName": "Coda",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.code",
+      "displayName": "Code",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.coinGecko",
+      "displayName": "CoinGecko",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.compareDatasets",
+      "displayName": "Compare Datasets",
+      "latestVersion": 2.3,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.compression",
+      "displayName": "Compression",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.contentful",
+      "displayName": "Contentful",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.convertKit",
+      "displayName": "ConvertKit",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.convertKitTrigger",
+      "displayName": "ConvertKit Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.convertToFile",
+      "displayName": "Convert to File",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.copper",
+      "displayName": "Copper",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.copperTrigger",
+      "displayName": "Copper Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.cortex",
+      "displayName": "Cortex",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.crateDb",
+      "displayName": "CrateDB",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.cron",
+      "displayName": "Cron",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger",
+        "schedule"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.crypto",
+      "displayName": "Crypto",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.currents",
+      "displayName": "Currents",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.currentsTrigger",
+      "displayName": "Currents Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.customerIo",
+      "displayName": "Customer.io",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.customerIoTrigger",
+      "displayName": "Customer.io Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.dataTable",
+      "displayName": "Data table",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "input",
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.dateTime",
+      "displayName": "Date & Time",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.debugHelper",
+      "displayName": "DebugHelper",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.deepL",
+      "displayName": "DeepL",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input",
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.demio",
+      "displayName": "Demio",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.dhl",
+      "displayName": "DHL",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.discord",
+      "displayName": "Discord",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.discourse",
+      "displayName": "Discourse",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.disqus",
+      "displayName": "Disqus",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.drift",
+      "displayName": "Drift",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.dropbox",
+      "displayName": "Dropbox",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.dropcontact",
+      "displayName": "Dropcontact",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.e2eTest",
+      "displayName": "E2E Test",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.editImage",
+      "displayName": "Edit Image",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.egoi",
+      "displayName": "E-goi",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.elasticsearch",
+      "displayName": "Elasticsearch",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.elasticSecurity",
+      "displayName": "Elastic Security",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.emailReadImap",
+      "displayName": "Email Trigger (IMAP)",
+      "latestVersion": 2.1,
+      "availableVersions": [
+        1,
+        2,
+        2.1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.emailSend",
+      "displayName": "Send Email",
+      "latestVersion": 2.1,
+      "availableVersions": [
+        1,
+        2,
+        2.1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.emelia",
+      "displayName": "Emelia",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.emeliaTrigger",
+      "displayName": "Emelia Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.erpNext",
+      "displayName": "ERPNext",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.errorTrigger",
+      "displayName": "Error Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.eventbriteTrigger",
+      "displayName": "Eventbrite Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.executeCommand",
+      "displayName": "Execute Command",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.executeWorkflow",
+      "displayName": "Execute Sub-workflow",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "displayName": "Execute Workflow Trigger",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.executionData",
+      "displayName": "Execution Data",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.extractFromFile",
+      "displayName": "Extract from File",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "displayName": "Facebook Graph API",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.facebookLeadAdsTrigger",
+      "displayName": "Facebook Lead Ads Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.facebookTrigger",
+      "displayName": "Facebook Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.figmaTrigger",
+      "displayName": "Figma Trigger (Beta)",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.filemaker",
+      "displayName": "FileMaker",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.filter",
+      "displayName": "Filter",
+      "latestVersion": 2.3,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.flow",
+      "displayName": "Flow",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.flowTrigger",
+      "displayName": "Flow Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.form",
+      "displayName": "n8n Form",
+      "latestVersion": 2.5,
+      "availableVersions": [
+        1,
+        2.3,
+        2.4,
+        2.5
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.formIoTrigger",
+      "displayName": "Form.io Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.formstackTrigger",
+      "displayName": "Formstack Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.formTrigger",
+      "displayName": "n8n Form Trigger",
+      "latestVersion": 2.5,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3,
+        2.4,
+        2.5
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.freshdesk",
+      "displayName": "Freshdesk",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.freshservice",
+      "displayName": "Freshservice",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.freshworksCrm",
+      "displayName": "Freshworks CRM",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.ftp",
+      "displayName": "FTP",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.function",
+      "displayName": "Function",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.functionItem",
+      "displayName": "Function Item",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.getResponse",
+      "displayName": "GetResponse",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.getResponseTrigger",
+      "displayName": "GetResponse Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.ghost",
+      "displayName": "Ghost",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.git",
+      "displayName": "Git",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.github",
+      "displayName": "GitHub",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.githubTrigger",
+      "displayName": "Github Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.gitlab",
+      "displayName": "GitLab",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.gitlabTrigger",
+      "displayName": "GitLab Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.gmail",
+      "displayName": "Gmail",
+      "latestVersion": 2.2,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.gmailTrigger",
+      "displayName": "Gmail Trigger",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.gong",
+      "displayName": "Gong",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleAds",
+      "displayName": "Google Ads",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleAnalytics",
+      "displayName": "Google Analytics",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleBigQuery",
+      "displayName": "Google BigQuery",
+      "latestVersion": 2.1,
+      "availableVersions": [
+        1,
+        2,
+        2.1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleBooks",
+      "displayName": "Google Books",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "input",
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleBusinessProfile",
+      "displayName": "Google Business Profile",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleBusinessProfileTrigger",
+      "displayName": "Google Business Profile Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleCalendar",
+      "displayName": "Google Calendar",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "displayName": "Google Calendar Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleChat",
+      "displayName": "Google Chat",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleCloudNaturalLanguage",
+      "displayName": "Google Cloud Natural Language",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input",
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleCloudStorage",
+      "displayName": "Google Cloud Storage",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleContacts",
+      "displayName": "Google Contacts",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleDocs",
+      "displayName": "Google Docs",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleDrive",
+      "displayName": "Google Drive",
+      "latestVersion": 3,
+      "availableVersions": [
+        1,
+        2,
+        3
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "displayName": "Google Drive Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestore",
+      "displayName": "Google Cloud Firestore",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleFirebaseRealtimeDatabase",
+      "displayName": "Google Cloud Realtime Database",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googlePerspective",
+      "displayName": "Google Perspective",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleSheets",
+      "displayName": "Google Sheets",
+      "latestVersion": 4.7,
+      "availableVersions": [
+        1,
+        2,
+        3,
+        4,
+        4.1,
+        4.2,
+        4.3,
+        4.4,
+        4.5,
+        4.6,
+        4.7
+      ],
+      "group": [
+        "input",
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "displayName": "Google Sheets Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleSlides",
+      "displayName": "Google Slides",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "input",
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleTasks",
+      "displayName": "Google Tasks",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleTranslate",
+      "displayName": "Google Translate",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "input",
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.gotify",
+      "displayName": "Gotify",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.goToWebinar",
+      "displayName": "GoToWebinar",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.grafana",
+      "displayName": "Grafana",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.graphql",
+      "displayName": "GraphQL",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.grist",
+      "displayName": "Grist",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.gSuiteAdmin",
+      "displayName": "Google Workspace Admin",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.gumroadTrigger",
+      "displayName": "Gumroad Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.hackerNews",
+      "displayName": "Hacker News",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.haloPSA",
+      "displayName": "HaloPSA",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.harvest",
+      "displayName": "Harvest",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.helpScout",
+      "displayName": "Help Scout",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.helpScoutTrigger",
+      "displayName": "Help Scout Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.highLevel",
+      "displayName": "HighLevel",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.homeAssistant",
+      "displayName": "Home Assistant",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.html",
+      "displayName": "HTML",
+      "latestVersion": 1.2,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.htmlExtract",
+      "displayName": "HTML Extract",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.httpRequest",
+      "displayName": "HTTP Request",
+      "latestVersion": 4.4,
+      "availableVersions": [
+        1,
+        2,
+        3,
+        4,
+        4.1,
+        4.2,
+        4.3,
+        4.4
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.hubspot",
+      "displayName": "HubSpot",
+      "latestVersion": 2.2,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.hubspotTrigger",
+      "displayName": "HubSpot Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.humanticAi",
+      "displayName": "Humantic AI",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.hunter",
+      "displayName": "Hunter",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.iCal",
+      "displayName": "iCalendar",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.if",
+      "displayName": "If",
+      "latestVersion": 2.3,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.intercom",
+      "displayName": "Intercom",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.interval",
+      "displayName": "Interval",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger",
+        "schedule"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.invoiceNinja",
+      "displayName": "Invoice Ninja",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.invoiceNinjaTrigger",
+      "displayName": "Invoice Ninja Trigger",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.itemLists",
+      "displayName": "Item Lists",
+      "latestVersion": 3.1,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        3,
+        3.1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.iterable",
+      "displayName": "Iterable",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.jenkins",
+      "displayName": "Jenkins",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.jinaAi",
+      "displayName": "Jina AI",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.jira",
+      "displayName": "Jira Software",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.jiraTrigger",
+      "displayName": "Jira Trigger",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.jotFormTrigger",
+      "displayName": "Jotform Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.jwt",
+      "displayName": "JWT",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.kafka",
+      "displayName": "Kafka",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.kafkaTrigger",
+      "displayName": "Kafka Trigger",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.keap",
+      "displayName": "Keap",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.keapTrigger",
+      "displayName": "Keap Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.koBoToolbox",
+      "displayName": "KoBoToolbox",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.koBoToolboxTrigger",
+      "displayName": "KoBoToolbox Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.ldap",
+      "displayName": "Ldap",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.lemlist",
+      "displayName": "Lemlist",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.lemlistTrigger",
+      "displayName": "Lemlist Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.limit",
+      "displayName": "Limit",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.line",
+      "displayName": "Line",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.linear",
+      "displayName": "Linear",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.linearTrigger",
+      "displayName": "Linear Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.lingvaNex",
+      "displayName": "LingvaNex",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.linkedIn",
+      "displayName": "LinkedIn",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.localFileTrigger",
+      "displayName": "Local File Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.loneScale",
+      "displayName": "LoneScale",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.loneScaleTrigger",
+      "displayName": "LoneScale Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.magento2",
+      "displayName": "Magento 2",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mailcheck",
+      "displayName": "Mailcheck",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mailchimp",
+      "displayName": "Mailchimp",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mailchimpTrigger",
+      "displayName": "Mailchimp Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mailerLite",
+      "displayName": "MailerLite",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mailerLiteTrigger",
+      "displayName": "MailerLite Trigger",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mailgun",
+      "displayName": "Mailgun",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mailjet",
+      "displayName": "Mailjet",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mailjetTrigger",
+      "displayName": "Mailjet Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mandrill",
+      "displayName": "Mandrill",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.manualTrigger",
+      "displayName": "Manual Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.markdown",
+      "displayName": "Markdown",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.marketstack",
+      "displayName": "Marketstack",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.matrix",
+      "displayName": "Matrix",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mattermost",
+      "displayName": "Mattermost",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mautic",
+      "displayName": "Mautic",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mauticTrigger",
+      "displayName": "Mautic Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.medium",
+      "displayName": "Medium",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.merge",
+      "displayName": "Merge",
+      "latestVersion": 3.2,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        3,
+        3.1,
+        3.2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.messageBird",
+      "displayName": "MessageBird",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.metabase",
+      "displayName": "Metabase",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.microsoftDynamicsCrm",
+      "displayName": "Microsoft Dynamics CRM",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.microsoftEntra",
+      "displayName": "Microsoft Entra ID",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.microsoftExcel",
+      "displayName": "Microsoft Excel 365",
+      "latestVersion": 2.2,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.microsoftGraphSecurity",
+      "displayName": "Microsoft Graph Security",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "displayName": "Microsoft OneDrive",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.microsoftOneDriveTrigger",
+      "displayName": "Microsoft OneDrive Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "displayName": "Microsoft Outlook",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "displayName": "Microsoft Outlook Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "displayName": "Microsoft SharePoint",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.microsoftSql",
+      "displayName": "Microsoft SQL",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.microsoftTeams",
+      "displayName": "Microsoft Teams",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        1.1,
+        2
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.microsoftTeamsTrigger",
+      "displayName": "Microsoft Teams Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.microsoftToDo",
+      "displayName": "Microsoft To Do",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mindee",
+      "displayName": "Mindee",
+      "latestVersion": 3,
+      "availableVersions": [
+        1,
+        2,
+        3
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.misp",
+      "displayName": "MISP",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mistralAi",
+      "displayName": "Mistral AI",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mocean",
+      "displayName": "Mocean",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mondayCom",
+      "displayName": "Monday.com",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mongoDb",
+      "displayName": "MongoDB",
+      "latestVersion": 1.2,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.monicaCrm",
+      "displayName": "Monica CRM",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.moveBinaryData",
+      "displayName": "Convert to/from binary data",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mqtt",
+      "displayName": "MQTT",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mqttTrigger",
+      "displayName": "MQTT Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.msg91",
+      "displayName": "MSG91",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.mySql",
+      "displayName": "MySQL",
+      "latestVersion": 2.5,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3,
+        2.4,
+        2.5
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.n8n",
+      "displayName": "n8n",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.n8nTrainingCustomerDatastore",
+      "displayName": "Customer Datastore (n8n training)",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.n8nTrainingCustomerMessenger",
+      "displayName": "Customer Messenger (n8n training)",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.n8nTrigger",
+      "displayName": "n8n Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.nasa",
+      "displayName": "NASA",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.netlify",
+      "displayName": "Netlify",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.netlifyTrigger",
+      "displayName": "Netlify Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.nextCloud",
+      "displayName": "Nextcloud",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.nocoDb",
+      "displayName": "NocoDB",
+      "latestVersion": 3,
+      "availableVersions": [
+        1,
+        2,
+        3
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.noOp",
+      "displayName": "No Operation, do nothing",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "organization"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.notion",
+      "displayName": "Notion",
+      "latestVersion": 2.2,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.notionTrigger",
+      "displayName": "Notion Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.npm",
+      "displayName": "Npm",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.odoo",
+      "displayName": "Odoo",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.okta",
+      "displayName": "Okta",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.oneSimpleApi",
+      "displayName": "One Simple API",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.onfleet",
+      "displayName": "Onfleet",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.onfleetTrigger",
+      "displayName": "Onfleet Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.openAi",
+      "displayName": "OpenAI",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.openThesaurus",
+      "displayName": "OpenThesaurus",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.openWeatherMap",
+      "displayName": "OpenWeatherMap",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.oracleDatabase",
+      "displayName": "Oracle Database",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.orbit",
+      "displayName": "Orbit",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.oura",
+      "displayName": "Oura",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.paddle",
+      "displayName": "Paddle",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.pagerDuty",
+      "displayName": "PagerDuty",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.payPal",
+      "displayName": "PayPal",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.payPalTrigger",
+      "displayName": "PayPal Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.peekalink",
+      "displayName": "Peekalink",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.perplexity",
+      "displayName": "Perplexity",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.phantombuster",
+      "displayName": "Phantombuster",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.philipsHue",
+      "displayName": "Philips Hue",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.pipedrive",
+      "displayName": "Pipedrive",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.pipedriveTrigger",
+      "displayName": "Pipedrive Trigger",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.plivo",
+      "displayName": "Plivo",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.postBin",
+      "displayName": "PostBin",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.postgres",
+      "displayName": "Postgres",
+      "latestVersion": 2.6,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3,
+        2.4,
+        2.5,
+        2.6
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.postgresTrigger",
+      "displayName": "Postgres Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.postHog",
+      "displayName": "PostHog",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.postmarkTrigger",
+      "displayName": "Postmark Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.profitWell",
+      "displayName": "ProfitWell",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.pushbullet",
+      "displayName": "Pushbullet",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.pushcut",
+      "displayName": "Pushcut",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.pushcutTrigger",
+      "displayName": "Pushcut Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.pushover",
+      "displayName": "Pushover",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.questDb",
+      "displayName": "QuestDB",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.quickbase",
+      "displayName": "Quick Base",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.quickbooks",
+      "displayName": "QuickBooks Online",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.quickChart",
+      "displayName": "QuickChart",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.rabbitmq",
+      "displayName": "RabbitMQ",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.rabbitmqTrigger",
+      "displayName": "RabbitMQ Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.raindrop",
+      "displayName": "Raindrop",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.readBinaryFile",
+      "displayName": "Read Binary File",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.readBinaryFiles",
+      "displayName": "Read Binary Files",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.readPDF",
+      "displayName": "Read PDF",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.readWriteFile",
+      "displayName": "Read/Write Files from Disk",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.reddit",
+      "displayName": "Reddit",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.redis",
+      "displayName": "Redis",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.redisTrigger",
+      "displayName": "Redis Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.removeDuplicates",
+      "displayName": "Remove Duplicates",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        1.1,
+        2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.renameKeys",
+      "displayName": "Rename Keys",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.respondToWebhook",
+      "displayName": "Respond to Webhook",
+      "latestVersion": 1.5,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.rocketchat",
+      "displayName": "RocketChat",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.rssFeedRead",
+      "displayName": "RSS Read",
+      "latestVersion": 1.2,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "displayName": "RSS Feed Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.rundeck",
+      "displayName": "Rundeck",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.s3",
+      "displayName": "S3",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.salesforce",
+      "displayName": "Salesforce",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.salesforceTrigger",
+      "displayName": "Salesforce Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.salesmate",
+      "displayName": "Salesmate",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "displayName": "Schedule Trigger",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "trigger",
+        "schedule"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.seaTable",
+      "displayName": "SeaTable",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.seaTableTrigger",
+      "displayName": "SeaTable Trigger",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.securityScorecard",
+      "displayName": "SecurityScorecard",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.segment",
+      "displayName": "Segment",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.sendGrid",
+      "displayName": "SendGrid",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.sendInBlue",
+      "displayName": "Brevo",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.sendInBlueTrigger",
+      "displayName": "Brevo Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.sendy",
+      "displayName": "Sendy",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.sentryIo",
+      "displayName": "Sentry.io",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.serviceNow",
+      "displayName": "ServiceNow",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.set",
+      "displayName": "Set",
+      "latestVersion": 3.4,
+      "availableVersions": [
+        1,
+        2,
+        3,
+        3.1,
+        3.2,
+        3.3,
+        3.4
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.shopify",
+      "displayName": "Shopify",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.shopifyTrigger",
+      "displayName": "Shopify Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.signl4",
+      "displayName": "SIGNL4",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.simulate",
+      "displayName": "Simulate",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "organization"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.simulateTrigger",
+      "displayName": "Simulate Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.slack",
+      "displayName": "Slack",
+      "latestVersion": 2.4,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3,
+        2.4
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.slackTrigger",
+      "displayName": "Slack Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.sms77",
+      "displayName": "seven",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.snowflake",
+      "displayName": "Snowflake",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.sort",
+      "displayName": "Sort",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.splitInBatches",
+      "displayName": "Split In Batches",
+      "latestVersion": 3,
+      "availableVersions": [
+        1,
+        2,
+        3
+      ],
+      "group": [
+        "organization"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.splitOut",
+      "displayName": "Split Out",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.splunk",
+      "displayName": "Splunk",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.spotify",
+      "displayName": "Spotify",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "displayName": "Spreadsheet File",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.sseTrigger",
+      "displayName": "SSE Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.ssh",
+      "displayName": "SSH",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.stackby",
+      "displayName": "Stackby",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.stickyNote",
+      "displayName": "Sticky Note",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.stopAndError",
+      "displayName": "Stop and Error",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.storyblok",
+      "displayName": "Storyblok",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.strapi",
+      "displayName": "Strapi",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.strava",
+      "displayName": "Strava",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.stravaTrigger",
+      "displayName": "Strava Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.stripe",
+      "displayName": "Stripe",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.stripeTrigger",
+      "displayName": "Stripe Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.summarize",
+      "displayName": "Summarize",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.supabase",
+      "displayName": "Supabase",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.surveyMonkeyTrigger",
+      "displayName": "SurveyMonkey Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.switch",
+      "displayName": "Switch",
+      "latestVersion": 3.4,
+      "availableVersions": [
+        1,
+        2,
+        3,
+        3.1,
+        3.2,
+        3.3,
+        3.4
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.syncroMsp",
+      "displayName": "SyncroMSP",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.taiga",
+      "displayName": "Taiga",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.taigaTrigger",
+      "displayName": "Taiga Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.tapfiliate",
+      "displayName": "Tapfiliate",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.telegram",
+      "displayName": "Telegram",
+      "latestVersion": 1.2,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.telegramTrigger",
+      "displayName": "Telegram Trigger",
+      "latestVersion": 1.2,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.theHive",
+      "displayName": "TheHive",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.theHiveProject",
+      "displayName": "TheHive 5",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.theHiveProjectTrigger",
+      "displayName": "TheHive 5 Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.theHiveTrigger",
+      "displayName": "TheHive Trigger",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.timeSaved",
+      "displayName": "Track Time Saved",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "organization"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.timescaleDb",
+      "displayName": "TimescaleDB",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.todoist",
+      "displayName": "Todoist",
+      "latestVersion": 2.2,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.togglTrigger",
+      "displayName": "Toggl Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.totp",
+      "displayName": "TOTP",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.travisCi",
+      "displayName": "TravisCI",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.trello",
+      "displayName": "Trello",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.trelloTrigger",
+      "displayName": "Trello Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.twake",
+      "displayName": "Twake",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.twilio",
+      "displayName": "Twilio",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.twilioTrigger",
+      "displayName": "Twilio Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.twist",
+      "displayName": "Twist",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.twitter",
+      "displayName": "X (Formerly Twitter)",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.typeformTrigger",
+      "displayName": "Typeform Trigger",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.unleashedSoftware",
+      "displayName": "Unleashed Software",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.uplead",
+      "displayName": "Uplead",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.uproc",
+      "displayName": "uProc",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.uptimeRobot",
+      "displayName": "UptimeRobot",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.urlScanIo",
+      "displayName": "urlscan.io",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.venafiTlsProtectCloud",
+      "displayName": "Venafi TLS Protect Cloud",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.venafiTlsProtectCloudTrigger",
+      "displayName": "Venafi TLS Protect Cloud Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.venafiTlsProtectDatacenter",
+      "displayName": "Venafi TLS Protect Datacenter",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.venafiTlsProtectDatacenterTrigger",
+      "displayName": "Venafi TLS Protect Datacenter Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.vero",
+      "displayName": "Vero",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.vonage",
+      "displayName": "Vonage",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.wait",
+      "displayName": "Wait",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "organization"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.webflow",
+      "displayName": "Webflow",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.webflowTrigger",
+      "displayName": "Webflow Trigger",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.webhook",
+      "displayName": "Webhook",
+      "latestVersion": 2.1,
+      "availableVersions": [
+        1,
+        1.1,
+        2,
+        2.1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.wekan",
+      "displayName": "Wekan",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.whatsApp",
+      "displayName": "WhatsApp Business Cloud",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "displayName": "WhatsApp Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.wise",
+      "displayName": "Wise",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.wiseTrigger",
+      "displayName": "Wise Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.wooCommerce",
+      "displayName": "WooCommerce",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.wooCommerceTrigger",
+      "displayName": "WooCommerce Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.wordpress",
+      "displayName": "Wordpress",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.workableTrigger",
+      "displayName": "Workable Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.workflowTrigger",
+      "displayName": "Workflow Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "displayName": "Write Binary File",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.wufooTrigger",
+      "displayName": "Wufoo Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.xero",
+      "displayName": "Xero",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.xml",
+      "displayName": "XML",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.yourls",
+      "displayName": "Yourls",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.youTube",
+      "displayName": "YouTube",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.zammad",
+      "displayName": "Zammad",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.zendesk",
+      "displayName": "Zendesk",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.zendeskTrigger",
+      "displayName": "Zendesk Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.zohoCrm",
+      "displayName": "Zoho CRM",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.zoom",
+      "displayName": "Zoom",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.zulip",
+      "displayName": "Zulip",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "output"
+      ]
+    }
+  ]
+}

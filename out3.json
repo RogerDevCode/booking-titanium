@@ -1,0 +1,788 @@
+{
+  "id": "2246",
+  "finished": true,
+  "mode": "error",
+  "retryOf": null,
+  "retrySuccessId": null,
+  "status": "success",
+  "createdAt": "2026-03-14T14:20:38.991Z",
+  "startedAt": "2026-03-14T14:20:39.004Z",
+  "stoppedAt": "2026-03-14T14:20:41.232Z",
+  "deletedAt": null,
+  "workflowId": "B1VnkirO5dF20MHg",
+  "waitTill": null,
+  "storedAt": "db",
+  "data": {
+    "version": 1,
+    "startData": {},
+    "resultData": {
+      "runData": {
+        "Error Trigger": [
+          {
+            "startTime": 1773498039011,
+            "executionIndex": 0,
+            "source": [],
+            "hints": [],
+            "executionTime": 1,
+            "metadata": {
+              "parentExecution": {
+                "executionId": "2245",
+                "workflowId": "bT0r2EmUqGjc6Ioz",
+                "executionContext": {
+                  "version": 1,
+                  "establishedAt": 1773498038586,
+                  "source": "webhook",
+                  "triggerNode": {
+                    "name": "Record Result Webhook",
+                    "type": "n8n-nodes-base.webhook"
+                  }
+                }
+              }
+            },
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "execution": {
+                        "id": "2245",
+                        "url": "https://n8n.stax.ink/workflow/bT0r2EmUqGjc6Ioz/executions/2245",
+                        "error": {
+                          "level": "warning",
+                          "tags": {},
+                          "description": "Failed query: INSERT INTO circuit_breaker_state (\n    service_id, state, failure_count, success_count, \n    last_failure_at, last_success_at, opened_at, last_error_message\n)\nVALUES (\n    $1::text, \n    CASE WHEN $2::text = 'failure' THEN 'open' ELSE 'closed' END,\n    CASE WHEN $2::text = 'failure' THEN 1 ELSE 0 END, \n    CASE WHEN $2::text = 'success' THEN 1 ELSE 0 END, \n    CASE WHEN $2::text = 'failure' THEN NOW() ELSE NULL END,\n    CASE WHEN $2::text = 'success' THEN NOW() ELSE NULL END,\n    CASE WHEN $2::text = 'failure' THEN NOW() ELSE NULL END,\n    CASE WHEN $2::text = 'failure' THEN $3::text ELSE NULL END\n)\nON CONFLICT (service_id) DO UPDATE SET \n    failure_count = CASE \n      WHEN $2::text = 'success' THEN 0\n      ELSE circuit_breaker_state.failure_count + 1\n    END,\n    success_count = CASE \n      WHEN $2::text = 'success' THEN \n        CASE WHEN circuit_breaker_state.state = 'half-open' THEN circuit_breaker_state.success_count + 1 ELSE 1 END\n      ELSE 0\n    END,\n    state = CASE \n      WHEN $2::text = 'failure' AND circuit_breaker_state.failure_count + 1 >= circuit_breaker_state.failure_threshold THEN 'open'\n      WHEN $2::text = 'success' AND circuit_breaker_state.state = 'half-open' AND circuit_breaker_state.success_count + 1 >= circuit_breaker_state.success_threshold THEN 'closed'\n      ELSE circuit_breaker_state.state\n    END,\n    opened_at = CASE \n      WHEN $2::text = 'failure' AND circuit_breaker_state.state != 'open' AND circuit_breaker_state.failure_count + 1 >= circuit_breaker_state.failure_threshold THEN NOW()\n      ELSE circuit_breaker_state.opened_at\n    END,\n    last_failure_at = CASE WHEN $2::text = 'failure' THEN NOW() ELSE circuit_breaker_state.last_failure_at END,\n    last_success_at = CASE WHEN $2::text = 'success' THEN NOW() ELSE circuit_breaker_state.last_success_at END,\n    last_error_message = CASE WHEN $2::text = 'failure' THEN $3::text ELSE circuit_breaker_state.last_error_message END\nRETURNING *;",
+                          "timestamp": 1773498038983,
+                          "context": {},
+                          "functionality": "regular",
+                          "name": "NodeOperationError",
+                          "node": {
+                            "parameters": {
+                              "resource": "database",
+                              "operation": "executeQuery",
+                              "query": "INSERT INTO circuit_breaker_state (\n    service_id, state, failure_count, success_count, \n    last_failure_at, last_success_at, opened_at, last_error_message\n)\nVALUES (\n    $1::text, \n    CASE WHEN $2::text = 'failure' THEN 'open' ELSE 'closed' END,\n    CASE WHEN $2::text = 'failure' THEN 1 ELSE 0 END, \n    CASE WHEN $2::text = 'success' THEN 1 ELSE 0 END, \n    CASE WHEN $2::text = 'failure' THEN NOW() ELSE NULL END,\n    CASE WHEN $2::text = 'success' THEN NOW() ELSE NULL END,\n    CASE WHEN $2::text = 'failure' THEN NOW() ELSE NULL END,\n    CASE WHEN $2::text = 'failure' THEN $3::text ELSE NULL END\n)\nON CONFLICT (service_id) DO UPDATE SET \n    failure_count = CASE \n      WHEN $2::text = 'success' THEN 0\n      ELSE circuit_breaker_state.failure_count + 1\n    END,\n    success_count = CASE \n      WHEN $2::text = 'success' THEN \n        CASE WHEN circuit_breaker_state.state = 'half-open' THEN circuit_breaker_state.success_count + 1 ELSE 1 END\n      ELSE 0\n    END,\n    state = CASE \n      WHEN $2::text = 'failure' AND circuit_breaker_state.failure_count + 1 >= circuit_breaker_state.failure_threshold THEN 'open'\n      WHEN $2::text = 'success' AND circuit_breaker_state.state = 'half-open' AND circuit_breaker_state.success_count + 1 >= circuit_breaker_state.success_threshold THEN 'closed'\n      ELSE circuit_breaker_state.state\n    END,\n    opened_at = CASE \n      WHEN $2::text = 'failure' AND circuit_breaker_state.state != 'open' AND circuit_breaker_state.failure_count + 1 >= circuit_breaker_state.failure_threshold THEN NOW()\n      ELSE circuit_breaker_state.opened_at\n    END,\n    last_failure_at = CASE WHEN $2::text = 'failure' THEN NOW() ELSE circuit_breaker_state.last_failure_at END,\n    last_success_at = CASE WHEN $2::text = 'success' THEN NOW() ELSE circuit_breaker_state.last_success_at END,\n    last_error_message = CASE WHEN $2::text = 'failure' THEN $3::text ELSE circuit_breaker_state.last_error_message END\nRETURNING *;",
+                              "options": {
+                                "queryReplacement": "={{ $json.service_id }}, {{ $json.result }}, {{ $json.error_message || '' }}"
+                              }
+                            },
+                            "name": "Record Result",
+                            "type": "n8n-nodes-base.postgres",
+                            "typeVersion": 2.6,
+                            "position": [
+                              500,
+                              0
+                            ],
+                            "credentials": {
+                              "postgres": {
+                                "id": "5LzvCP9BsQwCi9Z0",
+                                "name": "Postgres account"
+                              }
+                            },
+                            "id": "cb_record_014"
+                          },
+                          "messages": [],
+                          "message": "there is no parameter $3",
+                          "stack": "NodeOperationError: there is no parameter $3\n    at parsePostgresError (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/Postgres/v2/helpers/utils.ts:123:9)\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/Postgres/v2/helpers/utils.ts:267:19\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at ExecuteContext.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/Postgres/v2/actions/database/executeQuery.operation.ts:149:9)\n    at ExecuteContext.router (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/Postgres/v2/actions/router.ts:41:17)\n    at ExecuteContext.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/Postgres/v2/PostgresV2.node.ts:26:10)\n    at WorkflowExecute.executeNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+exporter-trace-otlp_9f358c3eeaef0d2736f54ac9757ada43/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1043:8)\n    at WorkflowExecute.runNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+exporter-trace-otlp_9f358c3eeaef0d2736f54ac9757ada43/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1222:11)\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+exporter-trace-otlp_9f358c3eeaef0d2736f54ac9757ada43/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1665:27\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+exporter-trace-otlp_9f358c3eeaef0d2736f54ac9757ada43/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:2308:11"
+                        },
+                        "lastNodeExecuted": "Record Result",
+                        "mode": "webhook",
+                        "executionContext": {
+                          "version": 1,
+                          "establishedAt": 1773498038586,
+                          "source": "webhook",
+                          "triggerNode": {
+                            "name": "Record Result Webhook",
+                            "type": "n8n-nodes-base.webhook"
+                          }
+                        }
+                      },
+                      "workflow": {
+                        "id": "bT0r2EmUqGjc6Ioz",
+                        "name": "CB_02_Record_Result"
+                      }
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Global Config": [
+          {
+            "startTime": 1773498039012,
+            "executionIndex": 1,
+            "source": [
+              {
+                "previousNode": "Error Trigger",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 1,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "N8N_EDITOR_BASE_URL": "https://n8n.stax.ink",
+                      "TELEGRAM_ADMIN_ID": "5391760292",
+                      "BUSINESS_EMAIL": "baba.orere@gmail.com"
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Format Error Payload": [
+          {
+            "startTime": 1773498039013,
+            "executionIndex": 2,
+            "source": [
+              {
+                "previousNode": "Global Config",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 5,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "workflow_id": "UNKNOWN",
+                      "workflow_name": "UNKNOWN",
+                      "execution_id": "MANUAL_TEST_ID",
+                      "error_message": "Unknown Error",
+                      "error_stack": "",
+                      "last_node": "",
+                      "mode": "manual"
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Build Safe SQL": [
+          {
+            "startTime": 1773498039018,
+            "executionIndex": 3,
+            "source": [
+              {
+                "previousNode": "Format Error Payload",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 6,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "query": "INSERT INTO system_logs (workflow_name, execution_id, level, message, details) VALUES ('UNKNOWN', 'MANUAL_TEST_ID', 'ERROR', 'Unknown Error', '{\"workflow_id\":\"UNKNOWN\",\"workflow_name\":\"UNKNOWN\",\"execution_id\":\"MANUAL_TEST_ID\",\"error_message\":\"Unknown Error\",\"error_stack\":\"\",\"last_node\":\"\",\"mode\":\"manual\"}') RETURNING id;",
+                      "workflow_id": "UNKNOWN",
+                      "workflow_name": "UNKNOWN",
+                      "execution_id": "MANUAL_TEST_ID",
+                      "error_message": "Unknown Error",
+                      "error_stack": "",
+                      "last_node": "",
+                      "mode": "manual"
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Log to Postgres": [
+          {
+            "startTime": 1773498039024,
+            "executionIndex": 4,
+            "source": [
+              {
+                "previousNode": "Build Safe SQL",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 168,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "id": 50
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Telegram Alert": [
+          {
+            "startTime": 1773498039192,
+            "executionIndex": 5,
+            "source": [
+              {
+                "previousNode": "Log to Postgres",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 963,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "ok": true,
+                      "result": {
+                        "message_id": 2279,
+                        "from": {
+                          "id": 8581822135,
+                          "is_bot": true,
+                          "first_name": "AutoAgenda",
+                          "username": "setcalendarbot"
+                        },
+                        "chat": {
+                          "id": 5391760292,
+                          "first_name": "Roger",
+                          "last_name": "Gallegos",
+                          "type": "private"
+                        },
+                        "date": 1773498039,
+                        "text": "🚨 ERROR en N8N Workflow 🚨\n\nWorkflow: UNKNOWN\nError: Unknown Error\nNode: \nExec ID: MANUALTESTID\n\nVer Detalles\n\nThis message was sent automatically with n8n",
+                        "entities": [
+                          {
+                            "offset": 0,
+                            "length": 27,
+                            "type": "bold"
+                          },
+                          {
+                            "offset": 29,
+                            "length": 9,
+                            "type": "bold"
+                          },
+                          {
+                            "offset": 47,
+                            "length": 6,
+                            "type": "bold"
+                          },
+                          {
+                            "offset": 68,
+                            "length": 5,
+                            "type": "bold"
+                          },
+                          {
+                            "offset": 75,
+                            "length": 8,
+                            "type": "bold"
+                          },
+                          {
+                            "offset": 90,
+                            "length": 4,
+                            "type": "italic"
+                          },
+                          {
+                            "offset": 98,
+                            "length": 12,
+                            "type": "text_link",
+                            "url": "https://n8n.stax.ink/workflow/UNKNOWN/executions/MANUAL_TEST_ID"
+                          },
+                          {
+                            "offset": 112,
+                            "length": 41,
+                            "type": "italic"
+                          },
+                          {
+                            "offset": 153,
+                            "length": 3,
+                            "type": "text_link",
+                            "url": "https://n8n.io/?utm_source=n8n-internal&utm_medium=powered_by&utm_campaign=n8n-nodes-base.telegram_dcff9bffd57bf60f63303c902ff8a9da3e3cc1df7b0fee28dae6d77c5d352c30"
+                          }
+                        ],
+                        "link_preview_options": {
+                          "is_disabled": true
+                        }
+                      }
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Gmail Alert": [
+          {
+            "startTime": 1773498040155,
+            "executionIndex": 6,
+            "source": [
+              {
+                "previousNode": "Telegram Alert",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 1065,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "error": "The provided authorization grant (e.g., authorization code, resource owner credentials) or refresh token is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client. (item 0)"
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Standard Contract Output": [
+          {
+            "startTime": 1773498041220,
+            "executionIndex": 7,
+            "source": [
+              {
+                "previousNode": "Gmail Alert",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 12,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "success": true,
+                      "error_code": null,
+                      "error_message": null,
+                      "data": {
+                        "log_id": 50,
+                        "telegram_sent": true,
+                        "gmail_sent": false
+                      },
+                      "_meta": {
+                        "source": "NN_00_Global_Error_Handler",
+                        "timestamp": "2026-03-14T14:20:41.231Z",
+                        "workflow_id": "NN_00",
+                        "version": "1.2.0"
+                      }
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "lastNodeExecuted": "Standard Contract Output"
+    },
+    "executionData": {
+      "contextData": {},
+      "nodeExecutionStack": [],
+      "metadata": {},
+      "waitingExecution": {},
+      "waitingExecutionSource": {},
+      "runtimeData": {
+        "version": 1,
+        "establishedAt": 1773498039011,
+        "source": "error",
+        "triggerNode": {
+          "name": "Error Trigger",
+          "type": "n8n-nodes-base.errorTrigger"
+        },
+        "parentExecutionId": "2245"
+      }
+    }
+  },
+  "workflowData": {
+    "id": "B1VnkirO5dF20MHg",
+    "name": "NN_00_Global_Error_Handler",
+    "nodes": [
+      {
+        "parameters": {
+          "notice": ""
+        },
+        "name": "When clicking 'Test workflow'",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          208,
+          224
+        ],
+        "id": "5384f1c5-05df-4089-b08d-4988cccd1b08"
+      },
+      {
+        "parameters": {
+          "notice": ""
+        },
+        "name": "Error Trigger",
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          208,
+          432
+        ],
+        "id": "30611f2a-eabf-43ad-9101-f150f8ec6f6b"
+      },
+      {
+        "parameters": {
+          "events": "worklfow_call",
+          "inputSource": "passthrough"
+        },
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          208,
+          640
+        ],
+        "id": "80e15af4-d972-4836-9713-caaa560ac4ea"
+      },
+      {
+        "parameters": {
+          "multipleMethods": false,
+          "httpMethod": "POST",
+          "path": "nn-00-global-error",
+          "authentication": "none",
+          "responseMode": "lastNode",
+          "responseData": "firstEntryJson",
+          "options": {}
+        },
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          208,
+          848
+        ],
+        "webhookId": "nn-00-global-error",
+        "id": "26ca229f-2a25-4d2c-960e-b68d733b3d93"
+      },
+      {
+        "parameters": {
+          "mode": "manual",
+          "duplicateItem": false,
+          "assignments": {
+            "assignments": [
+              {
+                "id": "N8N_EDITOR_BASE_URL",
+                "name": "N8N_EDITOR_BASE_URL",
+                "value": "https://n8n.stax.ink",
+                "type": "string"
+              },
+              {
+                "id": "TELEGRAM_ADMIN_ID",
+                "name": "TELEGRAM_ADMIN_ID",
+                "value": "5391760292",
+                "type": "string"
+              },
+              {
+                "id": "BUSINESS_EMAIL",
+                "name": "BUSINESS_EMAIL",
+                "value": "baba.orere@gmail.com",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": false,
+          "options": {}
+        },
+        "name": "Global Config",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          480,
+          432
+        ],
+        "id": "b95e559c-d5cb-4269-8c0c-5cfd347241be"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "/*\n  Format Error Payload — isolates 4 sources into common format.\n  - Error Trigger: { execution, workflow }\n  - Webhook / Execute / Manual: manual payload\n*/\nconst incoming = $input.first()?.json || {};\nconst isSystemError = !!incoming.execution;\nconst payload = isSystemError ? incoming : incoming.body || incoming;\n\nreturn {\n  workflow_id: payload.workflow?.id || \"UNKNOWN\",\n  workflow_name: payload.workflow?.name || \"UNKNOWN\",\n  execution_id: payload.execution?.id || \"MANUAL_TEST_ID\",\n  error_message: payload.execution?.error?.message || payload.error_message || \"Unknown Error\",\n  error_stack: payload.execution?.error?.stack || \"\",\n  last_node: payload.execution?.lastNodeExecuted || \"\",\n  mode: payload.execution?.mode || \"manual\"\n};",
+          "notice": ""
+        },
+        "name": "Format Error Payload",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          700,
+          432
+        ],
+        "id": "12041585-ed88-4d8c-a1fd-ad644bbaf715"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "// VRF — Build Safe SQL (SEC_02: escape backslash + single quote + length limit)\nconst esc = (v) => String(v || '').replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nconst data = $input.first()?.json || {};\n\nconst wfName = esc(data.workflow_name);\nconst execId = esc(data.execution_id);\nconst errMsg = esc(data.error_message);\nconst details = esc(JSON.stringify(data));\n\nreturn [{\n  json: {\n    query: `INSERT INTO system_logs (workflow_name, execution_id, level, message, details) VALUES ('${wfName}', '${execId}', 'ERROR', '${errMsg}', '${details}') RETURNING id;`,\n    ...data\n  }\n}];",
+          "notice": ""
+        },
+        "name": "Build Safe SQL",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          900,
+          432
+        ],
+        "id": "bdfd215b-ed1e-42bf-a2b8-3046797f324a"
+      },
+      {
+        "parameters": {
+          "resource": "database",
+          "operation": "executeQuery",
+          "query": "{{ $node[\"Build Safe SQL\"].json.query }}",
+          "options": {}
+        },
+        "name": "Log to Postgres",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          1100,
+          432
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "5LzvCP9BsQwCi9Z0",
+            "name": "Postgres account"
+          }
+        },
+        "continueOnFail": true,
+        "id": "8dfd9df3-49eb-4680-835f-02d4d24d3516"
+      },
+      {
+        "parameters": {
+          "resource": "message",
+          "operation": "sendMessage",
+          "chatId": "={{ $node[\"Global Config\"].json.TELEGRAM_ADMIN_ID }}",
+          "text": "=*🚨 ERROR en N8N Workflow 🚨*\n\n*Workflow:* {{ $node[\"Format Error Payload\"].json[\"workflow_name\"] }}\n*Error:* {{ $node[\"Format Error Payload\"].json[\"error_message\"] }}\n*Node:* {{ $node[\"Format Error Payload\"].json[\"last_node\"] }}\n*Exec ID:* {{ $node[\"Format Error Payload\"].json[\"execution_id\"] }}\n\n[Ver Detalles]({{ $node[\"Global Config\"].json.N8N_EDITOR_BASE_URL }}/workflow/{{ $node[\"Format Error Payload\"].json[\"workflow_id\"] }}/executions/{{ $node[\"Format Error Payload\"].json[\"execution_id\"] }})",
+          "replyMarkup": "none",
+          "additionalFields": {
+            "parse_mode": "Markdown"
+          }
+        },
+        "name": "Telegram Alert",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1350,
+          432
+        ],
+        "credentials": {
+          "telegramApi": {
+            "id": "WR4umwQYS9Gx0cTO",
+            "name": "Telegram account"
+          }
+        },
+        "continueOnFail": true,
+        "id": "696da924-a9a7-4ed0-8117-c268d51428c7"
+      },
+      {
+        "parameters": {
+          "authentication": "oAuth2",
+          "resource": "message",
+          "operation": "send",
+          "sendTo": "={{ $node[\"Global Config\"].json.BUSINESS_EMAIL }}",
+          "subject": "=ERROR N8N: {{ $node[\"Format Error Payload\"].json[\"workflow_name\"] }}",
+          "emailType": "html",
+          "message": "=Se ha producido un error crítico de ejecución.\n\nMensaje: {{ $node[\"Format Error Payload\"].json[\"error_message\"] }}\nNodo: {{ $node[\"Format Error Payload\"].json[\"last_node\"] }}\nEjecución: {{ $node[\"Global Config\"].json.N8N_EDITOR_BASE_URL }}/workflow/{{ $node[\"Format Error Payload\"].json[\"workflow_id\"] }}/executions/{{ $node[\"Format Error Payload\"].json[\"execution_id\"] }}\n\nStack:\n{{ $node[\"Format Error Payload\"].json[\"error_stack\"] }}",
+          "options": {}
+        },
+        "name": "Gmail Alert",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          1600,
+          432
+        ],
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "2oXMGEYDP70ILkBs",
+            "name": "Gmail account"
+          }
+        },
+        "continueOnFail": true,
+        "id": "932863da-9cf4-440b-b759-16a3acb51ab7"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "return {\n  success: true,\n  error_code: null,\n  error_message: null,\n  data: {\n    log_id: $node[\"Log to Postgres\"].json?.id || null,\n    telegram_sent: !$node[\"Telegram Alert\"].json?.error,\n    gmail_sent: !$node[\"Gmail Alert\"].json?.error\n  },\n  _meta: {\n    source: \"NN_00_Global_Error_Handler\",\n    timestamp: new Date().toISOString(),\n    workflow_id: \"NN_00\",\n    version: \"1.2.0\"\n  }\n};",
+          "notice": ""
+        },
+        "name": "Standard Contract Output",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1850,
+          432
+        ],
+        "id": "61a66624-bc49-45cf-84c6-806a74036ef5"
+      }
+    ],
+    "connections": {
+      "When clicking 'Test workflow'": {
+        "main": [
+          [
+            {
+              "node": "Global Config",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "Global Config",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Global Config",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Global Config",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Global Config": {
+        "main": [
+          [
+            {
+              "node": "Format Error Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Error Payload": {
+        "main": [
+          [
+            {
+              "node": "Build Safe SQL",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Safe SQL": {
+        "main": [
+          [
+            {
+              "node": "Log to Postgres",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log to Postgres": {
+        "main": [
+          [
+            {
+              "node": "Telegram Alert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram Alert": {
+        "main": [
+          [
+            {
+              "node": "Gmail Alert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gmail Alert": {
+        "main": [
+          [
+            {
+              "node": "Standard Contract Output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "callerPolicy": "workflowsFromSameOwner",
+      "availableInMCP": false
+    }
+  },
+  "customData": {}
+}

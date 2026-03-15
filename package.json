@@ -1,0 +1,45 @@
+{
+  "name": "booking-titanium",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:orchestrator": "jest orchestrator.test.ts --verbose --runInBand",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/luxon": "^3.7.1",
+    "@types/node": "^25.5.0",
+    "@types/pg": "^8.18.0",
+    "axios": "^1.13.6",
+    "dotenv": "^17.3.1",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "fast-glob": "^3.3.3",
+    "file-type": "^21.3.2",
+    "googleapis": "^171.4.0",
+    "mime-types": "^3.0.2",
+    "n8n": "^1.17.0",
+    "n8n-nodes-base": "^1.121.18",
+    "n8n-workflow": "^2.10.0",
+    "p-limit": "^7.3.0",
+    "pdf-lib": "^1.17.1",
+    "pg": "^8.20.0"
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "name": "DLQ_Manager",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "dlq/add",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Add to DLQ Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "webhookId": "dlq-add"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate and format DLQ input\nconst rawInput = $input.first().json;\nconst input = rawInput.body || rawInput;\n\n// Required fields\nconst required = ['failure_reason', 'original_payload'];\nfor (const field of required) {\n  if (!input[field]) {\n    throw new Error(`Missing required field: ${field}`);\n  }\n}\n\n// Prepare flat object for Postgres\nreturn [{\n  json: {\n    payload: {\n      booking_id: parseInt(input.booking_id) || 0,\n      idempotency_key: (input.idempotency_key || '').toString(),\n      provider_id: parseInt(input.provider_id) || 1,\n      service_id: parseInt(input.service_id) || 1,\n      start_time: input.start_time || new Date().toISOString(),\n      customer_id: (input.customer_id || input.chat_id || '').toString(),\n      chat_id: (input.chat_id || 0).toString(),\n      failure_reason: (input.failure_reason || 'unknown').toString(),\n      last_error_message: (input.error_message || input.failure_reason || 'Unknown error').toString(),\n      last_error_stack: (input.error_stack || '').toString(),\n      original_payload: input.original_payload,\n      context_data: input.context_data || {\n        workflow_id: input.workflow_id || 'UNKNOWN',\n        execution_id: input.execution_id || 'MANUAL',\n        failed_at: new Date().toISOString()\n      }\n    }\n  }\n}];",
+        "options": {}
+      },
+      "name": "Validate DLQ Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [250, 0]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH data AS (SELECT $1::jsonb as doc)\nSELECT booking_dlq_add(\n  (doc->>'booking_id')::int, \n  (doc->>'idempotency_key')::text, \n  (doc->>'provider_id')::int, \n  (doc->>'service_id')::int, \n  (doc->>'start_time')::timestamp, \n  (doc->>'customer_id')::text, \n  (doc->>'chat_id')::text, \n  (doc->>'failure_reason')::text, \n  (doc->>'last_error_message')::text, \n  (doc->>'last_error_stack')::text, \n  (doc->'original_payload')::jsonb, \n  (doc->'context_data')::jsonb\n) FROM data;",
+        "options": {
+          "queryReplacement": "={{ JSON.stringify($json.payload) }}"
+        }
+      },
+      "name": "Add to DLQ DB",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [500, 0],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Return DLQ addition result\nconst dbResult = $('Add to DLQ DB').first().json;\nconst payload = $('Validate DLQ Input').first().json.payload;\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      dlq_id: dbResult.booking_dlq_add,\n      added_to_dlq: true,\n      failure_count: 1,\n      next_retry_at: new Date(Date.now() + 2 * 60000).toISOString(),\n      message: `Booking added to Dead Letter Queue. ID: ${dbResult.booking_dlq_add}`,\n      idempotency_key: payload.idempotency_key\n    },\n    _meta: {\n      source: 'DLQ_MANAGER',\n      timestamp: new Date().toISOString(),\n      version: '1.1.0'\n    }\n  }\n}];",
+        "options": {}
+      },
+      "name": "DLQ Add Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 0]
+    },
+    {
+      "parameters": {
+        "path": "dlq/status",
+        "httpMethod": "GET",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "DLQ Status Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 300],
+      "webhookId": "dlq-status"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM v_booking_dlq_status;"
+      },
+      "name": "Get DLQ Status",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [250, 300],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Return DLQ status summary\nconst status = $('Get DLQ Status').all();\n\nconst summary = status.reduce((acc, item) => {\n  acc[item.json.status] = {\n    count: item.json.count,\n    oldest: item.json.oldest_failure,\n    avg_failures: parseFloat(item.json.avg_failure_count || 0).toFixed(2)\n  };\n  return acc;\n}, {});\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      summary: summary,\n      total_items: status.reduce((sum, item) => sum + (item.json.count || 0), 0),\n      generated_at: new Date().toISOString()\n    },\n    _meta: {\n      source: 'DLQ_MANAGER',\n      timestamp: new Date().toISOString(),\n      version: '1.0.0'\n    }\n  }\n}];",
+        "options": {}
+      },
+      "name": "DLQ Status Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300]
+    }
+  ],
+  "connections": {
+    "Add to DLQ Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate DLQ Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate DLQ Input": {
+      "main": [
+        [
+          {
+            "node": "Add to DLQ DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to DLQ DB": {
+      "main": [
+        [
+          {
+            "node": "DLQ Add Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DLQ Status Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get DLQ Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get DLQ Status": {
+      "main": [
+        [
+          {
+            "node": "DLQ Status Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

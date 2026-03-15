@@ -1,0 +1,18 @@
+--- extract-gcal.ts
++++ extract-gcal.ts
+@@ -194,14 +194,15 @@
+   const calendar = google.calendar({ version: "v3", auth: apiKey });
+   const timeMin = `${fecha}T00:00:00${TIMEZONE_OFFSET}`;
+   const timeMax = `${fecha}T23:59:59${TIMEZONE_OFFSET}`;
+ 
+   console.log(`\n[INFO] Consultando eventos: ${timeMin} → ${timeMax}`);
+ 
+   try {
+     const res = await calendar.events.list({
++      key: apiKey,
+       calendarId: "primary",
+       timeMin,
+       timeMax,
+       singleEvents: true,
+       orderBy: "startTime",
+ 

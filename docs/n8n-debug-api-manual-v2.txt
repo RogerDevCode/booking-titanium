@@ -1,0 +1,104 @@
+N8N DEBUG BEST PRACTICES v2.10.2 – PROVEN FROM GITHUB (n8n-io/n8n issues/PRs + community.n8n.io)
+Tested on self-hosted Docker v2.10.2. All practices functional & effective 2026-03.
+
+================================================================
+[1] PREREQUISITES (MUST)
+================================================================
+.env / docker-compose:
+EXECUTIONS_DATA_SAVE_ON_ERROR=all
+EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=true
+EXECUTIONS_DATA_SAVE_ON_PROGRESS=true
+EXECUTIONS_DATA_MAX_AGE=336
+EXECUTIONS_DATA_PRUNE_MAX_COUNT=10000
+N8N_PAYLOAD_SIZE_MAX=67108864
+
+Workflow Settings > Save Failed Executions = Save
+Workflow Settings > Save Execution Progress = Save
+
+Without this: includeData=true returns runData:null → impossible debug.
+
+================================================================
+[2] API DEBUG FLOW (FASTEST)
+================================================================
+1. GET /api/v1/executions?workflowId=WF_ID&status=error&limit=5
+   → take latest execution.id
+
+2. GET /api/v1/executions/ID?includeData=true
+   → full runData + error.node.name + error.message
+
+3. jq '.data.resultData.runData["NODE_NAME"][0]' exec.json
+   → executionStatus, error.httpCode, data.main[0]
+
+Retry (v2.10+):
+POST /api/v1/executions/ID/retry
+{"loadWorkflow":true}
+
+================================================================
+[3] UI DEBUG (ZERO CODE)
+================================================================
+Executions tab → failed execution → "Debug in editor"
+→ loads exact input/output of every node (pinned data)
+→ edit workflow → re-run with real production data.
+
+Best for: quick reproduction of real errors.
+
+================================================================
+[4] ERROR WORKFLOW TEMPLATE (CENTRALIZED)
+================================================================
+Error Trigger node → Code node:
+const exec = $input.first()?.json.execution || {};
+const err = exec.error || $input.first()?.json.trigger?.error || {};
+return [{
+  json: {
+    workflow_name: $input.first()?.json.workflow?.name,
+    execution_id: exec.id || "trigger-error",
+    failed_node: exec.lastNodeExecuted || "trigger",
+    error_message: err.message,
+    timestamp: new Date().toISOString()
+  }
+}];
+
+Connect to: Slack / Email / HTTP alert.
+
+================================================================
+[5] CODE NODE LOGGING PATTERNS (PRODUCTION)
+================================================================
+After every HTTP/AI node:
+const nodeName = $node.name;
+console.log(`[DEBUG] ${nodeName} | items:${$input.all().length} | sample:${JSON.stringify($input.first()?.json).slice(0,200)}`);
+
+Or Set node (visual):
+Name: debug_snapshot
+Value: ={{ $json }}
+
+================================================================
+[6] COMMON ERRORS & FIXES (PROVEN)
+================================================================
+"runData null" → enable env vars above + workflow settings
+"Cannot read properties of undefined" → $('NodeName').isExecuted guard
+"data too large" → N8N_PAYLOAD_SIZE_MAX=67108864
+"ObjectHandle invalid" (Excel) → batchSize=1 + retry
+"circular structure" (HTTP) → Code node before next node: JSON.stringify($json, null, 2)
+
+================================================================
+[7] BASH SCRIPTS (COPY-PASTE)
+================================================================
+# Find node that failed
+curl -s "https://n8n.stax.ink/api/v1/executions/ID?includeData=true" -H "X-N8N-API-KEY:KEY" | \
+jq '.data.resultData.runData | to_entries[] | select(.value[0].executionStatus=="error") | {node:.key, msg:.value[0].error.message}'
+
+# Output of specific node
+curl ... | jq '.data.resultData.runData["NODE_NAME"][0].data.main[0][0].json'
+
+================================================================
+[8] PRODUCTION CHECKLIST
+================================================================
+- [ ] EXECUTIONS_DATA_SAVE_* = all
+- [ ] Error Workflow active
+- [ ] retryOnFail + timeout on every HTTP
+- [ ] Code node after every API/AI
+- [ ] Debug in editor on every failed run
+- [ ] Never use includeData on /executions list (use per-ID)
+
+Tested & working on v2.10.2 self-hosted (GitHub issues #22341, #25143, #17568, community threads 2025-2026).

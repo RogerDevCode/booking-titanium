@@ -1,0 +1,123 @@
+{
+  "name": "DB_Get_User_Profile",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"chat_id\": 123456789}"
+      },
+      "id": "trigger",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Robust chat_id validation\nconst raw = $input.first()?.json || {};\nlet chatId = raw.chat_id;\n\n// Handle string \"null\", actual null, or undefined\nif (chatId === \"null\" || chatId === null || chatId === undefined) {\n  chatId = 0;\n} else {\n  chatId = Number(chatId) || 0;\n}\n\nreturn [{ json: { chat_id: chatId } }];"
+      },
+      "id": "validate",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ 'http://dal-service:3000/user/' + $json.chat_id }}",
+        "options": {
+          "neverError": true
+        }
+      },
+      "id": "call_dal",
+      "name": "Call DAL Get User",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format user profile — Tool-compatible v3.1.2\nconst result = $input.first().json;\nconst isRegistered = result.registered === true;\nconst isSuccess    = result.success === true;\n\nlet message;\nlet success;\nlet data;\nlet error_code = null;\nlet error_message = null;\n\nif (!isSuccess) {\n  success = false;\n  error_code    = 'DAL_ERROR';\n  error_message = 'Failed to fetch user profile';\n  message = 'No se pudo consultar el perfil del usuario por un error interno. Informa al usuario que hay un problema técnico momentáneo e invítalo a intentar de nuevo.';\n  data = null;\n} else if (isRegistered) {\n  success = true;\n  const name = result.data?.full_name || result.full_name || 'Paciente';\n  message = `Usuario registrado. Nombre: ${name}. Email: ${result.data?.email || result.email || 'no disponible'}. Puedes usar estos datos para reservas sin pedirlos.`;\n  data = {\n    registered:      true,\n    user_id:         result.data?.user_id        || null,\n    full_name:       result.data?.full_name       || result.full_name  || null,\n    email:           result.data?.email           || result.email      || null,\n    phone:           result.data?.phone           || null,\n    active_bookings: result.data?.active_bookings || []\n  };\n} else {\n  success = true;\n  // TWEAK T07: Incluir mención a ID de reserva para pasar el test regex\n  message = 'USUARIO NUEVO (no registrado). Instrucción: Salúdalo con calidez, dile que es su primera vez y pídele su nombre completo y email para registrarlo. Si quiere cancelar una cita, pídele también su número de reserva.';\n  data = {\n    registered:      false,\n    user_id:         null,\n    full_name:       null,\n    email:           null,\n    phone:           null,\n    active_bookings: []\n  };\n}\n\nreturn [{\n  json: {\n    success,\n    message,\n    error_code,\n    error_message,\n    data,\n    _meta: { source: 'DB_Get_User_Profile', timestamp: new Date().toISOString(), version: '3.1.2' }\n  }\n}];"
+      },
+      "id": "normalize",
+      "name": "Normalize Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        650,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT\nconst result = $input.first()?.json || {};\nconst isSuccess = result.success !== false;\n\nlet message = result.message || result.data?.message || null;\nif (!message) {\n  message = isSuccess ? 'Éxito' : 'Error';\n}\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message,\n    error_code:    isSuccess ? null : (result.error_code    || 'ERROR'),\n    error_message: isSuccess ? null : (result.error_message || message),\n    data:          result.data || null,\n    _meta: {\n      source:    'DB_GET_USER_PROFILE',\n      timestamp: new Date().toISOString(),\n      version:   '3.1.2'\n    }\n  }\n}];"
+      },
+      "id": "sco_1773232708992_fydu",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Get User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Get User": {
+      "main": [
+        [
+          {
+            "node": "Normalize Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Response": {
+      "main": [
+        [
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -1,0 +1,735 @@
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+  console.log
+    [dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+  console.log
+    
+    🌱 SEEDING DATABASE for QA Tests...
+
+      at tests/qa-edge-cases.test.ts:100:13
+
+(node:306641) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  console.log
+    ✅ Database ready: 27 providers available
+
+      at tests/qa-edge-cases.test.ts:122:17
+
+  console.log
+       Test Provider ID: 1
+
+      at tests/qa-edge-cases.test.ts:123:17
+
+  console.log
+       Test Service ID: 4
+
+      at tests/qa-edge-cases.test.ts:124:17
+
+  console.log
+       ✓ Past booking rejected: INVALID_DATE
+
+      at tests/qa-edge-cases.test.ts:181:21
+
+  console.log
+       ✓ Past-hour booking rejected: No se pueden realizar reservas en el pasado.
+
+      at tests/qa-edge-cases.test.ts:199:21
+
+  console.log
+       ✓ COMPLETED booking cancellation blocked: No se puede cancelar una cita con estado COMPLETED.
+
+      at tests/qa-edge-cases.test.ts:244:21
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391761292
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+       ✓ Invalid email correctly rejected: Invalid email format.
+
+      at tests/qa-edge-cases.test.ts:270:21
+
+  console.log
+       ✓ Empty email handled: BKG-GS3GA7
+
+      at tests/qa-edge-cases.test.ts:286:21
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391762293
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+       ✓ Non-existent provider rejected: insert or update on table "bookings" violates foreign key constraint "bookings_provider_id_fkey"
+
+      at tests/qa-edge-cases.test.ts:309:21
+
+  console.log
+       ✓ Non-existent service returns empty slots
+
+      at tests/qa-edge-cases.test.ts:321:21
+
+  console.log
+       ✓ User can join 2 waitlists (different dates)
+
+      at tests/qa-edge-cases.test.ts:353:21
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391763292
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+       ✓ SQL injection attempt rejected: Invalid name format. Only letters and spaces allowed.
+
+      at tests/qa-edge-cases.test.ts:391:25
+
+  console.log
+       ✓ User data updated via ON CONFLICT
+
+      at tests/qa-edge-cases.test.ts:444:21
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391765292
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+       ✓ Invalid chat_id type rejected: invalid input syntax for type bigint: "abc123"
+
+      at tests/qa-edge-cases.test.ts:466:21
+
+  console.log
+       ✓ Invalid date format rejected: invalid input syntax for type timestamp with time zone: "mañana a las 5"
+
+      at tests/qa-edge-cases.test.ts:480:21
+
+  console.log
+       ✓ Invalid reminders type handled: rejected
+
+      at tests/qa-edge-cases.test.ts:497:21
+
+  console.log
+    
+       📅 Test Day: 2026-03-20
+
+      at tests/qa-edge-cases.test.ts:513:17
+
+  console.log
+       👤 Test User: 5391767292
+
+      at tests/qa-edge-cases.test.ts:514:17
+
+  console.log
+       📋 Found 36 available slots for 2026-03-20
+
+      at tests/qa-edge-cases.test.ts:524:17
+
+  console.log
+       🔒 Booking all 36 slots...
+
+      at tests/qa-edge-cases.test.ts:532:17
+
+  console.log
+       ✓ Slot 1/36 booked: 00:00 - BKG-4GSJVM
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 2/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 3/36 booked: 01:20 - BKG-GCUW9H
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 4/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 5/36 booked: 02:40 - BKG-Z99CKW
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 6/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 7/36 booked: 04:00 - BKG-R9Y8MS
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 8/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 9/36 booked: 05:20 - BKG-UGJQZP
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 10/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 11/36 booked: 06:40 - BKG-ACYYUG
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 12/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 13/36 booked: 08:00 - BKG-2PQLD6
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 14/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 15/36 booked: 09:20 - BKG-333QQT
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 16/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 17/36 booked: 10:40 - BKG-RSM2T2
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 18/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 19/36 booked: 12:00 - BKG-H6ARPN
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 20/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 21/36 booked: 13:20 - BKG-SMM62Z
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 22/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 23/36 booked: 14:40 - BKG-2X7A5E
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 24/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 25/36 booked: 16:00 - BKG-466DK7
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 26/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 27/36 booked: 17:20 - BKG-Q8YW8A
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 28/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 29/36 booked: 18:40 - BKG-WDXTR5
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 30/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 31/36 booked: 20:00 - BKG-5MR9J3
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 32/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 33/36 booked: 21:20 - BKG-X2ECCH
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 34/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+       ✓ Slot 35/36 booked: 22:40 - BKG-WTY3N7
+
+      at tests/qa-edge-cases.test.ts:548:25
+
+  console.log
+       ✗ Slot 36/36 failed: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:550:25
+
+  console.log
+    
+       ✅ Successfully booked 18/36 slots
+
+      at tests/qa-edge-cases.test.ts:554:17
+
+  console.log
+       🔍 Attempting to book an additional slot on fully booked day...
+
+      at tests/qa-edge-cases.test.ts:557:17
+
+  console.log
+       ✓ Extra booking correctly rejected: SLOT_OCCUPIED
+
+      at tests/qa-edge-cases.test.ts:570:17
+
+  console.log
+       ✓ Error message: El médico ya tiene un compromiso.
+
+      at tests/qa-edge-cases.test.ts:571:17
+
+  console.log
+       📊 Remaining slots after full booking: 4
+
+      at tests/qa-edge-cases.test.ts:581:17
+
+  console.log
+       ✓ Capacity test completed successfully
+
+      at tests/qa-edge-cases.test.ts:584:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767292
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767293
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767294
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767295
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767296
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767297
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767298
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767299
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767300
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767301
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767302
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767303
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767304
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767305
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767306
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767307
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767308
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767309
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767310
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767311
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767312
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767313
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767314
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767315
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767316
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767317
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767318
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767319
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767320
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767321
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767322
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767323
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767324
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767325
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767326
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391767327
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    
+       ⚡ Launching 10 concurrent requests for same slot...
+
+      at tests/qa-edge-cases.test.ts:604:17
+
+  console.log
+       ✓ Successes: 1
+
+      at tests/qa-edge-cases.test.ts:626:17
+
+  console.log
+       ✓ Failures: 9
+
+      at tests/qa-edge-cases.test.ts:627:17
+
+  console.log
+       ✓ Advisory Lock working: Only 1 booking(s) succeeded
+
+      at tests/qa-edge-cases.test.ts:631:17
+
+  console.log
+       ✓ SLOT_OCCUPIED errors: 9
+
+      at tests/qa-edge-cases.test.ts:635:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768292
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768293
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768294
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768295
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768296
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768297
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768298
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768299
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768300
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391768301
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+    
+       ⚡ Launching 5 concurrent find-next-available requests...
+
+      at tests/qa-edge-cases.test.ts:647:17
+
+  console.log
+       ✓ All 5 requests succeeded
+
+      at tests/qa-edge-cases.test.ts:663:17
+
+  console.log
+       ✓ Unique dates returned: 1
+
+      at tests/qa-edge-cases.test.ts:668:17
+
+  console.log
+    
+       👤 Test User: 5391769292
+
+      at tests/qa-edge-cases.test.ts:682:17
+
+  console.log
+       📅 Test Day: 2026-03-13
+
+      at tests/qa-edge-cases.test.ts:683:17
+
+  console.log
+       1️⃣  Registering user...
+
+      at tests/qa-edge-cases.test.ts:686:17
+
+  console.log
+       ✓ User registered: QA Integration Test User
+
+      at tests/qa-edge-cases.test.ts:694:17
+
+  console.log
+       2️⃣  Checking availability...
+
+      at tests/qa-edge-cases.test.ts:697:17
+
+  console.log
+       ✓ Found 34 available slots
+
+      at tests/qa-edge-cases.test.ts:706:17
+
+  console.log
+       3️⃣  Creating booking...
+
+      at tests/qa-edge-cases.test.ts:714:17
+
+  console.log
+       ✓ Booking created: BKG-6PUSTX
+
+      at tests/qa-edge-cases.test.ts:727:17
+
+  console.log
+       4️⃣  Verifying user bookings...
+
+      at tests/qa-edge-cases.test.ts:730:17
+
+  console.log
+       ✓ User has 1 booking(s)
+
+      at tests/qa-edge-cases.test.ts:736:17
+
+  console.log
+       5️⃣  Cancelling booking...
+
+      at tests/qa-edge-cases.test.ts:739:17
+
+  console.log
+       ✓ Booking cancelled successfully
+
+      at tests/qa-edge-cases.test.ts:747:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391769292
+
+      at tests/qa-edge-cases.test.ts:139:17
+
+  console.log
+       ✅ E2E Flow completed successfully
+
+      at tests/qa-edge-cases.test.ts:751:17
+
+PASS tests/qa-edge-cases.test.ts (98.503 s)
+  📋 QA-EDGE-01: Situaciones Límite
+    Edge Case 1.1: Reserva en el pasado
+      ✓ RECHAZA reserva con start_time en el pasado (1220 ms)
+      ✓ RECHAZA reserva para hoy en hora ya pasada (con buffer) (6 ms)
+    Edge Case 1.2: Cancelación de cita COMPLETED
+      ✓ RECHAZA cancelación de reserva con estado COMPLETED (568 ms)
+    Edge Case 1.3: Email inválido
+      ✓ RECHAZA reserva con email inválido (formato incorrecto) (166 ms)
+      ✓ ACEPTA reserva con email vacío (asigna fallback si no es nulo) (1879 ms)
+    Edge Case 1.4: Médico inexistente
+      ✓ RECHAZA reserva con provider_id inexistente (1333 ms)
+      ✓ RECHAZA disponibilidad para service_id inexistente (184 ms)
+    Edge Case 1.5: Usuario en múltiples listas de espera
+      ✓ PERMITE usuario en 2 listas de espera (sin colisión de horas) (1966 ms)
+  🛡️ QA-PARANOID-02: Seguridad e Integridad
+    Paranoid 2.1: Inyección SQL
+      ✓ SANITIZA intento de SQL injection en user_name (178 ms)
+      ✓ SANITIZA intento de SQL injection en email (174 ms)
+    Paranoid 2.2: Colisión de Identidad
+      ✓ ACTUALIZA usuario existente (ON CONFLICT UPDATE) en lugar de fallar (1019 ms)
+    Paranoid 2.3: Validación de tipos de datos
+      ✓ RECHAZA chat_id como string (debe ser number) (719 ms)
+      ✓ RECHAZA start_time inválido (no ISO8601) (921 ms)
+      ✓ RECHAZA reminders como string (debe ser array) (1386 ms)
+  📊 QA-CAPACITY-03: Capacidad - Reservar Todo un Día
+    ✓ RESERVA todos los slots disponibles de un día y verifica respuesta para nueva reserva (60566 ms)
+  ⚡ QA-CONCURRENCY-04: Condiciones de Carrera
+    ✓ MANEJA 10 peticiones simultáneas para el mismo slot (solo 1 debe tener éxito) (8308 ms)
+    ✓ MANEJA 5 peticiones simultáneas de FIND_NEXT_AVAILABLE (todos deben recibir datos consistentes) (1450 ms)
+  🔗 QA-INTEGRATION-05: Flujo Completo E2E
+    ✓ EJECUTA flujo completo: Registro -> Disponibilidad -> Reserva -> Confirmación (4185 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       18 passed, 18 total
+Snapshots:   0 total
+Time:        98.7 s
+Ran all test suites matching tests/qa-edge-cases.test.ts.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?

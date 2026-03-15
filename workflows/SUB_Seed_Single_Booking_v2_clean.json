@@ -1,0 +1,340 @@
+{
+  "name": "SUB_Seed_Single_Booking",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough",
+        "workflowInputs": {
+          "__rl": true,
+          "value": {
+            "calendar_id": "primary",
+            "provider_id": "={{ $json.provider_id }}",
+            "service_id": "={{ $json.service_id }}",
+            "start_time": "={{ $json.start_time }}",
+            "chat_id": "={{ $json.chat_id }}",
+            "user_name": "={{ $json.user_name }}",
+            "user_email": "={{ $json.user_email }}"
+          },
+          "mode": "pairs"
+        }
+      },
+      "id": "trigger",
+      "name": "\ud83d\udce5 IN: Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/create-booking",
+        "sendBody": true,
+        "specifyBody": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $json.chat_id }}"
+            },
+            {
+              "name": "provider_id",
+              "value": "={{ $json.provider_id }}"
+            },
+            {
+              "name": "service_id",
+              "value": "={{ $json.service_id }}"
+            },
+            {
+              "name": "start_time",
+              "value": "={{ $json.start_time }}"
+            },
+            {
+              "name": "user_name",
+              "value": "={{ $json.user_name }}"
+            },
+            {
+              "name": "user_email",
+              "value": "={{ $json.user_email }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "retry": {
+            "enable": true,
+            "maxRetries": 3,
+            "retryInterval": 1000
+          }
+        }
+      },
+      "id": "dal_create",
+      "name": "Create Booking (DAL)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        250,
+        0
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value": true,
+              "operation": "equal",
+              "property": "={{ $json.success }}"
+            }
+          ]
+        }
+      },
+      "id": "is_success",
+      "name": "Is Success?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        500,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n.stax.ink/webhook/gcal-create-event",
+        "sendBody": true,
+        "specifyBody": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "calendar_id",
+              "value": "={{ $input.first().json.calendar_id }}"
+            },
+            {
+              "name": "booking_id",
+              "value": "={{ $input.first().json.data?.booking_id || $input.first().json.booking_id }}"
+            },
+            {
+              "name": "booking_code",
+              "value": "={{ $input.first().json.data?.booking_code || $input.first().json.booking_code }}"
+            },
+            {
+              "name": "summary",
+              "value": "Cita Seed: {{ $input.first().json.user_name }}"
+            },
+            {
+              "name": "start_time",
+              "value": "={{ $input.first().json.start_time }}"
+            },
+            {
+              "name": "end_time",
+              "value": "={{ new Date(new Date($input.first().json.start_time).getTime() + 30*60000).toISOString() }}"
+            },
+            {
+              "name": "user_name",
+              "value": "={{ $input.first().json.user_name }}"
+            },
+            {
+              "name": "user_email",
+              "value": "={{ $input.first().json.user_email }}"
+            },
+            {
+              "name": "service_name",
+              "value": "Consulta Seed"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "retry": {
+            "enable": true,
+            "maxRetries": 3,
+            "retryInterval": 1000
+          }
+        }
+      },
+      "id": "gcal_create",
+      "name": "Create GCAL Event",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        750,
+        -100
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/update-gcal-event-id",
+        "sendBody": true,
+        "specifyBody": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "booking_id",
+              "value": "={{ $('Create Booking (DAL)').first().json.data?.booking_id || $('Create Booking (DAL)').first().json.booking_id }}"
+            },
+            {
+              "name": "gcal_event_id",
+              "value": "={{ $json.data?.gcal_event_id || $json.gcal_event_id }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "retry": {
+            "enable": true,
+            "maxRetries": 3,
+            "retryInterval": 1000
+          }
+        }
+      },
+      "id": "dal_update",
+      "name": "Update DB with GCAL ID",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1000,
+        -100
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Standard Contract Output v1.0\nconst input = $input.first().json;\n\nreturn [{\n  json: {\n    success: input.success || false,\n    error_code: input.error_code || null,\n    error_message: input.error_message || null,\n    data: input.data || {\n      booking_id: input.booking_id || null,\n      gcal_event_id: input.gcal_event_id || null,\n      status: input.status || 'UNKNOWN'\n    },\n    _meta: {\n      source: 'SUB_SEED_SINGLE_BOOKING',\n      workflow_id: 'qCCOLoAHJTl1BibE',\n      timestamp: new Date().toISOString(),\n      version: '1.0.0'\n    }\n  }\n}];"
+      },
+      "id": "sco",
+      "name": "\ud83d\udce4 OUT: Standard Contract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1250,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Error Handler: Format error to Standard Contract\nconst error = $input.first().json;\nconst nodeName = $('Is Success').first().json.error?.nodeName || 'Unknown';\n\nreturn [{\n  json: {\n    success: false,\n    error_code: error.error_code || 'SUB_WORKFLOW_ERROR',\n    error_message: `Error en ${nodeName}: ${error.message || 'Error desconocido'}`,\n    data: null,\n    _meta: {\n      source: 'SUB_SEED_ERROR_HANDLER',\n      workflow_id: 'qCCOLoAHJTl1BibE',\n      timestamp: new Date().toISOString(),\n      version: '1.0.0',\n      error_node: nodeName\n    }\n  }\n}];"
+      },
+      "id": "error_handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        100
+      ]
+    }
+  ],
+  "connections": {
+    "\ud83d\udce5 IN: Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Create Booking (DAL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Booking (DAL)": {
+      "main": [
+        [
+          {
+            "node": "Is Success?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Success?": {
+      "main": [
+        [
+          {
+            "node": "Create GCAL Event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create GCAL Event": {
+      "main": [
+        [
+          {
+            "node": "Update DB with GCAL ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update DB with GCAL ID": {
+      "main": [
+        [
+          {
+            "node": "\ud83d\udce4 OUT: Standard Contract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "error": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Handler": {
+      "main": [
+        [
+          {
+            "node": "\ud83d\udce4 OUT: Standard Contract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "name": "WF2_Booking_Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking-orchestrator",
+        "responseMode": "lastNode",
+        "options": {
+          "allowedMethods": ["POST"]
+        }
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-500, 300],
+      "webhookId": "booking-orchestrator"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simple test - echo input\nconst input = $input.first().json;\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      received: input,\n      message: 'WF2 is working!'\n    },\n    _meta: {\n      source: 'WF2_BOOKING_ORCHESTRATOR',\n      timestamp: new Date().toISOString(),\n      version: '2.0.1-test'\n    }\n  }\n}];"
+      },
+      "name": "Test Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-250, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Test Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

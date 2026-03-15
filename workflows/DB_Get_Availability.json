@@ -1,0 +1,251 @@
+{
+  "name": "DB_Get_Availability",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/availability",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"provider_id\": {{ $json.provider_id }},\n  \"service_id\": {{ $json.service_id }},\n  \"date\": \"{{ $json.date }}\"\n}",
+        "options": {
+          "timeout": 15000,
+          "maxRetries": 3,
+          "retryWait": {
+            "type": "exponentialBackoff",
+            "base": 1000
+          }
+        }
+      },
+      "name": "Call DAL Proxy",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        750,
+        500
+      ],
+      "id": "call_dal"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "db-get-availability-test",
+        "responseMode": "lastNode"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -200,
+        400
+      ],
+      "webhookId": "db-get-availability-test"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"provider_id\": 1, \"service_id\": 1, \"date\": \"2026-03-15\"}"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -200,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// REGLA 1: NORMALIZACIÓN DE TIPOS\n// REGLA 5: VALIDACIÓN DE PAYLOAD\nconst raw = $input.first()?.json || {};\n// Handle both webhook (raw.body) and execute workflow (raw directly)\nconst input = Object.keys(raw.body || {}).length > 0 ? raw.body : raw;\n\n// Normalizar tipos (REGLA 1)\nconst provider_id = Number(input.provider_id ?? 1);\nconst service_id = Number(input.service_id ?? 1);\nlet date = String(input.date || \"\");\n\n// Evitar que lea la versión 1.3.0 por accidente u otro metadato\nif (!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)) {\n  date = new Date().toISOString().split('T')[0];\n}\n\n// Validar payload (REGLA 5)\nconst isValidProvider = provider_id > 0 && Number.isInteger(provider_id);\nconst isValidService = service_id > 0 && Number.isInteger(service_id);\nconst isValidDate = /^\\d{4}-\\d{2}-\\d{2}$/.test(date);\n\nconst isValid = isValidProvider && isValidService && isValidDate;\n\nreturn [{\n  json: {\n    provider_id,\n    service_id,\n    date,\n    isValid,\n    _meta: {\n      source: 'DB_Get_Availability',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Get_Availability',\n      version: '1.3.1'\n    }\n  }\n}];"
+      },
+      "name": "Validate & Normalize (PRE)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid_availability",
+              "leftValue": "={{ $json.isValid === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": false
+      },
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        500,
+        500
+      ],
+      "id": "is_valid_if"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: \"INVALID_AVAILABILITY_PARAMS\",\n    error_message: \"Parámetros inválidos: provider_id y service_id deben ser números positivos, date debe ser YYYY-MM-DD\",\n    data: null,\n    _meta: {\n      source: 'DB_Get_Availability',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Get_Availability',\n      version: '1.3.0'\n    }\n  }\n}];"
+      },
+      "name": "Format Invalid Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        700
+      ],
+      "id": "format_invalid"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format availability response — Tool-compatible v3.1.0\nconst input = $input.first()?.json || {};\nconst isCacheHit   = input.cache_hit === true;\nconst dalResponse  = isCacheHit ? input.cache_data : input;\nconst isSuccess    = dalResponse.success !== false;\nconst slots        = dalResponse.data?.available_slots || dalResponse.data?.slots || [];\nconst hasSlots     = slots.length > 0;\n\nlet message;\nif (!isSuccess) {\n  message = dalResponse.error_message || 'Error consultando disponibilidad. Informa al usuario e invítalo a intentarlo en unos minutos.';\n} else if (hasSlots) {\n  message = `Hay ${slots.length} turno(s) disponible(s) para esa fecha. Muéstrale las opciones al usuario para que elija.`;\n} else {\n  message = 'NO HAY TURNOS DISPONIBLES para esa fecha. Instrucción: Informa al usuario y ofrécele SIEMPRE dos alternativas: (1) buscar el próximo turno disponible usando FindNextAvailable, (2) unirse a la lista de espera usando ManageWaitlist.';\n}\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message,\n    error_code:    isSuccess ? null : (dalResponse.error_code    || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || 'Operation failed'),\n    data: isSuccess ? { available_slots: slots } : null,\n    _meta: { source: 'DB_Get_Availability', timestamp: new Date().toISOString(), version: '3.1.0' }\n  }\n}];"
+      },
+      "name": "Final Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1150,
+        400
+      ],
+      "id": "final_res_123"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT — Tool-compatible (v3.0.0)\n// El AI Agent lee \"message\" como respuesta legible y \"data\" para detalles.\nconst result = $input.first()?.json || {};\nconst isSuccess = result.success !== false;\n\n// Construir mensaje legible para el LLM\nlet message = result.message || result.data?.message || null;\nif (!message) {\n  message = isSuccess\n    ? 'Operación completada con éxito.'\n    : (result.error_message || result.error_code || 'Error desconocido.');\n}\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message,\n    error_code:    isSuccess ? null : (result.error_code    || 'UNKNOWN_ERROR'),\n    error_message: isSuccess ? null : (result.error_message || message),\n    data:          result.data || null,\n    _meta: {\n      source:    'DB_GET_AVAILABILITY',\n      timestamp: new Date().toISOString(),\n      version:   '3.0.0'\n    }\n  }\n}];"
+      },
+      "id": "standard_contract_1772984456915",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5000,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate & Normalize (PRE)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate & Normalize (PRE)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate & Normalize (PRE)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate & Normalize (PRE)": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Proxy",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Invalid Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Proxy": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Invalid Error": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Response": {
+      "main": [
+        [
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "zdUslfT9C0sTI83H"
+}

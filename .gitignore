@@ -1,0 +1,152 @@
+# Global OS / Editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+docker-compose/
+
+# IDEs
+.idea/
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/*.code-workspace
+*.sublime-project
+*.sublime-workspace
+
+# Logs y temporales
+*.log
+*.tmp
+logs/
+tmp/
+reports/
+execution_*.json
+final_check_*.json
+scripts-ts/recent_executions.json
+scripts-ts/server_*.json
+docs/rag_documents_export.json
+Telegram Desktop/
+reinstall.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Entornos
+.pgpass
+.env
+.env.test
+.env.local
+.env.*.local
+.env*
+.venv/
+venv/
+env/
+ENV/
+
+# n8n - NO ignores workflows/credentials JSON (versiona todo)
+# Ignora solo temporales pesados si los generas
+n8n-cache/
+n8n-temp/
+*.db  # SQLite locales de testing
+*.sqlite
+
+# Python (mantén si usas scripts de soporte)
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+.mypy_cache/
+htmlcov/
+.eggs/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Node/JS (si usas tooling local)
+node_modules/
+.npm/
+.yarn/
+pnpm-lock.yaml
+dist/
+build/
+out/
+*.tsbuildinfo
+.cache/
+
+# Docker
+.docker/
+docker-data/
+.dockerignore
+Dockerfile.*
+
+# SQL dumps (backups regenerables)
+*_dump.sql
+current_schema_dump.sql
+current_tables_dump.sql
+
+# Binarios grandes (capturas, multimedia y diseño)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.ico
+*.webp
+*.avif
+*.heic
+*.heif
+*.svg
+*.eps
+*.ai
+*.psd
+
+*.avi
+*.mpeg
+*.mpg
+*.mp4
+*.m4v
+*.mov
+*.wmv
+*.flv
+*.mkv
+*.webm
+*.3gp
+*.3g2
+*.m2ts
+*.mts
+*.vob
+*.ogv
+
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

@@ -1,0 +1,68 @@
+{
+  "name": "SEED_Book_Tomorrow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual_trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "seed-tomorrow",
+        "responseMode": "lastNode"
+      },
+      "id": "webhook_trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 200],
+      "webhookId": "seed-tomorrow"
+    },
+    {
+      "parameters": {
+        "jsCode": "const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1); const date = tomorrow.toISOString().split('T')[0]; const slots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00']; return slots.map((time, i) => ({ json: { provider_id: 1, service_id: 1, start_time: `${date}T${time}:00.000-03:00`, chat_id: 9800000 + i, user_name: 'Seed Patient ' + String.fromCharCode(65+i), user_email: 'seed@test.local', calendar_id: 'primary' } }));"
+      },
+      "id": "build_config",
+      "name": "Build Seed Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [200, 100]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "8h2HMDoNQTJEkiZL",
+          "mode": "id"
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "id": "execute_sub",
+      "name": "Execute Sub-workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [400, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { success: true } }];"
+      },
+      "id": "sco",
+      "name": "Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, 100]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": { "main": [[{ "node": "Build Seed Config", "type": "main", "index": 0 }]] },
+    "Webhook": { "main": [[{ "node": "Build Seed Config", "type": "main", "index": 0 }]] },
+    "Build Seed Config": { "main": [[{ "node": "Execute Sub-workflow", "type": "main", "index": 0 }]] },
+    "Execute Sub-workflow": { "main": [[{ "node": "Standard Contract Output", "type": "main", "index": 0 }]] }
+  }
+}

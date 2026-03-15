@@ -1,0 +1,167 @@
+{
+  "_meta": {
+    "generatedAt": "2026-03-02T16:24:17.486Z",
+    "n8nVersion": "2.10.2",
+    "n8nUrl": "https://n8n.stax.ink",
+    "method": "docker cp+exec (n8n_titanium)",
+    "container": "n8n_titanium",
+    "totalNodes": 543,
+    "extractedAt": "2026-03-15T14:11:10.076Z",
+    "sourceWorkflowsDir": "/home/manager/Sync/N8N Projects/booking-titanium/workflows/seed",
+    "totalWorkflowsScanned": 14,
+    "totalNodesUsed": 11,
+    "nodesNotFound": 0
+  },
+  "nodes": [
+    {
+      "type": "n8n-nodes-base.code",
+      "displayName": "Code",
+      "latestVersion": 2,
+      "availableVersions": [
+        1,
+        2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.cron",
+      "displayName": "Cron",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger",
+        "schedule"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.errorTrigger",
+      "displayName": "Error Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "displayName": "Execute Workflow Trigger",
+      "latestVersion": 1.1,
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.googleCalendar",
+      "displayName": "Google Calendar",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.httpRequest",
+      "displayName": "HTTP Request",
+      "latestVersion": 4.4,
+      "availableVersions": [
+        1,
+        2,
+        3,
+        4,
+        4.1,
+        4.2,
+        4.3,
+        4.4
+      ],
+      "group": [
+        "output"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.if",
+      "displayName": "If",
+      "latestVersion": 2.3,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.manualTrigger",
+      "displayName": "Manual Trigger",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.postgres",
+      "displayName": "Postgres",
+      "latestVersion": 2.6,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3,
+        2.4,
+        2.5,
+        2.6
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.splitInBatches",
+      "displayName": "Split In Batches",
+      "latestVersion": 3,
+      "availableVersions": [
+        1,
+        2,
+        3
+      ],
+      "group": [
+        "organization"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.webhook",
+      "displayName": "Webhook",
+      "latestVersion": 2.1,
+      "availableVersions": [
+        1,
+        1.1,
+        2,
+        2.1
+      ],
+      "group": [
+        "trigger"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,423 @@
+{
+  "name": "RAG_01_Document_Ingestion",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rag-ingest-document",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "6f448fb2-d101-4704-8bef-3fdfe72d834d",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        6448,
+        688
+      ],
+      "webhookId": "rag-ingest-document",
+      "notes": "📥 IN: { provider_id: number (>0), service_id?: number, title: string (min 5), content: string (min 10), source_type: rag_source_type, status?: string, language?: string, metadata?: object, summary?: string }"
+    },
+    {
+      "parameters": {},
+      "id": "c893d409-bc62-490b-bbca-7c614722b838",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        6448,
+        896
+      ]
+    },
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{ \"provider_id\": 1, \"title\": \"Ejemplo de documento\", \"content\": \"Contenido de ejemplo para RAG\", \"source_type\": \"faq\", \"status\": \"published\", \"language\": \"es\" }"
+      },
+      "id": "b0dce5ad-b8dd-443d-b09d-9f8d84deaee6",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        6448,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validation Sandwich - PRE Validate (SEC02)\n// O03: Extract → Validate → Build | SEC04: Regex Whitelist\n// Unicode support: Spanish (áéíóúüñ) + English\n\nconst input = $input.first()?.json.body || $input.first()?.json || {};\n\n// EXTRACT\nconst provider_id  = input.provider_id  !== undefined ? Number(input.provider_id)  : null;\nconst service_id   = input.service_id   !== undefined ? Number(input.service_id)   : null;\nconst title        = input.title        !== undefined ? String(input.title).trim()  : '';\nconst content      = input.content      !== undefined ? String(input.content).trim(): '';\nconst language     = input.language     !== undefined ? String(input.language).toLowerCase().trim() : 'es';\nconst status       = input.status       !== undefined ? String(input.status).toLowerCase().trim()   : 'published';\n\n// SEC04 - Regex Whitelist con soporte Unicode Latin (español + inglés)\nconst safeStringRegex = /^[\\w\\s\\-\\'\\\"\\.\\,\\?\\!\\(\\)\\:\\;\\n\\r\\u00C0-\\u017F]{1,500}$/u;\nconst safeLongRegex   = /^[\\w\\s\\-\\'\\\"\\.\\,\\?\\!\\(\\)\\:\\;\\n\\r\\[\\]\\{\\}\\u00C0-\\u017F]{1,50000}$/u;\nconst langRegex       = /^[a-z]{2}$/;\n\n// Valid ENUMs\nconst validSourceTypes = ['faq','policy','schedule','service','provider','insurance','pricing','preparation','post_care','emergency','other'];\nconst validStatuses    = ['published','draft','archived'];\n\nlet source_type = input.source_type !== undefined ? String(input.source_type).toLowerCase().trim() : 'other';\nif (!validSourceTypes.includes(source_type)) source_type = 'other';\n\nif (!validStatuses.includes(status)) {\n  throw new Error('VALIDATION_ERROR: status must be one of: ' + validStatuses.join(', '));\n}\n\n// VALIDATE\nconst errors = [];\n\nif (!provider_id || provider_id <= 0 || !Number.isInteger(provider_id)) {\n  errors.push('provider_id must be positive integer');\n}\nif (service_id !== null && (!Number.isInteger(service_id) || service_id <= 0)) {\n  errors.push('service_id must be positive integer or omitted');\n}\nif (!title || title.length < 5) {\n  errors.push('title too short (min 5 chars)');\n}\nif (title && !safeStringRegex.test(title)) {\n  errors.push('title contains invalid characters');\n}\nif (!content || content.length < 10) {\n  errors.push('content too short (min 10 chars)');\n}\nif (content && !safeLongRegex.test(content)) {\n  errors.push('content contains invalid characters');\n}\nif (!langRegex.test(language)) {\n  errors.push('language must be 2-char ISO code (e.g. es, en)');\n}\n\nif (errors.length > 0) {\n  throw new Error('VALIDATION_ERROR: ' + errors.join(' | '));\n}\n\n// Metadata: solo object plano\nlet metadata = {};\nif (input.metadata && typeof input.metadata === 'object' && !Array.isArray(input.metadata)) {\n  metadata = input.metadata;\n}\n\n// Summary: auto-generate if missing\nconst summary = input.summary\n  ? String(input.summary).substring(0, 500)\n  : (content.length > 200 ? content.substring(0, 197) + '...' : content);\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    provider_id,\n    service_id,\n    title,\n    content,\n    source_type,\n    status,\n    language,\n    metadata,\n    summary,\n    _meta: {\n      source: 'RAG_01_Document_Ingestion',\n      timestamp: new Date().toISOString(),\n      version: '1.7.0'\n    }\n  }\n}];"
+      },
+      "id": "498dda4b-6ff4-4c72-a6c2-48db3fd8120f",
+      "name": "Validate & Normalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6848,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "054b92bc-48e7-4f7a-9219-05feb4ebc454",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        7056,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "text-embedding-3-small"
+            },
+            {
+              "name": "input",
+              "value": "={{ $('Validate & Normalize').first().json.content }}"
+            },
+            {
+              "name": "dimensions",
+              "value": "=1536"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "adccabb0-27d0-464b-9445-b466b4f64adb",
+      "name": "Get OpenAI Embedding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        7248,
+        688
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "8HwznNQRrIZCMsyQ",
+          "name": "OpenAI API Key Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Post-Validate Embedding (SEC02)\n// httpRequest /v1/embeddings retorna: { data: [{ embedding: [...1536] }] }\n\nconst response = $input.first()?.json;\n\nif (!response || !response.data || !Array.isArray(response.data) || response.data.length === 0) {\n  throw new Error('EMBEDDING_ERROR: OpenAI returned empty or invalid response');\n}\n\nconst embedding = response.data[0]?.embedding;\n\nif (!Array.isArray(embedding) || embedding.length !== 1536) {\n  throw new Error('EMBEDDING_ERROR: Expected 1536 floats, got length ' + (embedding?.length ?? 'undefined'));\n}\n\nif (!embedding.every(n => typeof n === 'number' && isFinite(n))) {\n  throw new Error('EMBEDDING_ERROR: Embedding contains non-finite values');\n}\n\n// Merge con validated data\nconst validatedData = $('Validate & Normalize').first()?.json;\n\nreturn [{\n  json: {\n    ...validatedData,\n    embedding\n  }\n}];"
+      },
+      "id": "post_val_emb_01",
+      "name": "Post-Validate Embedding",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7456,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.embedding.length }}",
+              "rightValue": 1536,
+              "operator": {
+                "type": "number",
+                "operation": "equal",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "emb_success_01",
+      "name": "Embedding Success?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        7648,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// O03 Postgres 4 Capas - BUILD\n// P02 workaround: interpolación + casteo estricto (SEC03)\n// SEC05: escape de backslash + comillas simples + límite longitud\n\nconst d = $input.first()?.json;\n\n// Guards redundantes (SEC02 defense-in-depth)\nif (!Array.isArray(d.embedding) || d.embedding.length !== 1536) throw new Error('BUILD_ERROR: invalid embedding');\nif (!Number.isInteger(d.provider_id) || d.provider_id <= 0) throw new Error('BUILD_ERROR: invalid provider_id');\nif (!d.title || d.title.length < 5) throw new Error('BUILD_ERROR: invalid title');\nif (!d.content || d.content.length < 10) throw new Error('BUILD_ERROR: invalid content');\n\n// SEC05 - Escape helper: backslash + single quotes + truncate\nconst esc = (s, maxLen = 500) => String(s ?? '')\n  .replace(/\\\\/g, '\\\\\\\\')\n  .replace(/'/g, \"''\")\n  .substring(0, maxLen);\n\nconst embeddingLiteral = `'[${d.embedding.join(',')}]'::vector(1536)`;\nconst serviceIdLiteral = (d.service_id !== null && Number.isInteger(d.service_id))\n  ? String(d.service_id)\n  : 'NULL';\n\n// metadata: validar que sea object serializable\nlet metaJson;\ntry {\n  metaJson = JSON.stringify(d.metadata || {});\n  if (metaJson.length > 10000) throw new Error('metadata too large');\n} catch(e) {\n  throw new Error('BUILD_ERROR: metadata serialization failed');\n}\n\nconst query = `\nINSERT INTO rag_documents (\n  provider_id,\n  service_id,\n  title,\n  content,\n  summary,\n  embedding,\n  source_type,\n  status,\n  language,\n  metadata\n) VALUES (\n  ${d.provider_id}::bigint,\n  ${serviceIdLiteral}${serviceIdLiteral !== 'NULL' ? '::bigint' : ''},\n  '${esc(d.title)}'::text,\n  '${esc(d.content, 50000)}'::text,\n  '${esc(d.summary)}'::text,\n  ${embeddingLiteral},\n  '${esc(d.source_type)}'::rag_source_type,\n  '${esc(d.status)}'::rag_document_status,\n  '${esc(d.language, 10)}'::text,\n  '${esc(metaJson, 10000)}'::jsonb\n)\nRETURNING id, provider_id, title, created_at;\n`.trim();\n\n// ── ARCHIVE SUPERSEDED DOCS (Política de Ciclo de Vida) ──\nconst archive_query = `\nUPDATE rag_documents\nSET\n  status     = 'archived',\n  deleted_at = NOW()\nWHERE\n  provider_id = ${d.provider_id}::bigint\n  AND title       = '${esc(d.title)}'::text\n  AND source_type = '${esc(d.source_type)}'::rag_source_type\n  AND status      = 'published'\nRETURNING id;\n`.trim();\n\nreturn [{ json: { query, archive_query, provider_id: d.provider_id } }];"
+      },
+      "id": "09d700ec-f889-4148-9bcc-882c0971ee92",
+      "name": "Build Parameterized Query",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7856,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.query }}",
+        "options": {}
+      },
+      "id": "3d46e660-958c-4a6f-ac62-499fef0bb75b",
+      "name": "Insert into rag_documents",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        8448,
+        688
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "credentials": {
+        "postgres": {
+          "id": "SFNQsmuu4zirZAnP",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Post-Validate Insert (SEC02 - POST)\nconst rows = $input.all();\nif (!rows || rows.length === 0) {\n  throw new Error('DATABASE_ERROR: INSERT returned no rows');\n}\nconst row = rows[0]?.json;\nif (!row || row.id === undefined || row.id === null) {\n  throw new Error('DATABASE_ERROR: INSERT succeeded but returned no id');\n}\nreturn [{ json: { db_row: row } }];"
+      },
+      "id": "post_val_insert_01",
+      "name": "Post-Validate Insert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8640,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.db_row.id !== undefined && $json.db_row.id !== null }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "insert_success_01",
+      "name": "Insert Success?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        8832,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format Success Response - Standard Contract O02\nconst dbRow         = $input.first()?.json?.db_row || {};\nconst validatedData = $('Validate & Normalize').first()?.json || {};\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      document_id: dbRow.id,\n      title:       dbRow.title       || validatedData.title,\n      provider_id: dbRow.provider_id || validatedData.provider_id,\n      created_at:  dbRow.created_at  || new Date().toISOString()\n    },\n    _meta: {\n      source:      'RAG_01_Document_Ingestion',\n      timestamp:   new Date().toISOString(),\n      workflow_id: 'RAG_01',\n      version:     '1.7.0'\n    }\n  }\n}];"
+      },
+      "id": "76272a6c-8ed1-4c3e-98ae-9233e540e11e",
+      "name": "Format Success Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9024,
+        688
+      ],
+      "notes": "📤 OUT"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Central Error Handler - Standard Contract O02\nconst input = $input.first()?.json || {};\nlet errorCode    = input.error_code    || 'GENERAL_ERROR';\nlet errorMessage = input.error_message || input.message || 'Unknown error occurred';\n\nreturn [{\n  json: {\n    success:       false,\n    error_code:    errorCode,\n    error_message: errorMessage,\n    data:          null,\n    _meta: {\n      source:      'RAG_01_Document_Ingestion',\n      timestamp:   new Date().toISOString(),\n      workflow_id: 'RAG_01',\n      version:     '1.7.0'\n    }\n  }\n}];"
+      },
+      "id": "central_err_01",
+      "name": "Central Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9024,
+        1088
+      ],
+      "notes": "📤 OUT - Errors"
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $input.first()?.json?.message || 'Input validation failed';\nreturn [{ json: { error_code: 'VALIDATION_ERROR', error_message: msg } }];"
+      },
+      "id": "11bd862e-5cd1-4d84-add8-eca189dbe6f3",
+      "name": "Format Validation Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7248,
+        896
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $input.first()?.json?.message || 'Failed to generate embedding';\nreturn [{ json: { error_code: 'EMBEDDING_ERROR', error_message: msg } }];"
+      },
+      "id": "71a884ba-666a-41b8-9b5d-a73c83a367c2",
+      "name": "Format Embedding Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7648,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $input.first()?.json?.message || 'Failed to insert document';\nreturn [{ json: { error_code: 'DATABASE_ERROR', error_message: msg } }];"
+      },
+      "id": "1d9fab78-9c67-4a50-8e1e-ed8bd86039ce",
+      "name": "Format Database Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8640,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $input.first()?.json?.message || 'Insert returned no valid id';\nreturn [{ json: { error_code: 'INSERT_ERROR', error_message: msg } }];"
+      },
+      "id": "format_insert_err_01",
+      "name": "Format Insert Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8832,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.archive_query }}",
+        "options": {}
+      },
+      "id": "archive-docs-01",
+      "name": "Archive Superseded Docs",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        8048,
+        688
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "credentials": {
+        "postgres": {
+          "id": "SFNQsmuu4zirZAnP",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all();\nconst buildData = $('Build Parameterized Query').first()?.json;\nif (!buildData || !buildData.query) throw new Error('ARCHIVE_ERROR: Build data not found');\nreturn [{ json: { ...buildData, archived_count: rows.length } }];"
+      },
+      "id": "post-val-archive-01",
+      "name": "Post-Validate Archive",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8248,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $input.first()?.json?.message || 'Failed to archive superseded documents';\nreturn [{ json: { error_code: 'ARCHIVE_ERROR', error_message: msg } }];"
+      },
+      "id": "fmt-archive-err-01",
+      "name": "Format Archive Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8248,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\nconst result = $input.first()?.json || {};\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'RAG_01_DOCUMENT_INGESTION',\n      workflow_id: 'RAG_01',\n      timestamp: new Date().toISOString(),\n      version: '1.7.0'\n    }\n  }\n}];"
+      },
+      "id": "545da97a-24eb-46d6-bfc8-2c1e005c6b7d",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9248,
+        800
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{"node": "Validate & Normalize", "type": "main", "index": 0}]] },
+    "Manual Trigger": { "main": [[{"node": "Validate & Normalize", "type": "main", "index": 0}]] },
+    "Execute Workflow Trigger": { "main": [[{"node": "Validate & Normalize", "type": "main", "index": 0}]] },
+    "Validate & Normalize": { "main": [[{"node": "Is Valid?", "type": "main", "index": 0}]] },
+    "Is Valid?": { "main": [[{"node": "Get OpenAI Embedding", "type": "main", "index": 0}], [{"node": "Format Validation Error", "type": "main", "index": 0}]] },
+    "Get OpenAI Embedding": { "main": [[{"node": "Post-Validate Embedding", "type": "main", "index": 0}]] },
+    "Post-Validate Embedding": { "main": [[{"node": "Embedding Success?", "type": "main", "index": 0}]] },
+    "Embedding Success?": { "main": [[{"node": "Build Parameterized Query", "type": "main", "index": 0}], [{"node": "Format Embedding Error", "type": "main", "index": 0}]] },
+    "Build Parameterized Query": { "main": [[{"node": "Archive Superseded Docs", "type": "main", "index": 0}]] },
+    "Archive Superseded Docs": { "main": [[{"node": "Post-Validate Archive", "type": "main", "index": 0}], [{"node": "Format Archive Error", "type": "main", "index": 0}]] },
+    "Post-Validate Archive": { "main": [[{"node": "Insert into rag_documents", "type": "main", "index": 0}]] },
+    "Insert into rag_documents": { "main": [[{"node": "Post-Validate Insert", "type": "main", "index": 0}], [{"node": "Format Database Error", "type": "main", "index": 0}]] },
+    "Post-Validate Insert": { "main": [[{"node": "Insert Success?", "type": "main", "index": 0}]] },
+    "Insert Success?": { "main": [[{"node": "Format Success Response", "type": "main", "index": 0}], [{"node": "Format Insert Error", "type": "main", "index": 0}]] },
+    "Format Success Response": { "main": [[{"node": "📤 Standard Contract Output", "type": "main", "index": 0}]] },
+    "Central Error Handler": { "main": [[{"node": "📤 Standard Contract Output", "type": "main", "index": 0}]] },
+    "Format Validation Error": { "main": [[{"node": "Central Error Handler", "type": "main", "index": 0}]] },
+    "Format Embedding Error": { "main": [[{"node": "Central Error Handler", "type": "main", "index": 0}]] },
+    "Format Archive Error": { "main": [[{"node": "Central Error Handler", "type": "main", "index": 0}]] },
+    "Format Database Error": { "main": [[{"node": "Central Error Handler", "type": "main", "index": 0}]] },
+    "Format Insert Error": { "main": [[{"node": "Central Error Handler", "type": "main", "index": 0}]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}

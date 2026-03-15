@@ -1,0 +1,305 @@
+{
+  "name": "DB_Reschedule_Booking",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"booking_id\": \"BKG-X7K9P2\", \"new_start_time\": \"2026-03-20T14:00:00\", \"chat_id\": 12345}"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -200,
+        432
+      ],
+      "id": "trigger"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "db-reschedule-booking",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -200,
+        632
+      ],
+      "webhookId": "db-reschedule-booking",
+      "id": "webhook_trigger"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        232
+      ],
+      "id": "manual_trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.body || $input.first().json;\n\n// VRF — GUARD + VALIDATE\nconst isValidUUID = (v) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);\nconst bookingId = input.old_booking_id || input.booking_id;\n\nlet isValid = true;\nlet error_message = null;\n\nif (!bookingId || !isValidUUID(bookingId)) {\n  isValid = false;\n  error_message = 'Invalid or missing booking_id (UUID required)';\n}\nif (isValid && !input.new_start_time) {\n  isValid = false;\n  error_message = 'Missing required field: new_start_time';\n}\n\nconst chatId = parseInt(input.chat_id);\n\nreturn [{\n  json: {\n    isValid,\n    error_message,\n    chat_id: isNaN(chatId) ? null : chatId,\n    booking_id: bookingId,\n    old_booking_id: bookingId,\n    start_time: input.new_start_time,\n    provider_id: parseInt(input.provider_id) || 1,\n    service_id: parseInt(input.service_id) || 1,\n    user_email: input.user_email || '',\n    user_name: input.user_name || 'Paciente'\n  }\n}];"
+      },
+      "name": "Build Secure JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        50,
+        432
+      ],
+      "id": "build_json"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "mf4qnUG7UlrAKpQU",
+          "mode": "id"
+        },
+        "mode": "wait",
+        "inputData": "={{ $json }}",
+        "options": {}
+      },
+      "name": "Step 1: Cancel Old",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        432
+      ],
+      "id": "cancel_old"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ilA6a6sM5CvDsSBi",
+          "mode": "id"
+        },
+        "mode": "wait",
+        "inputData": "={{ $json }}",
+        "options": {}
+      },
+      "name": "Step 2: Create New",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        750,
+        432
+      ],
+      "id": "create_new"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format reschedule response con message legible para el LLM\nconst cancelResult = $node[\"Step 1: Cancel Old\"]?.json  || {};\nconst createResult = $node[\"Step 2: Create New\"]?.json  || {};\nconst isSuccess    = createResult.success === true;\nconst newCode      = createResult.data?.booking_code || createResult.data?.new_booking_code || null;\nconst newTime      = createResult.data?.start_time   || null;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message: isSuccess\n      ? `Tu cita fue reprogramada correctamente${newCode ? ' (' + newCode + ')' : ''}${newTime ? ' para el ' + newTime : ''}`\n      : (createResult.error_message || 'No se pudo reprogramar la cita.'),\n    error_code:    isSuccess ? null : (createResult.error_code    || 'RESCHEDULE_ERROR'),\n    error_message: isSuccess ? null : (createResult.error_message || 'Reschedule failed'),\n    data: {\n      old_booking_id:   cancelResult.data?.booking_id   || null,\n      old_booking_code: cancelResult.data?.booking_code || null,\n      new_booking_id:   createResult.data?.booking_id   || null,\n      new_booking_code: newCode,\n      status: isSuccess ? 'CONFIRMED' : 'FAILED'\n    },\n    _meta: { source: 'DB_Reschedule_Booking', timestamp: new Date().toISOString(), version: '3.0.0' }\n  }\n}];"
+      },
+      "name": "Final Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        432
+      ],
+      "id": "final_res"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid_cond",
+              "leftValue": "={{ $json.isValid === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if_valid_reschedule",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        200,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: \"VALIDATION_ERROR\",\n    error_message: $json.error_message,\n    data: null,\n    _meta: { source: \"DB_Reschedule_Booking\", timestamp: new Date().toISOString(), version: \"1.0.0\" }\n  }\n}];"
+      },
+      "id": "format_invalid_reschedule",
+      "name": "Format Invalid",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT — Tool-compatible (v3.0.0)\n// El AI Agent lee \"message\" como respuesta legible y \"data\" para detalles.\nconst result = $input.first()?.json || {};\nconst isSuccess = result.success !== false;\n\n// Construir mensaje legible para el LLM\nlet message = result.message || result.data?.message || null;\nif (!message) {\n  message = isSuccess\n    ? 'Operación completada con éxito.'\n    : (result.error_message || result.error_code || 'Error desconocido.');\n}\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message,\n    error_code:    isSuccess ? null : (result.error_code    || 'UNKNOWN_ERROR'),\n    error_message: isSuccess ? null : (result.error_message || message),\n    data:          result.data || null,\n    _meta: {\n      source:    'DB_RESCHEDULE_BOOKING',\n      timestamp: new Date().toISOString(),\n      version:   '3.0.0'\n    }\n  }\n}];"
+      },
+      "id": "standard_contract_1772984456916",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5000,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const buildData = $('Build Secure JSON').first().json;\nreturn [{\n  json: {\n    chat_id: buildData.chat_id,\n    start_time: buildData.start_time,\n    provider_id: buildData.provider_id,\n    service_id: buildData.service_id,\n    user_name: buildData.user_name,\n    user_email: buildData.user_email\n  }\n}];"
+      },
+      "id": "prepare-create-input",
+      "name": "Prepare Create Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        550,
+        432
+      ]
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Secure JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build Secure JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Secure JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Secure JSON": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 1: Cancel Old": {
+      "main": [
+        [
+          {
+            "node": "Prepare Create Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 2: Create New": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Step 1: Cancel Old",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Invalid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Invalid": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Create Input": {
+      "main": [
+        [
+          {
+            "node": "Step 2: Create New",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Response": {
+      "main": [
+        [
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "F2F5oQ7okPDKwg9E"
+}

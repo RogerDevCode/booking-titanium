@@ -1,0 +1,332 @@
+{
+  "name": "WF4_Sync_Engine_Event_Driven",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "gcal-sync-trigger",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "gcal-sync-trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate webhook payload from Google Apps Script\nconst input = $input.first().json;\n\n// Verify source\nif (input.source !== 'google_apps_script') {\n  throw new Error('Invalid source: ' + input.source);\n}\n\n// Extract event data\nconst event = input.event || {};\n\nreturn [{\n  json: {\n    calendar_id: input.calendar_id,\n    event_id: event.id,\n    event_title: event.title,\n    event_start: event.start,\n    event_end: event.end,\n    event_status: event.status,\n    event_description: event.description,\n    last_updated: event.lastUpdated,\n    html_link: event.htmlLink,\n    sync_type: input.sync_type,\n    received_at: new Date().toISOString()\n  }\n}];",
+        "options": {}
+      },
+      "name": "Validate Webhook",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value": "cancelled",
+              "operation": "equals",
+              "property": "={{ $json.event_status }}"
+            }
+          ]
+        }
+      },
+      "name": "Is Event Cancelled?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        500,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Find booking by GCal event ID and cancel it\nUPDATE bookings \nSET status = 'cancelled', \n    cancelled_at = NOW(), \n    cancellation_reason = 'Event deleted/cancelled in Google Calendar',\n    gcal_synced_at = NOW()\nWHERE gcal_event_id = $1::text \nRETURNING booking_id, status, customer_id;",
+        "options": {
+          "queryReplacement": "={{ $json.event_id }}"
+        }
+      },
+      "name": "Cancel DB Booking",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        750,
+        -100
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "SFNQsmuu4zirZAnP",
+          "name": "Postgres account"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Find or update booking by event ID\n-- First try to find existing booking by event ID\nWITH existing AS (\n  SELECT booking_id FROM bookings \n  WHERE gcal_event_id = $1::text \n  LIMIT 1\n),\n-- If not found, try to find by time match\nmatched AS (\n  SELECT booking_id FROM bookings \n  WHERE DATE(start_time) = DATE($2::timestamp)\n    AND EXTRACT(HOUR FROM start_time) = EXTRACT(HOUR FROM $2::timestamp)\n    AND provider_id = (SELECT provider_id FROM services WHERE service_id = 1) -- Default provider\n  LIMIT 1\n)\nSELECT COALESCE(\n  (SELECT booking_id FROM existing),\n  (SELECT booking_id FROM matched)\n) as booking_id;",
+        "options": {
+          "queryReplacement": "={{ $json.event_id }}, {{ $json.event_start }}"
+        }
+      },
+      "name": "Find Matching Booking",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        750,
+        100
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "SFNQsmuu4zirZAnP",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value": "",
+              "operation": "notEmpty",
+              "property": "={{ $json.booking_id }}"
+            }
+          ]
+        }
+      },
+      "name": "Booking Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1000,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Update existing booking with GCal event ID and sync timestamp\nUPDATE bookings \nSET gcal_event_id = $1::text,\n    gcal_synced_at = NOW(),\n    status = CASE WHEN status != 'cancelled' THEN 'confirmed' ELSE status END\nWHERE booking_id = $2::int\nRETURNING booking_id, gcal_event_id;",
+        "options": {
+          "queryReplacement": "={{ $('Validate Webhook').first().json.event_id }}, {{ $json.booking_id }}"
+        }
+      },
+      "name": "Update Booking Sync",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1250,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "SFNQsmuu4zirZAnP",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// No matching booking found - this is an orphan event\n// Log it for manual review\nconst event = $('Validate Webhook').first().json;\n\nreturn [{\n  json: {\n    action: 'orphan_event_detected',\n    event_id: event.event_id,\n    event_title: event.event_title,\n    event_start: event.event_start,\n    message: 'Event exists in GCal but not in DB - may need manual review',\n    requires_action: true\n  }\n}];",
+        "options": {}
+      },
+      "name": "Handle Orphan Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1250,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Log sync operation\nINSERT INTO system_logs (workflow_name, execution_id, level, message, details) \nVALUES ($1::text, $2::text, 'INFO', $3::text, $4::jsonb) \nRETURNING id;",
+        "options": {
+          "queryReplacement": "={{ $node[\"Validate Webhook\"].json[\"sync_type\"] || 'gcal_sync' }}, {{ $execution.id }}, GCal sync processed, {{ JSON.stringify($input.first().json) }}"
+        }
+      },
+      "name": "Log Sync Operation",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1500,
+        100
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "SFNQsmuu4zirZAnP",
+          "name": "Postgres account"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Standard Contract Output\nconst input = $input.first().json;\nconst webhookData = $('Validate Webhook').first().json;\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      synced: true,\n      calendar_id: webhookData.calendar_id,\n      event_id: webhookData.event_id,\n      action_taken: input.action || 'sync_completed',\n      booking_id: input.booking_id || null,\n      requires_manual_review: input.requires_action || false\n    },\n    _meta: {\n      source: 'WF4_SYNC_ENGINE_EVENT_DRIVEN',\n      timestamp: new Date().toISOString(),\n      version: '2.0.0'\n    }\n  }\n}];",
+        "options": {}
+      },
+      "name": "Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1750,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle cancelled event result\nconst cancelled = $input.first().json;\n\nreturn [{\n  json: {\n    action: 'booking_cancelled',\n    booking_id: cancelled.booking_id,\n    status: cancelled.status,\n    customer_id: cancelled.customer_id,\n    message: 'Booking cancelled due to GCal event deletion'\n  }\n}];",
+        "options": {}
+      },
+      "name": "Cancel Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        -100
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Webhook": {
+      "main": [
+        [
+          {
+            "node": "Is Event Cancelled?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Event Cancelled?": {
+      "main": [
+        [
+          {
+            "node": "Cancel DB Booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Find Matching Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cancel DB Booking": {
+      "main": [
+        [
+          {
+            "node": "Cancel Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cancel Result": {
+      "main": [
+        [
+          {
+            "node": "Log Sync Operation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Matching Booking": {
+      "main": [
+        [
+          {
+            "node": "Booking Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Booking Found?": {
+      "main": [
+        [
+          {
+            "node": "Update Booking Sync",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle Orphan Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Booking Sync": {
+      "main": [
+        [
+          {
+            "node": "Log Sync Operation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Orphan Event": {
+      "main": [
+        [
+          {
+            "node": "Log Sync Operation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Sync Operation": {
+      "main": [
+        [
+          {
+            "node": "Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

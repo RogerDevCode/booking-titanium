@@ -1,0 +1,195 @@
+{
+  "name": "FRONTEND_Landing_Page",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "titanium-landing",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "e96c9c61-0f4a-4e1b-b4eb-2c49e623dbb7",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = `\n<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Booking Titanium | Sistema de Reservas</title>\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&family=Manrope:wght@400;600&display=swap\" rel=\"stylesheet\">\n    <style>\n        :root {\n            --bg-base: #050505;\n            --titanium-light: #e0e5ec;\n            --titanium-dark: #8c97a7;\n            --accent-cyan: #00f0ff;\n            --accent-purple: #7000ff;\n        }\n\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            background-color: var(--bg-base);\n            color: var(--titanium-light);\n            font-family: 'Manrope', sans-serif;\n            min-height: 100vh;\n            display: flex;\n            flex-direction: column;\n            overflow-x: hidden;\n            position: relative;\n        }\n\n        /* Mesh Gradient Background */\n        .ambient-bg {\n            position: fixed;\n            top: 0;\n            left: 0;\n            width: 100vw;\n            height: 100vh;\n            z-index: -1;\n            background: \n                radial-gradient(circle at 15% 50%, rgba(0, 240, 255, 0.08), transparent 50%),\n                radial-gradient(circle at 85% 30%, rgba(112, 0, 255, 0.12), transparent 50%);\n            filter: blur(60px);\n            animation: pulse 15s ease-in-out infinite alternate;\n        }\n\n        /* Noise overlay */\n        .noise-overlay {\n            position: fixed;\n            top: 0; left: 0; width: 100vw; height: 100vh;\n            z-index: -1;\n            opacity: 0.03;\n            background-image: url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E\");\n            pointer-events: none;\n        }\n\n        @keyframes pulse {\n            0% { transform: scale(1); opacity: 0.8; }\n            100% { transform: scale(1.1); opacity: 1; }\n        }\n\n        nav {\n            padding: 2rem 4rem;\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n            border-bottom: 1px solid rgba(255,255,255,0.05);\n        }\n\n        .logo {\n            font-family: 'Outfit', sans-serif;\n            font-weight: 800;\n            font-size: 1.5rem;\n            letter-spacing: 2px;\n            text-transform: uppercase;\n            background: linear-gradient(90deg, var(--titanium-light), var(--titanium-dark));\n            -webkit-background-clip: text;\n            -webkit-text-fill-color: transparent;\n        }\n\n        main {\n            flex: 1;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            padding: 4rem;\n        }\n\n        .hero-content {\n            max-width: 800px;\n            text-align: center;\n            z-index: 1;\n        }\n\n        .badge {\n            display: inline-block;\n            padding: 0.5rem 1.5rem;\n            border-radius: 100px;\n            font-size: 0.8rem;\n            font-weight: 600;\n            letter-spacing: 1px;\n            text-transform: uppercase;\n            background: rgba(255,255,255,0.03);\n            border: 1px solid rgba(255,255,255,0.1);\n            margin-bottom: 2rem;\n            backdrop-filter: blur(10px);\n        }\n\n        h1 {\n            font-family: 'Outfit', sans-serif;\n            font-weight: 300;\n            font-size: 4.5rem;\n            line-height: 1.1;\n            margin-bottom: 1.5rem;\n            letter-spacing: -1px;\n        }\n\n        h1 span {\n            font-weight: 800;\n            background: linear-gradient(45deg, var(--accent-cyan), var(--accent-purple));\n            -webkit-background-clip: text;\n            -webkit-text-fill-color: transparent;\n            position: relative;\n        }\n\n        p.subtitle {\n            font-size: 1.2rem;\n            color: var(--titanium-dark);\n            margin-bottom: 3rem;\n            max-width: 600px;\n            margin-inline: auto;\n            line-height: 1.6;\n        }\n\n        .cta-container {\n            display: flex;\n            gap: 1.5rem;\n            justify-content: center;\n        }\n\n        .btn {\n            padding: 1rem 2.5rem;\n            font-family: 'Outfit', sans-serif;\n            font-weight: 600;\n            font-size: 1rem;\n            border-radius: 4px;\n            cursor: pointer;\n            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);\n            text-decoration: none;\n            letter-spacing: 0.5px;\n        }\n\n        .btn-primary {\n            background: var(--titanium-light);\n            color: var(--bg-base);\n            border: none;\n            position: relative;\n            overflow: hidden;\n        }\n\n        .btn-primary:hover {\n            background: #fff;\n            box-shadow: 0 0 30px rgba(255,255,255,0.2);\n            transform: translateY(-2px);\n        }\n\n        .btn-secondary {\n            background: transparent;\n            color: var(--titanium-light);\n            border: 1px solid rgba(255,255,255,0.2);\n            backdrop-filter: blur(10px);\n        }\n\n        .btn-secondary:hover {\n            border-color: var(--titanium-light);\n            background: rgba(255,255,255,0.05);\n        }\n\n        /* Custom cursor interaction */\n        .cursor-glow {\n            width: 400px;\n            height: 400px;\n            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);\n            border-radius: 50%;\n            position: fixed;\n            pointer-events: none;\n            z-index: 9999;\n            transform: translate(-50%, -50%);\n            transition: background 0.3s ease;\n        }\n\n        @media (max-width: 768px) {\n            h1 { font-size: 3rem; }\n            nav { padding: 1.5rem 2rem; }\n            main { padding: 2rem; }\n            .cta-container { flex-direction: column; }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"ambient-bg\"></div>\n    <div class=\"noise-overlay\"></div>\n    <div class=\"cursor-glow\" id=\"cursorGlow\"></div>\n\n    <nav>\n        <div class=\"logo\">Titanium</div>\n        <a href=\"#\" class=\"btn btn-secondary\" style=\"padding: 0.5rem 1.5rem; font-size: 0.9rem;\">Acceso Staff</a>\n    </nav>\n\n    <main>\n        <div class=\"hero-content\">\n            <div class=\"badge\">IA + Automatización</div>\n            <h1>Gestión de Reservas <br><span>Inteligente.</span></h1>\n            <p class=\"subtitle\">Reserva, consulta y administra tus turnos en segundos. Potenciado por Inteligencia Artificial y un ecosistema omnicanal fluido.</p>\n            \n            <div class=\"cta-container\">\n                <!-- Reemplazar el enlace con el del bot de Telegram de producción -->\n                <a href=\"https://t.me/TuBotDeTitanium\" target=\"_blank\" class=\"btn btn-primary\">Reservar vía Telegram</a>\n                <a href=\"#\" class=\"btn btn-secondary\">Saber más</a>\n            </div>\n        </div>\n    </main>\n\n    <script>\n        // Interactive subtle glow following the cursor\n        const glow = document.getElementById('cursorGlow');\n        \n        document.addEventListener('mousemove', (e) => {\n            glow.style.left = e.clientX + 'px';\n            glow.style.top = e.clientY + 'px';\n        });\n\n        // Reveal animation on load\n        document.addEventListener(\"DOMContentLoaded\", () => {\n            const elements = document.querySelectorAll('.badge, h1, .subtitle, .cta-container');\n            elements.forEach((el, index) => {\n                el.style.opacity = '0';\n                el.style.transform = 'translateY(20px)';\n                el.style.transition = 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)';\n                setTimeout(() => {\n                    el.style.opacity = '1';\n                    el.style.transform = 'translateY(0)';\n                }, 100 + (index * 150));\n            });\n        });\n    </script>\n</body>\n</html>\n`;\n\nreturn [\n  {\n    json: {\n      html: html\n    }\n  }\n];"
+      },
+      "id": "e305e608-cbfa-4e78-9cc0-c3d523ec33cc",
+      "name": "Validate PRE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.html }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/html"
+              }
+            ]
+          }
+        }
+      },
+      "id": "8bb3e85e-9989-4b68-b715-db14902cd5b3",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        400,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "trigger_manual_auto",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "trigger_exec_auto",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid_cond_auto",
+              "leftValue": "={{ true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if_valid_auto",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        300,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\n// Retorna esquema unificado para todos los workflows\n\nconst result = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'FRONTEND_LANDING_PAGE',\n      workflow_id: 'FRONTEND_LANDING_PAGE',\n      timestamp: new Date().toISOString(),\n      version: '4.3.1'\n    }\n  }\n}];"
+      },
+      "id": "standard_contract_1772984456917",
+      "name": "📤 Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5000,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate PRE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Frontend": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate PRE": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate PRE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate PRE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "📤 Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "EfQxqiSRjdJapQIY"
+}

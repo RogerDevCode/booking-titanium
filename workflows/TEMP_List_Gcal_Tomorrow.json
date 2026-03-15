@@ -1,0 +1,85 @@
+{
+  "name": "TEMP_List_Gcal_Tomorrow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "list-gcal-tomorrow",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook_list",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "list-gcal-tomorrow"
+    },
+    {
+      "parameters": {
+        "calendar": "primary",
+        "filters": {
+          "timeMin": "=2026-03-12T00:00:00Z",
+          "timeMax": "=2026-03-15T23:59:59Z"
+        }
+      },
+      "id": "gcal_list",
+      "name": "Google Calendar",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        250,
+        0
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "OsRBfz3Cs7Ph5uV5",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nreturn [{\n  json: {\n    success: true,\n    data: items.map(i => ({\n      summary: i.json.summary,\n      start: i.json.start?.dateTime || i.json.start?.date,\n      end: i.json.end?.dateTime || i.json.end?.date,\n      id: i.json.id\n    })),\n    _meta: {\n      source: 'TEMP_List_Gcal_Tomorrow',\n      timestamp: new Date().toISOString()\n    }\n  }\n}];"
+      },
+      "id": "format_out",
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Google Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

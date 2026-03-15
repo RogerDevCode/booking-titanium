@@ -1,0 +1,10 @@
+--- workflows/seed_clean/WF2_Booking_Orchestrator.json
++++ workflows/seed_clean/WF2_Booking_Orchestrator.json
+@@ -282,7 +282,10 @@
+       "name": "Create GCal Event",
+       "type": "n8n-nodes-base.googleCalendar",
+       "typeVersion": 1.3,
+-      "credentials": { "googleCalendarOAuth2Api": { "id": "NDk9hJZ9MTokyiAh", "name": "Google Calendar account" } },
+       "position": [3000, -400],
+       "onError": "continueErrorOutput"
+     },

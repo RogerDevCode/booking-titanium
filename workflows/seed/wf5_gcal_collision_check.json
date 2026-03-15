@@ -1,0 +1,39 @@
+{
+  "name": "WF5_GCal_Collision_Check",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "gcal-collision-check",
+        "httpMethod": "POST"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll"
+      },
+      "name": "List Events",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        250,
+        0
+      ]
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "active": true,
+  "versionId": "b0a66057-9190-4072-93be-20be8acb2d4f"
+}

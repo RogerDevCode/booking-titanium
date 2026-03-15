@@ -1,0 +1,612 @@
+N8N API DEBUG MANUAL v1.1 — 2025-03
+Instancia: https://n8n.stax.ink (self-hosted Docker + Cloudflare Tunnel)
+Fuentes: docs.n8n.io, community.n8n.io, github.com/n8n-io/n8n
+Optimizado para consumo LLM (densidad maxima, sin redundancia)
+====================================================================
+
+[SECCION 1] AUTENTICACION
+------------------------------------------------------------------
+HEADER requerido en TODOS los requests:
+  X-N8N-API-KEY: <tu_api_key>
+
+Obtener key: Settings > API > Create API Key
+Base URL self-hosted: https://n8n.stax.ink/api/v1
+Base URL cloud:       https://INSTANCE.app.n8n.cloud/api/v1
+
+NOTA: n8n.stax.ink usa Cloudflare Tunnel — SSL terminado por Cloudflare.
+No requiere configuracion adicional de certificados en el cliente.
+Timeout Cloudflare: 100s por request (ver SECCION 7 para implicaciones).
+
+====================================================================
+[SECCION 2] PREREQUISITO CRITICO — GUARDAR DATOS DE EJECUCION
+====================================================================
+Si GET /executions/{id}?includeData=true devuelve solo summary (sin runData),
+el problema es la configuracion de guardado, NO la API key.
+
+VARIABLES DE ENTORNO (docker-compose o .env):
+  EXECUTIONS_DATA_SAVE_ON_ERROR=all      # guarda ejecuciones con error
+  EXECUTIONS_DATA_SAVE_ON_SUCCESS=all    # guarda ejecuciones exitosas
+  EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=true  # guarda runs manuales
+  EXECUTIONS_DATA_SAVE_ON_PROGRESS=true  # guarda estado intermedio por nodo
+
+  # Cuantas ejecuciones retener (evita DB infinita):
+  EXECUTIONS_DATA_MAX_AGE=336            # horas (14 dias default)
+  EXECUTIONS_DATA_PRUNE_MAX_COUNT=10000  # max registros
+
+POR WORKFLOW (override del default de instancia):
+  En cada workflow: Options > Settings > Save Execution Progress = Save
+
+SIN ESTAS CONFIG: includeData=true devuelve runData:null
+Con runData:null no hay data de nodos para debug.
+
+====================================================================
+[SECCION 3] ENDPOINTS DE EJECUCION
+====================================================================
+
+--- 3.1 LISTAR EJECUCIONES ---
+GET /api/v1/executions
+
+PARAMS opcionales:
+  workflowId=<id>          filtra por workflow
+  status=<valor>           valores validos v2.10+: error, success, waiting, canceled
+                           NOTA: "running" como filtro tiene bug en v1.86-v1.115 (issue #19664)
+                           En v1.115+ (sept 2025) se agrego "running" y "canceled" como filtros validos
+  includeData=true         incluye runData de cada nodo (ADVERTENCIA: puede crashear con 400/502
+                           si las ejecuciones son muy grandes — ver SECCION 7)
+  limit=<n>                default 20, max 250
+  cursor=<str>             paginacion — usar nextCursor del response anterior
+  lastId=<id>              alternativa a cursor para paginar
+
+RESPONSE shape:
+  {
+    "data": [
+      {
+        "id": "123",
+        "finished": true,
+        "mode": "trigger|manual|webhook|retry",
+        "retryOf": null,
+        "retrySuccessId": null,
+        "startedAt": "2025-03-15T10:00:00.000Z",
+        "stoppedAt": "2025-03-15T10:00:05.123Z",
+        "workflowId": "abc",
+        "workflowName": "Mi Workflow",    // disponible desde v1.115 (sept 2025)
+        "status": "success|error|waiting|canceled"  // desde v1.115
+      }
+    ],
+    "nextCursor": "abc123|null"
+  }
+
+NOTA v1.86.1 BUG conocido: status="waiting" no aparece en GET /executions
+aunque exista en DB. Fix en versiones posteriores.
+
+--- 3.2 OBTENER EJECUCION INDIVIDUAL CON DATA COMPLETA ---
+GET /api/v1/executions/{id}?includeData=true
+
+RESPONSE shape completo (cuando includeData=true y hay runData guardado):
+  {
+    "id": "123",
+    "finished": true,
+    "mode": "trigger",
+    "startedAt": "...",
+    "stoppedAt": "...",
+    "workflowId": "abc",
+    "status": "error",
+    "data": {
+      "resultData": {
+        "runData": {
+          "<NODE_NAME>": [
+            {
+              "startTime": 1741000000000,
+              "executionTime": 250,
+              "source": [],
+              "executionStatus": "success|error",
+              "data": {
+                "main": [
+                  [
+                    { "json": { ...output_del_nodo... }, "pairedItem": { "item": 0 } }
+                  ]
+                ]
+              },
+              "error": {
+                "name": "NodeApiError|NodeOperationError",
+                "message": "descripcion del error",
+                "description": "detalle adicional",
+                "context": { "nodeCause": "<NODE_NAME>" },
+                "cause": { ...error_original... },
+                "httpCode": "400|401|403|429|500",
+                "timestamp": 1741000000000
+              }
+            }
+          ]
+        },
+        "error": {
+          "message": "error del workflow completo",
+          "node": { "name": "<NODE_DONDE_FALLO>" }
+        },
+        "lastNodeExecuted": "<ULTIMO_NODO_EJECUTADO>"
+      },
+      "executionData": {
+        "contextData": {},
+        "nodeExecutionStack": [],
+        "waitingExecution": {},
+        "waitingExecutionSource": {}
+      }
+    }
+  }
+
+COMO LEER runData PARA DEBUG:
+  1. Iterar data.resultData.runData
+  2. Para cada NODE_NAME, es un array (soporta multiples runs del mismo nodo en loops)
+  3. Chequear item[0].executionStatus === "error"
+  4. Si hay error: leer item[0].error.message + item[0].error.httpCode
+  5. data.resultData.lastNodeExecuted = nombre del ultimo nodo que corrio
+  6. data.resultData.error.node.name = nodo donde fallo el workflow
+
+SCRIPT BASH — encontrar nodo con error rapidamente:
+  curl -s "https://n8n.stax.ink/api/v1/executions/ID?includeData=true" \
+    -H "X-N8N-API-KEY: KEY" | \
+    jq '.data.resultData.runData | to_entries[] |
+        select(.value[0].executionStatus == "error") |
+        {node: .key, error: .value[0].error.message, httpCode: .value[0].error.httpCode}'
+
+SCRIPT BASH — output de un nodo especifico:
+  curl -s "https://n8n.stax.ink/api/v1/executions/ID?includeData=true" \
+    -H "X-N8N-API-KEY: KEY" | \
+    jq '.data.resultData.runData["NOMBRE_NODO"][0].data.main[0]'
+
+--- 3.3 ELIMINAR EJECUCION ---
+DELETE /api/v1/executions/{id}
+Response: 200 OK
+
+--- 3.4 RETRY DE EJECUCION FALLIDA (desde v1.115, sept 2025) ---
+POST /api/v1/executions/{id}/retry
+Body: { "loadWorkflow": true|false }
+  loadWorkflow=true  -> retry con el workflow ACTUAL (post-correcciones)
+  loadWorkflow=false -> retry con el workflow ORIGINAL de la ejecucion
+
+Response: { "data": { "id": "nuevo_execution_id" } }
+
+NOTA pre-v1.115: retry no existia en API publica. Solo via UI o via
+POST /api/v1/workflows/{id}/run (nuevo run limpio, no retry con data anterior).
+
+====================================================================
+[SECCION 4] ENDPOINTS DE WORKFLOW
+====================================================================
+
+--- 4.1 LISTAR WORKFLOWS ---
+GET /api/v1/workflows?active=true&limit=20
+
+--- 4.2 OBTENER WORKFLOW ---
+GET /api/v1/workflows/{id}
+Incluye: nodes[], connections{}, settings{}, staticData{}
+
+--- 4.3 ACTIVAR / DESACTIVAR ---
+PATCH /api/v1/workflows/{id}
+Body: { "active": true|false }
+
+--- 4.4 EJECUTAR WORKFLOW MANUALMENTE ---
+POST /api/v1/workflows/{id}/run
+Body (opcional): { "runData": {}, "startNodes": ["NombreNodo"] }
+Response: { "data": { "executionId": "123" } }
+
+NOTA: runData en response es el execution_id, NO los datos del run.
+Para obtener datos del run: GET /api/v1/executions/{executionId}?includeData=true
+ADVERTENCIA: el run puede no estar completo cuando devuelve el POST.
+Hacer polling con GET hasta que finished=true o status != "running".
+
+====================================================================
+[SECCION 5] FLUJO COMPLETO DE DEBUG VIA API
+====================================================================
+
+PASO 1 — ENCONTRAR LA EJECUCION FALLIDA:
+  curl "BASE/executions?workflowId=WF_ID&status=error&limit=5" \
+    -H "X-N8N-API-KEY: KEY"
+  -> Tomar el id de la ejecucion mas reciente con status=error
+
+PASO 2 — OBTENER DETALLE COMPLETO:
+  curl "BASE/executions/EXEC_ID?includeData=true" \
+    -H "X-N8N-API-KEY: KEY" > exec.json
+
+PASO 3 — IDENTIFICAR NODO FALLIDO:
+  jq '.data.resultData.error' exec.json
+  # Muestra: { "message": "...", "node": { "name": "NombreNodo" } }
+
+PASO 4 — VER OUTPUT DEL NODO FALLIDO:
+  jq '.data.resultData.runData["NombreNodo"][0]' exec.json
+  # Muestra: executionStatus, error.message, error.httpCode, data.main
+
+PASO 5 — VER INPUT QUE RECIBIO EL NODO FALLIDO:
+  # El input de un nodo = output del nodo anterior en runData
+  # Buscar el nodo que conecta al fallido en .data.resultData.runData
+  # O usar: jq '.data.resultData.runData["NodoAnterior"][0].data.main[0]' exec.json
+
+PASO 6 — ANALIZAR ERROR Y CORREGIR:
+  Ver SECCION 6 para catalogo de errores comunes
+
+PASO 7 — RETRY CON WORKFLOW CORREGIDO (v1.115+):
+  # Primero hacer PATCH para corregir el workflow
+  # Luego:
+  curl -X POST "BASE/executions/EXEC_ID/retry" \
+    -H "X-N8N-API-KEY: KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"loadWorkflow": true}'
+
+PASO 7 PRE-v1.115 (alternativo):
+  # Ejecutar nuevo run usando data del anterior como input
+  curl -X POST "BASE/workflows/WF_ID/run" \
+    -H "X-N8N-API-KEY: KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"runData": <runData_del_step1_hasta_el_nodo_fallido>}'
+
+====================================================================
+[SECCION 6] CATALOGO DE ERRORES Y SOLUCIONES
+====================================================================
+
+--- HTTP Errors (en error.httpCode) ---
+
+400 Bad Request
+  Causas: parametro invalido, JSON mal formado, array no formateado
+  Fix: revisar query params, validar JSON con linter, chequear formato array
+
+401 Unauthorized
+  Causas: API key invalida o expirada, credencial del nodo incorrecta
+  Fix: regenerar API key, actualizar credencial del nodo
+
+403 Forbidden
+  Causas: scope insuficiente de la API key, permisos del recurso
+  Fix: actualizar permisos del token externo, verificar scopes
+
+404 Not Found
+  Causas: URL de endpoint incorrecta, ID de recurso inexistente
+  Fix: verificar URL en docs del servicio externo, confirmar que el recurso existe
+
+422 Unprocessable Entity
+  Causas: datos validos en formato pero semanticamente incorrectos
+  Fix: revisar la logica de negocio de la API destino
+
+429 Too Many Requests
+  Causas: rate limit del servicio externo
+  Fix opciones:
+    a) HTTP Request node > Settings > Retry on Fail + Wait Between Tries
+    b) Loop Over Items + Wait node al final (delay entre batches)
+    c) Batching en HTTP Request node: Add Option > Batching > batchSize=1, interval=1500
+
+500 / 502 / 503 Server Error
+  Causas: servicio externo caido, o n8n mismo (502 con includeData en exec grande)
+  Fix 502 con includeData: paginar con limit pequeno (5-10), no usar includeData=true
+      en bulk — usar solo por id individual
+
+--- n8n Internal Errors ---
+
+"node execution output incorrect data"
+  Fuente: workflow-execute.ts (error interno de n8n core)
+  Causa: nodo devuelve estructura no compatible con INodeExecutionData[]
+         (falta json:{}, o devuelve primitivo en vez de array de objetos)
+  Fix en Code node: asegurarse que return es [{ json: {...} }]
+  Fix en custom node: verificar que outputData sigue el schema de INodeExecutionData
+
+"Existing execution data is too large"
+  Causa: partial execution supera N8N_PAYLOAD_SIZE_MAX (default 16MB)
+  Fix: agregar en docker-compose:
+    N8N_PAYLOAD_SIZE_MAX=67108864   # 64MB
+    # o para workflows muy grandes:
+    N8N_PAYLOAD_SIZE_MAX=268435456  # 256MB
+  ALTERNATIVA: ejecutar workflow completo en vez de nodo individual
+
+"Cannot read properties of undefined (reading 'json')"
+  Causa: expresion $json en nodo accede a item inexistente, o nodo anterior no ejecuto
+  Fix: chequear que el nodo anterior tiene output, usar $input.first()?.json en Code node
+
+"runData not initialized for manual runs"
+  Causa: bug en v1.x cuando EXECUTIONS_DATA_SAVE_ON_PROGRESS=true y run manual
+         (issue #22030, noviembre 2025)
+  Fix: actualizar n8n, o deshabilitar SAVE_ON_PROGRESS temporalmente para runs manuales
+
+--- Error Workflow Trigger — shape del payload ---
+
+Cuando configurás un Error Workflow (con Error Trigger node), recibe:
+  {
+    "execution": {
+      "id": "123",          # puede ser undefined si error en trigger node
+      "url": "http://...",  # puede ser undefined si error en trigger node
+      "retryOf": "456",     # solo si es retry
+      "error": {
+        "message": "...",
+        "stack": "..."
+      },
+      "lastNodeExecuted": "NombreNodo",
+      "mode": "trigger|manual",
+      "workflowId": "abc"
+    },
+    "workflow": {
+      "id": "abc",
+      "name": "Mi Workflow"
+    }
+  }
+
+NOTA CRITICA: Si el error ocurre en el TRIGGER NODE del workflow principal,
+execution.id y execution.url son undefined. En ese caso el payload tiene
+mas datos en trigger{}:
+  {
+    "trigger": {
+      "error": { "message": "...", "stack": "..." },
+      "mode": "trigger"
+    },
+    "workflow": { ... }
+  }
+
+BUG CONOCIDO en Error Handler (NN_03-B):
+  NO usar $input.params.error — ese path NO existe en la API de n8n.
+  CORRECTO: leer de $input.first()?.json.execution.error
+
+====================================================================
+[SECCION 7] LIMITACIONES CONOCIDAS DE LA API (2025)
+====================================================================
+
+1. RUNTIME DATA NO DISPONIBLE:
+   GET /executions/{id}?includeData=true NO devuelve runData mientras el
+   workflow esta CORRIENDO. runData aparece solo cuando finished=true.
+   Para monitoreo en tiempo real: usar Log Streaming (enterprise) o
+   hacer polling cada N segundos hasta que status != "running".
+
+2. STATUS "running" COMO FILTRO:
+   En versiones < v1.115: status=running rechazado con error de validacion.
+   Issue #19664. Fix: actualizar a v1.115+. Workaround: no filtrar por status
+   y chequear campo finished=false en el response para detectar en ejecucion.
+
+3. STATUS "waiting" NO APARECE EN LISTADO:
+   Bug en v1.86.1 (issue #14748): execuciones con status=waiting no retornadas
+   por GET /executions aunque existan en DB.
+
+4. includeData=true EN BULK CAUSA 400 / 502:
+   GET /executions?includeData=true&workflowId=X puede crashear con:
+     400 "Invalid string length" — datos demasiado grandes para serializar
+     524 — Cloudflare timeout (100s hard limit) — comun en n8n.stax.ink
+     502 — timeout del reverse proxy nginx en self-hosted directo
+   FIX: NUNCA usar includeData=true en el endpoint de lista.
+   PATRON CORRECTO:
+     a) GET /executions?workflowId=X&limit=10 → obtener IDs
+     b) Por cada ID: GET /executions/{id}?includeData=true
+     c) Procesar de a uno
+
+5. includeData REQUIERE CONFIGURACION DE GUARDADO:
+   Ver SECCION 2. Sin EXECUTIONS_DATA_SAVE_ON_ERROR=all, runData sera null
+   para ejecuciones con error. Sin SAVE_ON_SUCCESS=all, null para exitosas.
+
+
+5b. CLOUDFLARE TUNNEL — TIMEOUT 524 (especifico de n8n.stax.ink):
+   Cloudflare tiene timeout de 100s por request en planes Free/Pro.
+   Cualquier request que tarde mas de 100s devuelve HTTP 524 (Connection Timed Out).
+   IMPACTO en n8n.stax.ink:
+     - GET /executions/{id}?includeData=true para ejecuciones con mucho runData -> 524
+     - POST /workflows/{id}/run para workflows lentos -> 524 (no significa que fallo)
+   
+   FIX para POST /run que devuelve 524:
+     El workflow puede haber iniciado igual. Hacer:
+     GET /executions?workflowId=X&limit=1  -> verificar si hay execution reciente
+   
+   FIX para GET con includeData que da 524:
+     a) Sin solucion en Cloudflare Free — el dato es demasiado grande
+     b) Acceder directamente por SSH al servidor y hacer curl interno:
+        ssh user@servidor "curl -s localhost:5678/api/v1/executions/ID?includeData=true -H 'X-N8N-API-KEY: KEY'"
+     c) Usar un workflow interno de n8n que haga el fetch y devuelva el resultado
+        (el fetch interno no pasa por Cloudflare)
+
+6. WORKFLOW SETTINGS OVERRIDE INSTANCIA:
+   Un workflow con "Save Manual Executions = Off" NO guardara runData
+   aunque la variable de entorno este en "all". El setting del workflow
+   tiene precedencia. Verificar: workflow > Options > Settings.
+
+7. EJECUCIONES DE SUBWORKFLOWS:
+   Las ejecuciones de sub-workflows (Execute Workflow node) tienen su propio
+   execution_id separado. El execution_id del workflow padre NO incluye
+   los datos de los sub-workflows. Hay que buscarlos por separado.
+   Identificarlos: mode="integrated" en la lista de executions.
+
+====================================================================
+[SECCION 8] CONFIGURACION DE AHORRO DE DATOS (WORKFLOW SETTINGS)
+====================================================================
+
+Cada workflow puede configurar independientemente que guardar:
+  Options > Settings:
+    Save Successful Executions: Default|Save|Do Not Save
+    Save Failed Executions:     Default|Save|Do Not Save  (CRITICO para debug)
+    Save Manual Executions:     Default|Save|Do Not Save
+    Save Execution Progress:    Default|Save              (nodo por nodo)
+
+Para debug efectivo la configuracion minima es:
+  Save Failed Executions = Save
+  Save Manual Executions = Save
+
+Para trazabilidad completa (mayor uso de DB):
+  Todas en Save + Save Execution Progress = Save
+
+====================================================================
+[SECCION 9] PATTERNS DE DEBUGGING PROGRAMATICO
+====================================================================
+
+PATTERN A — SCRIPT DE MONITOREO DE ERRORES (bash/curl/jq):
+-------------------------------------------------------------
+#!/bin/bash
+BASE="https://n8n.stax.ink/api/v1"
+KEY="tu_api_key"
+WF_ID="tu_workflow_id"
+
+# Ultimas 5 ejecuciones con error
+ERRORS=$(curl -s "$BASE/executions?workflowId=$WF_ID&status=error&limit=5" \
+  -H "X-N8N-API-KEY: $KEY")
+
+echo "$ERRORS" | jq -r '.data[] | "ID: \(.id) | Inicio: \(.startedAt)"'
+
+# Para cada una, obtener detalle del nodo fallido
+echo "$ERRORS" | jq -r '.data[].id' | while read EXEC_ID; do
+  echo "\n=== Execution: $EXEC_ID ==="
+  curl -s "$BASE/executions/$EXEC_ID?includeData=true" \
+    -H "X-N8N-API-KEY: $KEY" | \
+    jq '{
+      nodo_fallido: .data.resultData.error.node.name,
+      mensaje: .data.resultData.error.message,
+      ultimo_nodo: .data.resultData.lastNodeExecuted
+    }'
+done
+
+PATTERN B — OBTENER OUTPUTS DE TODOS LOS NODOS (Node.js/TypeScript):
+-------------------------------------------------------------
+async function debugExecution(execId: string) {
+  const res = await fetch(`${BASE}/executions/${execId}?includeData=true`,
+    { headers: { 'X-N8N-API-KEY': KEY } });
+  const exec = await res.json();
+  const runData = exec.data?.resultData?.runData || {};
+
+  for (const [nodeName, runs] of Object.entries(runData) as any) {
+    const run = runs[0];
+    console.log(`NODE: ${nodeName}`);
+    console.log(`  Status:  ${run.executionStatus}`);
+    console.log(`  Time:    ${run.executionTime}ms`);
+    if (run.error) {
+      console.log(`  ERROR:   ${run.error.message}`);
+      console.log(`  HTTP:    ${run.error.httpCode || 'N/A'}`);
+    }
+    if (run.data?.main?.[0]?.length) {
+      console.log(`  Items:   ${run.data.main[0].length}`);
+      console.log(`  Sample:  ${JSON.stringify(run.data.main[0][0]?.json).slice(0,100)}`);
+    }
+  }
+}
+
+PATTERN C — POLLING HASTA FIN DE EJECUCION:
+-------------------------------------------------------------
+async function runAndWait(workflowId: string, maxWaitMs = 60000) {
+  // Iniciar ejecucion
+  const runRes = await fetch(`${BASE}/workflows/${workflowId}/run`, {
+    method: 'POST',
+    headers: { 'X-N8N-API-KEY': KEY, 'Content-Type': 'application/json' }
+  });
+  const { data: { executionId } } = await runRes.json();
+
+  // Polling hasta finished
+  const start = Date.now();
+  while (Date.now() - start < maxWaitMs) {
+    await new Promise(r => setTimeout(r, 1000));
+    const execRes = await fetch(`${BASE}/executions/${executionId}`,
+      { headers: { 'X-N8N-API-KEY': KEY } });
+    const exec = await execRes.json();
+    if (exec.finished) {
+      if (exec.status === 'error') throw new Error(exec.data?.resultData?.error?.message);
+      return exec;
+    }
+  }
+  throw new Error(`Timeout esperando execution ${executionId}`);
+}
+
+PATTERN D — SELF-DEBUG DESDE DENTRO DE N8N (Code node):
+-------------------------------------------------------------
+// Agregar este Code node al principio del happy path para logging:
+const execId   = $execution.id;
+const wfId     = $workflow.id;
+const nodeName = $node.name;
+const itemCount = $input.all().length;
+console.log(`[DEBUG] ${wfId}/${execId} | ${nodeName} | items: ${itemCount}`);
+console.log(`[DEBUG] Input sample: ${JSON.stringify($input.first()?.json).slice(0,200)}`);
+return $input.all();  // pass-through
+
+====================================================================
+[SECCION 10] ERROR WORKFLOW — TEMPLATE RECOMENDADO
+====================================================================
+
+Crear workflow con Error Trigger:
+
+// Code node en Error Workflow — extrae datos del error correctamente:
+const execData = $input.first()?.json || {};
+const execution = execData.execution || {};
+const workflow  = execData.workflow  || {};
+const trigger   = execData.trigger   || {};
+
+// Error puede venir de execution{} o de trigger{} si fallo en el trigger node
+const errorMsg  = execution.error?.message || trigger.error?.message || 'Unknown error';
+const errorNode = execution.lastNodeExecuted || 'Trigger node';
+const execId    = execution.id || 'N/A (trigger error)';
+const execUrl   = execution.url || 'N/A';
+
+return [{
+  json: {
+    workflow_name:  workflow.name,
+    workflow_id:    workflow.id,
+    execution_id:   execId,
+    execution_url:  execUrl,
+    failed_node:    errorNode,
+    error_message:  errorMsg,
+    is_retry:       !!execution.retryOf,
+    retry_of:       execution.retryOf || null,
+    timestamp:      new Date().toISOString()
+  }
+}];
+
+// Conectar a: Slack node / Email node / HTTP Request a webhook de alertas
+
+====================================================================
+[SECCION 11] VARIABLES DE ENTORNO CLAVE PARA DEBUG
+====================================================================
+
+N8N_LOG_LEVEL=debug                    # verbose — usar solo en dev
+N8N_LOG_LEVEL=info                     # default produccion
+N8N_LOG_OUTPUT=console,file            # salida
+N8N_LOG_FILE_LOCATION=/home/node/.n8n/logs/n8n.log
+
+EXECUTIONS_DATA_SAVE_ON_ERROR=all
+EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=true
+EXECUTIONS_DATA_SAVE_ON_PROGRESS=true
+
+N8N_PAYLOAD_SIZE_MAX=67108864          # 64MB — fix para "data too large"
+                                       # APLICAR en docker-compose del servidor remoto
+EXECUTIONS_TIMEOUT=3600                # segundos, timeout por ejecucion
+EXECUTIONS_TIMEOUT_MAX=7200            # max override desde workflow
+
+# RETENCION:
+EXECUTIONS_DATA_MAX_AGE=336            # horas
+EXECUTIONS_DATA_PRUNE_MAX_COUNT=10000
+
+# SQLite disk reclaim (si usas SQLite):
+DB_SQLITE_VACUUM_ON_STARTUP=true
+
+====================================================================
+[SECCION 12] CHECKLIST DE DEBUG RAPIDO
+====================================================================
+
+CUANDO: execution tiene status=error
+DO:
+  [ ] GET /executions/{id}?includeData=true
+  [ ] Leer .data.resultData.error.node.name  -> nodo que fallo
+  [ ] Leer .data.resultData.runData[nodeName][0].error -> mensaje exacto
+  [ ] Chequear httpCode: 401=credencial, 429=rate limit, 400=datos, 500=servicio externo
+
+CUANDO: includeData devuelve runData:null
+DO:
+  [ ] Verificar EXECUTIONS_DATA_SAVE_ON_ERROR=all en env vars
+  [ ] Verificar workflow Settings: Save Failed Executions = Save
+  [ ] Confirmar que la ejecucion ya finished (no esta corriendo)
+
+CUANDO: status=error pero no hay execution en la lista
+DO:
+  [ ] Verificar que el error no fue en el TRIGGER node (no genera execution.id)
+  [ ] Chequear Error Workflow si esta configurado — puede haber capturado el error
+
+CUANDO: execution parece colgada (status=running por mucho tiempo)
+DO:
+  [ ] GET /executions?status=running — confirmar que sigue activa
+  [ ] Chequear si hay Wait node o HTTP Request sin timeout
+  [ ] Revisar logs del container: ssh user@servidor "docker logs n8n --tail 50"  # acceso remoto via SSH
+  [ ] Cancelar: DELETE /executions/{id} (cancela y borra)
+
+CUANDO: workflow no ejecuta aunque este activo
+DO:
+  [ ] GET /workflows/{id} -> chequear "active": true
+  [ ] Verificar que el trigger esta correctamente configurado (webhook URL, cron expr)
+  [ ] Chequear EXECUTIONS_DATA_MAX_AGE — si esta en 0 no guarda nada
+
+====================================================================
+FIN DEL MANUAL
+n8n version de referencia: v2.10 (self-hosted Docker)
+Ultima actualizacion: marzo 2026
+====================================================================

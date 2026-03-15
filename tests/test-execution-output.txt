@@ -1,0 +1,286 @@
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+  console.log
+    [dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+      at _log (node_modules/dotenv/lib/main.js:139:11)
+
+  console.log
+    
+    🌱 SEEDING DATABASE for QA Tests...
+
+      at tests/qa-edge-cases.test.ts:92:13
+
+(node:221190) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  console.log
+    ✅ Database ready: 27 providers available
+
+      at tests/qa-edge-cases.test.ts:114:17
+
+  console.log
+       Test Provider ID: 1
+
+      at tests/qa-edge-cases.test.ts:115:17
+
+  console.log
+       Test Service ID: 4
+
+      at tests/qa-edge-cases.test.ts:116:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391763292
+
+      at tests/qa-edge-cases.test.ts:131:17
+
+  console.log
+    🧹 Cleaned up test bookings for chat_id: 5391765292
+
+      at tests/qa-edge-cases.test.ts:131:17
+
+  console.log
+    
+       📅 Test Day: 2026-03-20
+
+      at tests/qa-edge-cases.test.ts:509:17
+
+  console.log
+       👤 Test User: 5391767292
+
+      at tests/qa-edge-cases.test.ts:510:17
+
+  console.log
+    
+       ⚡ Launching 10 concurrent requests for same slot...
+
+      at tests/qa-edge-cases.test.ts:599:17
+
+  console.log
+    
+       ⚡ Launching 5 concurrent find-next-available requests...
+
+      at tests/qa-edge-cases.test.ts:641:17
+
+  console.log
+    
+       👤 Test User: 5391769292
+
+      at tests/qa-edge-cases.test.ts:676:17
+
+  console.log
+       📅 Test Day: 2026-03-13
+
+      at tests/qa-edge-cases.test.ts:677:17
+
+  console.log
+       1️⃣  Registering user...
+
+      at tests/qa-edge-cases.test.ts:680:17
+
+FAIL tests/qa-edge-cases.test.ts (26.695 s)
+  📋 QA-EDGE-01: Situaciones Límite
+    Edge Case 1.1: Reserva en el pasado
+      ✕ RECHAZA reserva con start_time en el pasado (5086 ms)
+      ✕ RECHAZA reserva para hoy en hora ya pasada (con buffer) (68 ms)
+    Edge Case 1.2: Cancelación de cita COMPLETED
+      ✕ RECHAZA cancelación de reserva con estado COMPLETED (1 ms)
+    Edge Case 1.3: Email inválido
+      ✕ ACEPTA reserva con email inválido (asigna fallback o sanitiza) (5075 ms)
+      ✕ ACEPTA reserva con email vacío (asigna fallback) (69 ms)
+    Edge Case 1.4: Médico inexistente
+      ✕ RECHAZA reserva con provider_id inexistente (78 ms)
+      ✕ RECHAZA disponibilidad para service_id inexistente (83 ms)
+    Edge Case 1.5: Usuario en múltiples listas de espera
+      ✕ PERMITE usuario en 2 listas de espera (sin colisión de horas) (60 ms)
+  🛡️ QA-PARANOID-02: Seguridad e Integridad
+    Paranoid 2.1: Inyección SQL
+      ✕ SANITIZA intento de SQL injection en user_name (76 ms)
+      ✕ SANITIZA intento de SQL injection en email (75 ms)
+    Paranoid 2.2: Colisión de Identidad
+      ✕ ACTUALIZA usuario existente (ON CONFLICT UPDATE) en lugar de fallar (1 ms)
+    Paranoid 2.3: Validación de tipos de datos
+      ✕ RECHAZA chat_id como string (debe ser number) (73 ms)
+      ✕ RECHAZA start_time inválido (no ISO8601) (68 ms)
+      ✕ RECHAZA reminders como string (debe ser array) (75 ms)
+  📊 QA-CAPACITY-03: Capacidad - Reservar Todo un Día
+    ✕ RESERVA todos los slots disponibles de un día y verifica respuesta para nueva reserva (92 ms)
+  ⚡ QA-CONCURRENCY-04: Condiciones de Carrera
+    ✕ MANEJA 10 peticiones simultáneas para el mismo slot (solo 1 debe tener éxito) (66 ms)
+    ✕ MANEJA 5 peticiones simultáneas de FIND_NEXT_AVAILABLE (todos deben recibir datos consistentes) (354 ms)
+  🔗 QA-INTEGRATION-05: Flujo Completo E2E
+    ✕ EJECUTA flujo completo: Registro -> Disponibilidad -> Reserva -> Confirmación (159 ms)
+
+  ● 📋 QA-EDGE-01: Situaciones Límite › Edge Case 1.1: Reserva en el pasado › RECHAZA reserva con start_time en el pasado
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 📋 QA-EDGE-01: Situaciones Límite › Edge Case 1.1: Reserva en el pasado › RECHAZA reserva para hoy en hora ya pasada (con buffer)
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 📋 QA-EDGE-01: Situaciones Límite › Edge Case 1.2: Cancelación de cita COMPLETED › RECHAZA cancelación de reserva con estado COMPLETED
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 📋 QA-EDGE-01: Situaciones Límite › Edge Case 1.3: Email inválido › ACEPTA reserva con email inválido (asigna fallback o sanitiza)
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 📋 QA-EDGE-01: Situaciones Límite › Edge Case 1.3: Email inválido › ACEPTA reserva con email vacío (asigna fallback)
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 📋 QA-EDGE-01: Situaciones Límite › Edge Case 1.4: Médico inexistente › RECHAZA reserva con provider_id inexistente
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 📋 QA-EDGE-01: Situaciones Límite › Edge Case 1.4: Médico inexistente › RECHAZA disponibilidad para service_id inexistente
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 📋 QA-EDGE-01: Situaciones Límite › Edge Case 1.5: Usuario en múltiples listas de espera › PERMITE usuario en 2 listas de espera (sin colisión de horas)
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 🛡️ QA-PARANOID-02: Seguridad e Integridad › Paranoid 2.1: Inyección SQL › SANITIZA intento de SQL injection en user_name
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 🛡️ QA-PARANOID-02: Seguridad e Integridad › Paranoid 2.1: Inyección SQL › SANITIZA intento de SQL injection en email
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 🛡️ QA-PARANOID-02: Seguridad e Integridad › Paranoid 2.2: Colisión de Identidad › ACTUALIZA usuario existente (ON CONFLICT UPDATE) en lugar de fallar
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 🛡️ QA-PARANOID-02: Seguridad e Integridad › Paranoid 2.3: Validación de tipos de datos › RECHAZA chat_id como string (debe ser number)
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 🛡️ QA-PARANOID-02: Seguridad e Integridad › Paranoid 2.3: Validación de tipos de datos › RECHAZA start_time inválido (no ISO8601)
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 🛡️ QA-PARANOID-02: Seguridad e Integridad › Paranoid 2.3: Validación de tipos de datos › RECHAZA reminders como string (debe ser array)
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 📊 QA-CAPACITY-03: Capacidad - Reservar Todo un Día › RESERVA todos los slots disponibles de un día y verifica respuesta para nueva reserva
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● ⚡ QA-CONCURRENCY-04: Condiciones de Carrera › MANEJA 10 peticiones simultáneas para el mismo slot (solo 1 debe tener éxito)
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● ⚡ QA-CONCURRENCY-04: Condiciones de Carrera › MANEJA 5 peticiones simultáneas de FIND_NEXT_AVAILABLE (todos deben recibir datos consistentes)
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+  ● 🔗 QA-INTEGRATION-05: Flujo Completo E2E › EJECUTA flujo completo: Registro -> Disponibilidad -> Reserva -> Confirmación
+
+    TypeError: fetch failed
+
+
+    Cause:
+    getaddrinfo ENOTFOUND dal-service
+
+
+Test Suites: 1 failed, 1 total
+Tests:       18 failed, 18 total
+Snapshots:   0 total
+Time:        26.933 s
+Ran all test suites matching tests/qa-edge-cases.test.ts.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?

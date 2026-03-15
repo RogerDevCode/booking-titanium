@@ -1,0 +1,265 @@
+/**
+ * =============================================================================
+ * gcalendar_export.ts
+ * =============================================================================
+ * Exporta los eventos de Google Calendar de un día específico a JSON y TXT.
+ *
+ * REQUISITOS
+ * ──────────
+ * 1. Archivo .env en ruta absoluta con las variables:
+ *      GCALENDAR_CLIENT_ID=...
+ *      GCALENDAR_CLIENT_SECRET=...
+ *      GCALENDAR_API_KEY=...
+ *
+ * 2. OAuth2 Client ID creado en:
+ *      console.cloud.google.com → APIs & Services → Credentials
+ *      Tipo: Desktop App
+ *
+ * 3. Google Calendar API habilitada en:
+ *      console.cloud.google.com → APIs & Services → Library
+ *
+ * 4. Dependencias instaladas:
+ *      npm install googleapis google-auth-library dotenv
+ *      npm install -D typescript ts-node @types/node
+ *
+ * USO
+ * ───
+ *      npx ts-node gcalendar_export.ts <YYYY-MM-DD>
+ *
+ * EJEMPLOS
+ * ────────
+ *      npx ts-node gcalendar_export.ts 2026-03-12
+ *      npx ts-node gcalendar_export.ts 2026-01-01
+ *      npm run gcalendar -- 2026-03-12        ← si está definido en package.json
+ *
+ * SALIDA
+ * ──────
+ *      eventos_2026-03-12.json    → array de objetos con todos los campos del evento
+ *      eventos_2026-03-12.txt     → resumen legible con título, hora, lugar y notas
+ *
+ * AUTENTICACIÓN
+ * ─────────────
+ *      Primera ejecución: abre un URL en el navegador, autorizas con tu cuenta
+ *      Google y pegas el código en la terminal. El token se guarda en token.json
+ *      y se reutiliza automáticamente en ejecuciones siguientes.
+ *      Si el token expira, se renueva solo sin intervención manual.
+ *
+ * ERRORES COMUNES
+ * ───────────────
+ *      ERROR 401 → token revocado, se elimina token.json y pide re-autenticación
+ *      ERROR 403 → Calendar API no habilitada en Google Cloud Console
+ *      ERROR 429 → cuota de API excedida, esperar y reintentar
+ *      Fecha inválida → debe ser formato YYYY-MM-DD exacto
+ *      Variable faltante → revisar el archivo .env en la ruta configurada
+ *
+ * ZONA HORARIA
+ * ────────────
+ *      Configurada como -03:00 (Santiago, Chile).
+ *      Cambiar constante TIMEZONE_OFFSET si se usa en otra zona.
+ * =============================================================================
+ */
+
+import { google } from "googleapis";
+import { OAuth2Client } from "google-auth-library";
+import * as fs from "fs";
+import * as path from "path";
+import * as readline from "readline";
+import * as dotenv from "dotenv";
+
+// ─── Ruta absoluta al .env ─────────────────────────────────────────────────────
+
+const ENV_PATH = "/home/manager/Sync/N8N Projects/booking-titanium/.env";
+
+function cargarEnv(): void {
+  if (!fs.existsSync(ENV_PATH)) {
+    throw new Error(
+      `[ERROR] No se encontró el archivo .env en la ruta configurada:\n` +
+        `  → ${ENV_PATH}\n` +
+        `  → Verifica que la ruta sea correcta y que el archivo exista.`,
+    );
+  }
+
+  const result = dotenv.config({ path: ENV_PATH });
+
+  if (result.error) {
+    throw new Error(
+      `[ERROR] No se pudo parsear el archivo .env en '${ENV_PATH}'.\n` +
+        `  → Verifica que tenga formato KEY=VALUE válido.\n` +
+        `  → Detalle: ${result.error.message}`,
+    );
+  }
+
+  console.log(`[OK] Variables de entorno cargadas desde:\n  ${ENV_PATH}`);
+}
+
+function leerVarRequerida(nombre: string): string {
+  const valor = process.env[nombre];
+  if (!valor || valor.trim() === "") {
+    throw new Error(
+      `[ERROR] Variable de entorno '${nombre}' no encontrada o vacía.\n` +
+        `  → Verifica que exista en: ${ENV_PATH}\n` +
+        `  → Formato esperado: ${nombre}=tu_valor_aqui`,
+    );
+  }
+  return valor.trim();
+}
+
+// ─── Configuración ────────────────────────────────────────────────────────────
+
+const SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
+const TOKEN_FILE = "token.json";
+const TIMEZONE_OFFSET = "-03:00";
+const REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob"; // Desktop app, sin servidor local
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+
+function getApiKey(): string {
+  const apiKey = process.env["GCALENDAR_API_KEY"] ?? "";
+  if (!apiKey) {
+    throw new Error(
+      `[ERROR] GCALENDAR_API_KEY no encontrada en el archivo .env.\n` +
+        `  → Esta herramienta ahora requiere API Key en lugar de OAuth2.`
+    );
+  }
+  return apiKey;
+}
+
+function promptUser(question: string): Promise<string> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  return new Promise((resolve) =>
+    rl.question(question, (ans) => {
+      rl.close();
+      resolve(ans);
+    }),
+  );
+}
+
+// ─── Validación de fecha ───────────────────────────────────────────────────────
+
+function validateDate(fecha: string): void {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+    throw new Error(
+      `[ERROR] Formato de fecha inválido: '${fecha}'.\n` +
+        `  → Uso: npx ts-node script.ts 2026-03-12`,
+    );
+  }
+  if (isNaN(new Date(fecha).getTime())) {
+    throw new Error(`[ERROR] '${fecha}' no es una fecha válida.`);
+  }
+}
+
+// ─── Consulta Calendar API ────────────────────────────────────────────────────
+
+interface CalendarEvent {
+  id?: string;
+  summary?: string;
+  description?: string;
+  location?: string;
+  start?: { dateTime?: string; date?: string };
+  end?: { dateTime?: string; date?: string };
+}
+
+async function fetchEventos(
+  apiKey: string,
+  fecha: string,
+): Promise<CalendarEvent[]> {
+  const calendar = google.calendar("v3");
+  const timeMin = `${fecha}T00:00:00${TIMEZONE_OFFSET}`;
+  const timeMax = `${fecha}T23:59:59${TIMEZONE_OFFSET}`;
+
+  console.log(`\n[INFO] Consultando eventos: ${timeMin} → ${timeMax}`);
+
+  try {
+    const res = await calendar.events.list({
+      key: apiKey,
+      calendarId: "primary",
+      timeMin,
+      timeMax,
+      singleEvents: true,
+      orderBy: "startTime",
+      maxResults: 250,
+    });
+    const eventos = res.data.items ?? [];
+    console.log(`[OK] ${eventos.length} evento(s) encontrado(s).`);
+    return eventos;
+  } catch (e: any) {
+    const status = e?.code ?? e?.status ?? "?";
+    if (status === 401 || String(e?.message).includes("invalid_grant")) {
+      if (fs.existsSync(TOKEN_FILE)) fs.unlinkSync(TOKEN_FILE);
+      throw new Error(
+        `[ERROR 401] Token revocado. Se eliminó '${TOKEN_FILE}'.\n` +
+          `  → Vuelve a ejecutar el script para re-autenticarte.`,
+      );
+    }
+    if (status === 403)
+      throw new Error(
+        `[ERROR 403] Sin permisos. Verifica que la Google Calendar API esté habilitada\n` +
+          `  → console.cloud.google.com → APIs & Services → Library → "Google Calendar API"`,
+      );
+    if (status === 429)
+      throw new Error(
+        `[ERROR 429] Cuota excedida. Espera unos minutos e intenta de nuevo.`,
+      );
+    throw new Error(`[ERROR] API falló (HTTP ${status}): ${e.message}`);
+  }
+}
+
+// ─── Exportación ──────────────────────────────────────────────────────────────
+
+function exportarJSON(eventos: CalendarEvent[], fecha: string): void {
+  const archivo = `eventos_${fecha}.json`;
+  fs.writeFileSync(archivo, JSON.stringify(eventos, null, 2), "utf-8");
+  console.log(`[OK] JSON → ${path.resolve(archivo)}`);
+}
+
+function exportarTXT(eventos: CalendarEvent[], fecha: string): void {
+  const archivo = `eventos_${fecha}.txt`;
+  const lineas = [`Eventos del ${fecha}`, "=".repeat(40), ""];
+  if (eventos.length === 0) {
+    lineas.push("(Sin eventos para este día)");
+  } else {
+    eventos.forEach((e, i) => {
+      const inicio = e.start?.dateTime ?? e.start?.date ?? "Sin hora";
+      const fin = e.end?.dateTime ?? e.end?.date ?? "";
+      lineas.push(`[${i + 1}] ${e.summary ?? "(Sin título)"}`);
+      lineas.push(`    Inicio : ${inicio}`);
+      if (fin) lineas.push(`    Fin    : ${fin}`);
+      if (e.location) lineas.push(`    Lugar  : ${e.location}`);
+      if (e.description)
+        lineas.push(`    Notas  : ${e.description.replace(/\n/g, " ")}`);
+      lineas.push("");
+    });
+  }
+  fs.writeFileSync(archivo, lineas.join("\n"), "utf-8");
+  console.log(`[OK] TXT  → ${path.resolve(archivo)}`);
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
+
+async function main(): Promise<void> {
+  const fecha = process.argv[2];
+  if (!fecha) {
+    console.error(
+      `[ERROR] Falta la fecha.\n` + `  → Uso: npx ts-node script.ts 2026-03-12`,
+    );
+    process.exit(1);
+  }
+
+  try {
+    cargarEnv(); // Lee .env desde ruta absoluta
+    validateDate(fecha);
+    const apiKey = getApiKey();
+    const eventos = await fetchEventos(apiKey, fecha);
+    exportarJSON(eventos, fecha);
+    exportarTXT(eventos, fecha);
+    console.log(`\n[DONE] Exportación completada para el ${fecha}.`);
+  } catch (e) {
+    console.error(`\n${(e as Error).message}`);
+    process.exit(1);
+  }
+}
+
+main();

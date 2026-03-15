@@ -1,0 +1,2508 @@
+{
+  "id": "2750",
+  "finished": true,
+  "mode": "webhook",
+  "retryOf": null,
+  "retrySuccessId": null,
+  "status": "success",
+  "createdAt": "2026-03-15T02:56:51.724Z",
+  "startedAt": "2026-03-15T02:56:51.734Z",
+  "stoppedAt": "2026-03-15T02:56:55.115Z",
+  "deletedAt": null,
+  "workflowId": "Z7g7DgxXQ61V368P",
+  "waitTill": null,
+  "storedAt": "db",
+  "data": {
+    "version": 1,
+    "startData": {},
+    "resultData": {
+      "runData": {
+        "Webhook": [
+          {
+            "startTime": 1773543411744,
+            "executionIndex": 0,
+            "source": [],
+            "hints": [],
+            "executionTime": 0,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "headers": {
+                        "accept": "application/json, text/plain, */*",
+                        "content-type": "application/json",
+                        "user-agent": "axios/1.13.6",
+                        "content-length": "124",
+                        "accept-encoding": "gzip, compress, deflate, br",
+                        "host": "localhost:5678",
+                        "connection": "keep-alive"
+                      },
+                      "params": {},
+                      "query": {},
+                      "body": {
+                        "provider_id": 1,
+                        "service_id": 999999,
+                        "start_time": "2026-11-02T10:00:00Z",
+                        "duration_minutes": 60,
+                        "customer_id": "db_fail_user"
+                      },
+                      "webhookUrl": "https://n8n.stax.ink/webhook/booking-orchestrator",
+                      "executionMode": "production"
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Validate": [
+          {
+            "startTime": 1773543411744,
+            "executionIndex": 1,
+            "source": [
+              {
+                "previousNode": "Webhook",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 6,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "provider_id": 1,
+                      "service_id": 999999,
+                      "start_time": "2026-11-02T10:00:00Z",
+                      "end_time": "2026-11-02T11:00:00.000Z",
+                      "duration_minutes": 60,
+                      "user_id": null,
+                      "customer_id": "db_fail_user",
+                      "chat_id": null,
+                      "event_title": "Appointment",
+                      "idempotency_key": "booking_1_999999_20261102100000_db_fail_user",
+                      "original_body": {
+                        "provider_id": 1,
+                        "service_id": 999999,
+                        "start_time": "2026-11-02T10:00:00Z",
+                        "duration_minutes": 60,
+                        "customer_id": "db_fail_user"
+                      },
+                      "_meta": {
+                        "source": "WF2_Booking_Orchestrator",
+                        "version": "3.2",
+                        "started_at": "2026-03-15T02:56:51.749Z"
+                      }
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Check DB Idempotency": [
+          {
+            "startTime": 1773543411750,
+            "executionIndex": 2,
+            "source": [
+              {
+                "previousNode": "Validate",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 166,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {},
+                    "pairedItem": [
+                      {
+                        "item": 0,
+                        "input": 0
+                      }
+                    ]
+                  }
+                ],
+                []
+              ]
+            }
+          }
+        ],
+        "Process Idemp": [
+          {
+            "startTime": 1773543411916,
+            "executionIndex": 3,
+            "source": [
+              {
+                "previousNode": "Check DB Idempotency",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 4,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "_is_dup": false,
+                      "_dup": null
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Is Duplicate?": [
+          {
+            "startTime": 1773543411920,
+            "executionIndex": 4,
+            "source": [
+              {
+                "previousNode": "Process Idemp",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 1,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [],
+                [
+                  {
+                    "json": {
+                      "_is_dup": false,
+                      "_dup": null
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Lock Acquire": [
+          {
+            "startTime": 1773543411921,
+            "executionIndex": 5,
+            "source": [
+              {
+                "previousNode": "Is Duplicate?",
+                "previousNodeOutput": 1,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 311,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "success": true,
+                      "error_code": null,
+                      "error_message": null,
+                      "data": {
+                        "acquired": true,
+                        "lock_id": 121,
+                        "lock_key": "lock_1_2026-11-02T10:00:00Z",
+                        "owner_token": "mmr5yew7j5ncbc54",
+                        "expires_at": "2026-03-15T03:01:52.021Z",
+                        "message": "Lock acquired"
+                      },
+                      "_meta": {
+                        "source": "WF7_Distributed_Lock_System",
+                        "timestamp": "2026-03-15T02:56:52.208Z",
+                        "workflow_id": "fhjJXp5DWLjbsem1"
+                      }
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ],
+                []
+              ]
+            }
+          }
+        ],
+        "Process Lock": [
+          {
+            "startTime": 1773543412232,
+            "executionIndex": 6,
+            "source": [
+              {
+                "previousNode": "Lock Acquire",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 6,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "_lock_ok": true,
+                      "_lock_key": "lock_1_2026-11-02T10:00:00Z",
+                      "_owner_token": "mmr5yew7j5ncbc54",
+                      "_lock_err": null
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Lock OK?": [
+          {
+            "startTime": 1773543412238,
+            "executionIndex": 7,
+            "source": [
+              {
+                "previousNode": "Process Lock",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 1,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "_lock_ok": true,
+                      "_lock_key": "lock_1_2026-11-02T10:00:00Z",
+                      "_owner_token": "mmr5yew7j5ncbc54",
+                      "_lock_err": null
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ],
+                []
+              ]
+            }
+          }
+        ],
+        "Check CB": [
+          {
+            "startTime": 1773543412239,
+            "executionIndex": 8,
+            "source": [
+              {
+                "previousNode": "Lock OK?",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 307,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "success": true,
+                      "error_code": null,
+                      "error_message": null,
+                      "data": {
+                        "allowed": true,
+                        "circuit_state": "closed",
+                        "message": "Service is healthy - requests allowed",
+                        "failure_count": 0,
+                        "service_id": "google_calendar"
+                      },
+                      "_meta": {
+                        "source": "CB_GCal_Circuit_Breaker",
+                        "timestamp": "2026-03-15T02:56:52.528Z",
+                        "workflow_id": "6RDslq06ZS78Zph1"
+                      }
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ],
+                []
+              ]
+            }
+          }
+        ],
+        "Process CB": [
+          {
+            "startTime": 1773543412546,
+            "executionIndex": 9,
+            "source": [
+              {
+                "previousNode": "Check CB",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 5,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "_cb_ok": true,
+                      "_cb_err": null
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "CB OK?": [
+          {
+            "startTime": 1773543412551,
+            "executionIndex": 10,
+            "source": [
+              {
+                "previousNode": "Process CB",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 1,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "_cb_ok": true,
+                      "_cb_err": null
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ],
+                []
+              ]
+            }
+          }
+        ],
+        "Check Avail": [
+          {
+            "startTime": 1773543412552,
+            "executionIndex": 11,
+            "source": [
+              {
+                "previousNode": "CB OK?",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 786,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "success": true,
+                      "error_code": null,
+                      "error_message": null,
+                      "data": {
+                        "available": true,
+                        "db_available": true,
+                        "db_count": 0,
+                        "gcal_available": true,
+                        "gcal_conflicts": 0,
+                        "gcal_checked": false,
+                        "gcal_error": "Google Calendar API unavailable",
+                        "provider_id": 1,
+                        "service_id": 999999,
+                        "start_time": "2026-11-02T10:00:00Z",
+                        "end_time": "2026-11-02T11:00:00.000Z",
+                        "duration_minutes": 60,
+                        "mode": "degraded"
+                      },
+                      "_meta": {
+                        "source": "WF3_Availability_Service",
+                        "timestamp": "2026-03-15T02:56:53.318Z",
+                        "workflow_id": "6zftqMdtBAT0QaCt"
+                      }
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ],
+                []
+              ]
+            }
+          }
+        ],
+        "Process Avail": [
+          {
+            "startTime": 1773543413338,
+            "executionIndex": 12,
+            "source": [
+              {
+                "previousNode": "Check Avail",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 4,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "_avail_ok": true,
+                      "_avail_err": null
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Avail OK?": [
+          {
+            "startTime": 1773543413343,
+            "executionIndex": 13,
+            "source": [
+              {
+                "previousNode": "Process Avail",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 0,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "_avail_ok": true,
+                      "_avail_err": null
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ],
+                []
+              ]
+            }
+          }
+        ],
+        "Create GCal": [
+          {
+            "startTime": 1773543413343,
+            "executionIndex": 14,
+            "source": [
+              {
+                "previousNode": "Avail OK?",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 3,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "id": "mock_gcal_1773543413346"
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ],
+                []
+              ]
+            }
+          }
+        ],
+        "Process GCal": [
+          {
+            "startTime": 1773543413346,
+            "executionIndex": 15,
+            "source": [
+              {
+                "previousNode": "Create GCal",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 3,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "_gcal_ok": true,
+                      "_gcal_id": "mock_gcal_1773543413346",
+                      "_gcal_err": null
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "GCal OK?": [
+          {
+            "startTime": 1773543413349,
+            "executionIndex": 16,
+            "source": [
+              {
+                "previousNode": "Process GCal",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 0,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "_gcal_ok": true,
+                      "_gcal_id": "mock_gcal_1773543413346",
+                      "_gcal_err": null
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ],
+                []
+              ]
+            }
+          }
+        ],
+        "Create DB": [
+          {
+            "startTime": 1773543413349,
+            "executionIndex": 17,
+            "source": [
+              {
+                "previousNode": "GCal OK?",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 187,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {},
+                    "pairedItem": [
+                      {
+                        "item": 0,
+                        "input": 0
+                      }
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "json": {
+                      "message": "null value in column \"user_id\" of relation \"bookings\" violates not-null constraint",
+                      "error": {
+                        "level": "warning",
+                        "tags": {},
+                        "description": "Failing row contains (ed5c77a8-b052-447d-aa92-d80291874e0c, 1, 999999, null, 2026-11-02 10:00:00+00, 2026-11-02 11:00:00+00, mock_gcal_1773543413346, CONFIRMED, 24, 2, f, f, 2026-03-15 02:56:53.422687+00, 2026-03-15 02:56:53.422687+00, null, 6, f, null, booking_1_999999_20261102100000_db_fail_user, null, null, null).",
+                        "timestamp": 1773543413535,
+                        "context": {},
+                        "functionality": "regular",
+                        "name": "NodeOperationError",
+                        "node": {
+                          "parameters": {
+                            "resource": "database",
+                            "operation": "executeQuery",
+                            "query": "INSERT INTO bookings (provider_id, service_id, start_time, end_time, idempotency_key, gcal_event_id, status) VALUES ($1::int, $2::int, $3::timestamp, $4::timestamp, $5::text, $6::text, 'CONFIRMED') RETURNING id;",
+                            "options": {
+                              "queryReplacement": "={{ $('Validate').first().json.provider_id }}, {{ $('Validate').first().json.service_id }}, {{ $('Validate').first().json.start_time }}, {{ $('Validate').first().json.end_time }}, {{ $('Validate').first().json.idempotency_key }}, {{ $('Process GCal').first().json._gcal_id }}"
+                            }
+                          },
+                          "name": "Create DB",
+                          "type": "n8n-nodes-base.postgres",
+                          "typeVersion": 2.6,
+                          "position": [
+                            4250,
+                            -700
+                          ],
+                          "credentials": {
+                            "postgres": {
+                              "id": "5LzvCP9BsQwCi9Z0",
+                              "name": "Postgres account"
+                            }
+                          },
+                          "alwaysOutputData": true,
+                          "onError": "continueErrorOutput",
+                          "id": "48771d32-b049-4f84-a1e9-c7add668d3cb"
+                        },
+                        "messages": []
+                      }
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Process DB": [
+          {
+            "startTime": 1773543413536,
+            "executionIndex": 18,
+            "source": [
+              {
+                "previousNode": "Create DB",
+                "previousNodeOutput": 1,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 8,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "_db_ok": false,
+                      "_db_id": null,
+                      "_db_err": "null value in column \"user_id\" of relation \"bookings\" violates not-null constraint"
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "startTime": 1773543414328,
+            "executionIndex": 23,
+            "source": [
+              {
+                "previousNode": "Create DB",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 4,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "_db_ok": false,
+                      "_db_id": null,
+                      "_db_err": null
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "DB OK?": [
+          {
+            "startTime": 1773543413544,
+            "executionIndex": 19,
+            "source": [
+              {
+                "previousNode": "Process DB",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 1,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [],
+                [
+                  {
+                    "json": {
+                      "_db_ok": false,
+                      "_db_id": null,
+                      "_db_err": "null value in column \"user_id\" of relation \"bookings\" violates not-null constraint"
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "startTime": 1773543414332,
+            "executionIndex": 24,
+            "source": [
+              {
+                "previousNode": "Process DB",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 1
+              }
+            ],
+            "hints": [],
+            "executionTime": 0,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [],
+                [
+                  {
+                    "json": {
+                      "_db_ok": false,
+                      "_db_id": null,
+                      "_db_err": null
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "Rollback GCal": [
+          {
+            "startTime": 1773543413545,
+            "executionIndex": 20,
+            "source": [
+              {
+                "previousNode": "DB OK?",
+                "previousNodeOutput": 1,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 574,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "success": true,
+                      "error_code": null,
+                      "error_message": null,
+                      "data": {
+                        "rollback_completed": true,
+                        "steps": {
+                          "gcal": {
+                            "success": true,
+                            "skipped": false,
+                            "error": null
+                          },
+                          "db": {
+                            "success": true,
+                            "skipped": false,
+                            "was_updated": false,
+                            "error": null
+                          },
+                          "lock": {
+                            "success": true,
+                            "skipped": false,
+                            "was_released": false,
+                            "error": null
+                          }
+                        },
+                        "initiated_at": "2026-03-15T02:56:53.590Z",
+                        "completed_at": "2026-03-15T02:56:54.102Z"
+                      },
+                      "_meta": {
+                        "source": "WF6_Rollback_Workflow",
+                        "timestamp": "2026-03-15T02:56:54.102Z",
+                        "workflow_id": "hJtyeGLsMtOxLbAd"
+                      }
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ],
+                []
+              ]
+            }
+          },
+          {
+            "startTime": 1773543414332,
+            "executionIndex": 25,
+            "source": [
+              {
+                "previousNode": "DB OK?",
+                "previousNodeOutput": 1,
+                "previousNodeRun": 1
+              }
+            ],
+            "hints": [],
+            "executionTime": 520,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "success": true,
+                      "error_code": null,
+                      "error_message": null,
+                      "data": {
+                        "rollback_completed": true,
+                        "steps": {
+                          "gcal": {
+                            "success": true,
+                            "skipped": false,
+                            "error": null
+                          },
+                          "db": {
+                            "success": true,
+                            "skipped": false,
+                            "was_updated": false,
+                            "error": null
+                          },
+                          "lock": {
+                            "success": true,
+                            "skipped": false,
+                            "was_released": false,
+                            "error": null
+                          }
+                        },
+                        "initiated_at": "2026-03-15T02:56:54.358Z",
+                        "completed_at": "2026-03-15T02:56:54.836Z"
+                      },
+                      "_meta": {
+                        "source": "WF6_Rollback_Workflow",
+                        "timestamp": "2026-03-15T02:56:54.836Z",
+                        "workflow_id": "hJtyeGLsMtOxLbAd"
+                      }
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ],
+                []
+              ]
+            }
+          }
+        ],
+        "Release Lock DB Fail": [
+          {
+            "startTime": 1773543414119,
+            "executionIndex": 21,
+            "source": [
+              {
+                "previousNode": "Rollback GCal",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 204,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "success": true,
+                      "error_code": null,
+                      "error_message": null,
+                      "data": {
+                        "released": true,
+                        "lock_key": "lock_1_2026-11-02T10:00:00Z"
+                      },
+                      "_meta": {
+                        "source": "WF7_Distributed_Lock_System",
+                        "timestamp": "2026-03-15T02:56:54.308Z",
+                        "workflow_id": "fhjJXp5DWLjbsem1"
+                      }
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ],
+                []
+              ]
+            }
+          },
+          {
+            "startTime": 1773543414852,
+            "executionIndex": 26,
+            "source": [
+              {
+                "previousNode": "Rollback GCal",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 1
+              }
+            ],
+            "hints": [],
+            "executionTime": 257,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "success": true,
+                      "error_code": "LOCK_NOT_FOUND",
+                      "error_message": "Lock not found or owner_token mismatch",
+                      "data": {
+                        "released": false,
+                        "lock_key": "lock_1_2026-11-02T10:00:00Z"
+                      },
+                      "_meta": {
+                        "source": "WF7_Distributed_Lock_System",
+                        "timestamp": "2026-03-15T02:56:55.086Z",
+                        "workflow_id": "fhjJXp5DWLjbsem1"
+                      }
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ],
+                []
+              ]
+            }
+          }
+        ],
+        "DB Error SCO": [
+          {
+            "startTime": 1773543414323,
+            "executionIndex": 22,
+            "source": [
+              {
+                "previousNode": "Release Lock DB Fail",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 0
+              }
+            ],
+            "hints": [],
+            "executionTime": 5,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "success": false,
+                      "error_code": "DB_ERROR",
+                      "data": {
+                        "error": "null value in column \"user_id\" of relation \"bookings\" violates not-null constraint"
+                      },
+                      "_meta": {
+                        "source": "WF2_Booking_Orchestrator",
+                        "version": "3.2",
+                        "started_at": "2026-03-15T02:56:51.749Z"
+                      }
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "startTime": 1773543415109,
+            "executionIndex": 27,
+            "source": [
+              {
+                "previousNode": "Release Lock DB Fail",
+                "previousNodeOutput": 0,
+                "previousNodeRun": 1
+              }
+            ],
+            "hints": [],
+            "executionTime": 6,
+            "executionStatus": "success",
+            "data": {
+              "main": [
+                [
+                  {
+                    "json": {
+                      "success": false,
+                      "error_code": "DB_ERROR",
+                      "data": {
+                        "error": null
+                      },
+                      "_meta": {
+                        "source": "WF2_Booking_Orchestrator",
+                        "version": "3.2",
+                        "started_at": "2026-03-15T02:56:51.749Z"
+                      }
+                    },
+                    "pairedItem": {
+                      "item": 0
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "lastNodeExecuted": "DB Error SCO"
+    },
+    "executionData": {
+      "contextData": {},
+      "nodeExecutionStack": [],
+      "metadata": {},
+      "waitingExecution": {},
+      "waitingExecutionSource": {},
+      "runtimeData": {
+        "version": 1,
+        "establishedAt": 1773543411744,
+        "source": "webhook",
+        "triggerNode": {
+          "name": "Webhook",
+          "type": "n8n-nodes-base.webhook"
+        }
+      }
+    }
+  },
+  "workflowData": {
+    "id": "Z7g7DgxXQ61V368P",
+    "name": "WF2_Booking_Orchestrator",
+    "nodes": [
+      {
+        "parameters": {
+          "multipleMethods": false,
+          "httpMethod": "POST",
+          "path": "booking-orchestrator",
+          "authentication": "none",
+          "responseMode": "lastNode",
+          "responseData": "firstEntryJson",
+          "options": {}
+        },
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "webhookId": "booking-orchestrator",
+        "id": "5db5a8a8-f920-416e-888c-1a0d6bf53433"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "const body = $input.first().json.body || $input.first().json;\nconst provider_id = parseInt(body.provider_id, 10);\nconst service_id = parseInt(body.service_id, 10);\nconst start_time = body.start_time;\n\nif (isNaN(provider_id) || isNaN(service_id) || !start_time) {\n  throw new Error('Missing core fields');\n}\n\nconst duration = parseInt(body.duration_minutes || 60, 10);\nconst startDate = new Date(start_time);\nconst endDate = new Date(startDate.getTime() + duration * 60000);\n\nconst cleanTime = String(start_time).replace(/[^0-9]/g, '');\nconst idempotency_key = `booking_${provider_id}_${service_id}_${cleanTime}_${body.customer_id || body.chat_id || 'anon'}`;\n\nconst ctx = { \n  source: 'WF2_Booking_Orchestrator', \n  version: '3.2', \n  started_at: new Date().toISOString() \n};\n\nreturn [{ json: {\n  provider_id, \n  service_id, \n  start_time, \n  end_time: endDate.toISOString(),\n  duration_minutes: duration,\n  user_id: parseInt(body.user_id || 0, 10) || null, customer_id: body.customer_id || null,\n  chat_id: body.chat_id || null,\n  event_title: body.event_title || 'Appointment',\n  idempotency_key,\n  original_body: body,\n  _meta: ctx\n}}];",
+          "notice": ""
+        },
+        "name": "Validate",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          250,
+          0
+        ],
+        "id": "7e470970-1f85-4d41-ad69-9e466b935c68"
+      },
+      {
+        "parameters": {
+          "resource": "database",
+          "operation": "executeQuery",
+          "query": "SELECT id as booking_id, status, gcal_event_id FROM bookings WHERE idempotency_key = $1 LIMIT 1;",
+          "options": {
+            "queryReplacement": "={{ $('Validate').first().json.idempotency_key }}"
+          }
+        },
+        "name": "Check DB Idempotency",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          500,
+          0
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "5LzvCP9BsQwCi9Z0",
+            "name": "Postgres account"
+          }
+        },
+        "alwaysOutputData": true,
+        "onError": "continueErrorOutput",
+        "id": "d57c72c0-e359-42ad-a3f3-25cd745565f6"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "const items = $input.all();\nconst dup = (items.length > 0 && items[0].json.booking_id) ? items[0].json : null;\nreturn [{ json: { \n  _is_dup: !!dup, \n  _dup: dup \n} }];",
+          "notice": ""
+        },
+        "name": "Process Idemp",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          750,
+          0
+        ],
+        "id": "5e00a5fe-80ae-4730-8d29-e1ed19fd06ef"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "dup",
+                "leftValue": "={{ $json._is_dup }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": false,
+          "options": {}
+        },
+        "name": "Is Duplicate?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1000,
+          0
+        ],
+        "id": "26a7e6c0-0dbc-4e82-ba9d-71a182300c14"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "return [{ json: {\n  success: true,\n  error_code: null,\n  data: {\n    booking_id: $('Process Idemp').first().json._dup.booking_id,\n    status: $('Process Idemp').first().json._dup.status,\n    gcal_event_id: $('Process Idemp').first().json._dup.gcal_event_id,\n    is_duplicate: true\n  },\n  _meta: $('Validate').first().json._meta\n}}];",
+          "notice": ""
+        },
+        "name": "Duplicate SCO",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1250,
+          150
+        ],
+        "id": "f0091c81-2d31-43a6-89b0-ecdd339df845"
+      },
+      {
+        "parameters": {
+          "curlImport": "",
+          "method": "POST",
+          "url": "http://n8n:5678/webhook/acquire-lock",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": false,
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ provider_id: $('Validate').first().json.provider_id, start_time: $('Validate').first().json.start_time }) }}",
+          "options": {
+            "timeout": 10000
+          },
+          "infoMessage": ""
+        },
+        "name": "Lock Acquire",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1250,
+          -150
+        ],
+        "onError": "continueErrorOutput",
+        "id": "f10aff03-b0ae-478c-88f7-c9aca359394b"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "const res = $input.first().json;\nconst ok = res.data?.acquired === true;\nreturn [{ json: { \n  _lock_ok: ok, \n  _lock_key: res.data?.lock_key, \n  _owner_token: res.data?.owner_token,\n  _lock_err: res.error || (res.success === false ? res.error_message : null)\n}}];",
+          "notice": ""
+        },
+        "name": "Process Lock",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1500,
+          -150
+        ],
+        "id": "a1c5fa56-be24-48ec-bf6d-1295ee68d749"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "lock",
+                "leftValue": "={{ $json._lock_ok }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": false,
+          "options": {}
+        },
+        "name": "Lock OK?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1750,
+          -150
+        ],
+        "id": "e9f84b0d-662b-4601-b96a-ba75bb89e73c"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "return [{ json: {\n  success: false,\n  error_code: 'LOCK_DENIED',\n  data: {\n    error: $('Process Lock').first().json._lock_err\n  },\n  _meta: $('Validate').first().json._meta\n}}];",
+          "notice": ""
+        },
+        "name": "Denied SCO",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2000,
+          0
+        ],
+        "id": "387512df-81f1-4dc6-a3a4-e2946bbe597d"
+      },
+      {
+        "parameters": {
+          "curlImport": "",
+          "method": "POST",
+          "url": "http://n8n:5678/webhook/circuit-breaker/check",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": false,
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "{\"service_id\": \"google_calendar\"}",
+          "options": {
+            "timeout": 10000
+          },
+          "infoMessage": ""
+        },
+        "name": "Check CB",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          2000,
+          -250
+        ],
+        "onError": "continueErrorOutput",
+        "id": "5eee2a22-9e9c-47ee-b53c-be00a987358e"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "const res = $input.first().json;\nconst ok = res.data?.allowed === true;\nreturn [{ json: { \n  _cb_ok: ok, \n  _cb_err: res.error || null \n} }];",
+          "notice": ""
+        },
+        "name": "Process CB",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2250,
+          -250
+        ],
+        "id": "91945de1-c0be-4734-bf52-66090516e42e"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "cb",
+                "leftValue": "={{ $json._cb_ok }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": false,
+          "options": {}
+        },
+        "name": "CB OK?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          2500,
+          -250
+        ],
+        "id": "366bd917-e8f6-4777-9de3-8de15ef1931c"
+      },
+      {
+        "parameters": {
+          "curlImport": "",
+          "method": "POST",
+          "url": "http://n8n:5678/webhook/release-lock",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": false,
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ lock_key: $('Process Lock').first().json._lock_key, owner_token: $('Process Lock').first().json._owner_token }) }}",
+          "options": {},
+          "infoMessage": ""
+        },
+        "name": "Release Lock CB Fail",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          2750,
+          -100
+        ],
+        "onError": "continueErrorOutput",
+        "id": "548fd6f3-c9f9-47a9-8c63-a75769afab76"
+      },
+      {
+        "parameters": {
+          "curlImport": "",
+          "method": "POST",
+          "url": "http://n8n:5678/webhook/dlq/add",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": false,
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ failure_reason: 'CB_OPEN', original_payload: $('Validate').first().json.original_body }) }}",
+          "options": {},
+          "infoMessage": ""
+        },
+        "name": "DLQ CB Fail",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          3000,
+          -100
+        ],
+        "onError": "continueErrorOutput",
+        "id": "0d6f9c87-dbcd-4488-9feb-f8e1c37c948c"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "return [{ json: {\n  success: false,\n  error_code: 'CB_OPEN',\n  data: {\n    service: 'google_calendar'\n  },\n  _meta: $('Validate').first().json._meta\n}}];",
+          "notice": ""
+        },
+        "name": "CB Open SCO",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3250,
+          -100
+        ],
+        "id": "a55f032f-0a8f-4fcb-9b0b-7c9f319d4f13"
+      },
+      {
+        "parameters": {
+          "curlImport": "",
+          "method": "POST",
+          "url": "http://n8n:5678/webhook/check-availability",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": false,
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ provider_id: $('Validate').first().json.provider_id, service_id: $('Validate').first().json.service_id, start_time: $('Validate').first().json.start_time }) }}",
+          "options": {
+            "timeout": 20000
+          },
+          "infoMessage": ""
+        },
+        "name": "Check Avail",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          2750,
+          -400
+        ],
+        "onError": "continueErrorOutput",
+        "id": "8e8ca7b2-159e-41e3-a5d4-f663fc3acf41"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "const res = $input.first().json;\nconst ok = res.data?.available === true;\nreturn [{ json: { \n  _avail_ok: ok, \n  _avail_err: res.error || null \n} }];",
+          "notice": ""
+        },
+        "name": "Process Avail",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3000,
+          -400
+        ],
+        "id": "5a30c5be-a8db-4990-ae95-1f107be10ba8"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "av",
+                "leftValue": "={{ $json._avail_ok }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": false,
+          "options": {}
+        },
+        "name": "Avail OK?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          3250,
+          -400
+        ],
+        "id": "a0af36cc-a718-4b41-8779-e3068b8272be"
+      },
+      {
+        "parameters": {
+          "curlImport": "",
+          "method": "POST",
+          "url": "http://n8n:5678/webhook/release-lock",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": false,
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ lock_key: $('Process Lock').first().json._lock_key, owner_token: $('Process Lock').first().json._owner_token }) }}",
+          "options": {},
+          "infoMessage": ""
+        },
+        "name": "Release Lock Not Avail",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          3500,
+          -300
+        ],
+        "onError": "continueErrorOutput",
+        "id": "2aa5b7d3-d3c7-4d93-a303-02ba6943e42c"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "return [{ json: {\n  success: false,\n  error_code: 'NOT_AVAILABLE',\n  data: {\n    message: 'Slot no longer available'\n  },\n  _meta: $('Validate').first().json._meta\n}}];",
+          "notice": ""
+        },
+        "name": "Not Avail SCO",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3750,
+          -300
+        ],
+        "id": "c9b1b21e-cb98-40c1-aa9e-b6d064e4accf"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "return [{ json: { id: \"mock_gcal_\" + Date.now() } }];",
+          "notice": ""
+        },
+        "name": "Create GCal",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3500,
+          -550
+        ],
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "OsRBfz3Cs7Ph5uV5",
+            "name": "Google Calendar account"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "id": "2466b273-7000-4e63-af29-064367ceab4c"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "const res = $input.first().json;\nconst ok = !!res.id;\nreturn [{ json: { \n  _gcal_ok: ok, \n  _gcal_id: res.id || null, \n  _gcal_err: res.message || null \n} }];",
+          "notice": ""
+        },
+        "name": "Process GCal",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3750,
+          -550
+        ],
+        "id": "a0db1839-a53d-43a3-bc88-07740d3a07e4"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "gc",
+                "leftValue": "={{ $json._gcal_ok }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": false,
+          "options": {}
+        },
+        "name": "GCal OK?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          4000,
+          -550
+        ],
+        "id": "e96a1a7f-aa23-46ed-ba77-1724e1228745"
+      },
+      {
+        "parameters": {
+          "curlImport": "",
+          "method": "POST",
+          "url": "http://n8n:5678/webhook/circuit-breaker/record",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": false,
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "{\"service_id\": \"google_calendar\", \"success\": false}",
+          "options": {},
+          "infoMessage": ""
+        },
+        "name": "Record Fail CB GCal",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          4250,
+          -450
+        ],
+        "onError": "continueErrorOutput",
+        "id": "8ab4ee35-cd96-4ca1-bbbf-ff0a29ed7d15"
+      },
+      {
+        "parameters": {
+          "curlImport": "",
+          "method": "POST",
+          "url": "http://n8n:5678/webhook/release-lock",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": false,
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ lock_key: $('Process Lock').first().json._lock_key, owner_token: $('Process Lock').first().json._owner_token }) }}",
+          "options": {},
+          "infoMessage": ""
+        },
+        "name": "Release Lock GCal Fail",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          4500,
+          -450
+        ],
+        "onError": "continueErrorOutput",
+        "id": "96697089-99ba-46cf-82b0-bf0b5ac5c5e5"
+      },
+      {
+        "parameters": {
+          "curlImport": "",
+          "method": "POST",
+          "url": "http://n8n:5678/webhook/dlq/add",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": false,
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ failure_reason: 'GCAL_ERROR', original_payload: $('Validate').first().json.original_body }) }}",
+          "options": {},
+          "infoMessage": ""
+        },
+        "name": "DLQ GCal Fail",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          4750,
+          -450
+        ],
+        "onError": "continueErrorOutput",
+        "id": "3e8bd0d1-0b5d-4ee9-8d8e-e5eb37bebe76"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "return [{ json: {\n  success: false,\n  error_code: 'GCAL_ERROR',\n  data: {\n    error: $('Process GCal').first().json._gcal_err\n  },\n  _meta: $('Validate').first().json._meta\n}}];",
+          "notice": ""
+        },
+        "name": "GCal Error SCO",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          5000,
+          -450
+        ],
+        "id": "458e2a36-3fee-4e87-8358-a0c5e42d914c"
+      },
+      {
+        "parameters": {
+          "resource": "database",
+          "operation": "executeQuery",
+          "query": "INSERT INTO bookings (provider_id, service_id, start_time, end_time, idempotency_key, gcal_event_id, status) VALUES ($1::int, $2::int, $3::timestamp, $4::timestamp, $5::text, $6::text, 'CONFIRMED') RETURNING id;",
+          "options": {
+            "queryReplacement": "={{ $('Validate').first().json.provider_id }}, {{ $('Validate').first().json.service_id }}, {{ $('Validate').first().json.start_time }}, {{ $('Validate').first().json.end_time }}, {{ $('Validate').first().json.idempotency_key }}, {{ $('Process GCal').first().json._gcal_id }}"
+          }
+        },
+        "name": "Create DB",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          4250,
+          -700
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "5LzvCP9BsQwCi9Z0",
+            "name": "Postgres account"
+          }
+        },
+        "alwaysOutputData": true,
+        "onError": "continueErrorOutput",
+        "id": "48771d32-b049-4f84-a1e9-c7add668d3cb"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "const res = $input.first().json;\nconst ok = !!res.id;\nreturn [{ json: { \n  _db_ok: ok, \n  _db_id: res.id || null, \n  _db_err: res.message || null \n} }];",
+          "notice": ""
+        },
+        "name": "Process DB",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          4500,
+          -700
+        ],
+        "id": "eafd04b7-7d99-45a1-95b0-e4deee7763b7"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "db",
+                "leftValue": "={{ $json._db_ok }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": false,
+          "options": {}
+        },
+        "name": "DB OK?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          4750,
+          -700
+        ],
+        "id": "24a8413d-6d48-475d-8ede-851f928f8d83"
+      },
+      {
+        "parameters": {
+          "curlImport": "",
+          "method": "POST",
+          "url": "http://n8n:5678/webhook/rollback-booking",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": false,
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ gcal_event_id: $('Process GCal').first().json._gcal_id, reason: 'DB_FAIL' }) }}",
+          "options": {
+            "timeout": 30000
+          },
+          "infoMessage": ""
+        },
+        "name": "Rollback GCal",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          5000,
+          -600
+        ],
+        "onError": "continueErrorOutput",
+        "id": "31580d9e-c49c-4af0-859e-c638dc8da529"
+      },
+      {
+        "parameters": {
+          "curlImport": "",
+          "method": "POST",
+          "url": "http://n8n:5678/webhook/release-lock",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": false,
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ lock_key: $('Process Lock').first().json._lock_key, owner_token: $('Process Lock').first().json._owner_token }) }}",
+          "options": {},
+          "infoMessage": ""
+        },
+        "name": "Release Lock DB Fail",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          5250,
+          -600
+        ],
+        "onError": "continueErrorOutput",
+        "id": "a321c840-f7b6-4e63-a0cb-b6f13c08162d"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "return [{ json: {\n  success: false,\n  error_code: 'DB_ERROR',\n  data: {\n    error: $('Process DB').first().json._db_err\n  },\n  _meta: $('Validate').first().json._meta\n}}];",
+          "notice": ""
+        },
+        "name": "DB Error SCO",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          5500,
+          -600
+        ],
+        "id": "14cfd572-7b09-4ce3-81ca-f3fa24dd77a1"
+      },
+      {
+        "parameters": {
+          "curlImport": "",
+          "method": "POST",
+          "url": "http://n8n:5678/webhook/circuit-breaker/record",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": false,
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "{\"service_id\": \"google_calendar\", \"success\": true}",
+          "options": {},
+          "infoMessage": ""
+        },
+        "name": "Record Success CB",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          5000,
+          -850
+        ],
+        "onError": "continueErrorOutput",
+        "id": "77c4b480-fecf-48e4-85b2-0178b90cad5b"
+      },
+      {
+        "parameters": {
+          "curlImport": "",
+          "method": "POST",
+          "url": "http://n8n:5678/webhook/release-lock",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": false,
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ lock_key: $('Process Lock').first().json._lock_key, owner_token: $('Process Lock').first().json._owner_token }) }}",
+          "options": {
+            "timeout": 10000
+          },
+          "infoMessage": ""
+        },
+        "name": "Release Lock Success",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          5250,
+          -850
+        ],
+        "onError": "continueErrorOutput",
+        "id": "e7157918-b4e2-4110-a067-e0ac21bb1d7f"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "return [{ json: {\n  success: true,\n  error_code: null,\n  data: {\n    booking_id: $('Process DB').first().json._db_id,\n    gcal_event_id: $('Process GCal').first().json._gcal_id\n  },\n  _meta: $('Validate').first().json._meta\n}}];",
+          "notice": ""
+        },
+        "name": "Success SCO",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          5500,
+          -850
+        ],
+        "id": "236c8521-4607-4f55-b639-909bce9a73b4"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Validate",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validate": {
+        "main": [
+          [
+            {
+              "node": "Check DB Idempotency",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check DB Idempotency": {
+        "main": [
+          [
+            {
+              "node": "Process Idemp",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Process Idemp",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Process Idemp": {
+        "main": [
+          [
+            {
+              "node": "Is Duplicate?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Duplicate?": {
+        "main": [
+          [
+            {
+              "node": "Duplicate SCO",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Lock Acquire",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Lock Acquire": {
+        "main": [
+          [
+            {
+              "node": "Process Lock",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Process Lock",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Process Lock": {
+        "main": [
+          [
+            {
+              "node": "Lock OK?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Lock OK?": {
+        "main": [
+          [
+            {
+              "node": "Check CB",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Denied SCO",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check CB": {
+        "main": [
+          [
+            {
+              "node": "Process CB",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Process CB",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Process CB": {
+        "main": [
+          [
+            {
+              "node": "CB OK?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "CB OK?": {
+        "main": [
+          [
+            {
+              "node": "Check Avail",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Release Lock CB Fail",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Release Lock CB Fail": {
+        "main": [
+          [
+            {
+              "node": "DLQ CB Fail",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "DLQ CB Fail",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DLQ CB Fail": {
+        "main": [
+          [
+            {
+              "node": "CB Open SCO",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "CB Open SCO",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Avail": {
+        "main": [
+          [
+            {
+              "node": "Process Avail",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Process Avail",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Process Avail": {
+        "main": [
+          [
+            {
+              "node": "Avail OK?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Avail OK?": {
+        "main": [
+          [
+            {
+              "node": "Create GCal",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Release Lock Not Avail",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Release Lock Not Avail": {
+        "main": [
+          [
+            {
+              "node": "Not Avail SCO",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Not Avail SCO",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create GCal": {
+        "main": [
+          [
+            {
+              "node": "Process GCal",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Process GCal",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Process GCal": {
+        "main": [
+          [
+            {
+              "node": "GCal OK?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GCal OK?": {
+        "main": [
+          [
+            {
+              "node": "Create DB",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Record Fail CB GCal",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Record Fail CB GCal": {
+        "main": [
+          [
+            {
+              "node": "Release Lock GCal Fail",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Release Lock GCal Fail",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Release Lock GCal Fail": {
+        "main": [
+          [
+            {
+              "node": "DLQ GCal Fail",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "DLQ GCal Fail",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DLQ GCal Fail": {
+        "main": [
+          [
+            {
+              "node": "GCal Error SCO",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "GCal Error SCO",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create DB": {
+        "main": [
+          [
+            {
+              "node": "Process DB",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Process DB",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Process DB": {
+        "main": [
+          [
+            {
+              "node": "DB OK?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB OK?": {
+        "main": [
+          [
+            {
+              "node": "Record Success CB",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Rollback GCal",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Rollback GCal": {
+        "main": [
+          [
+            {
+              "node": "Release Lock DB Fail",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Release Lock DB Fail",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Release Lock DB Fail": {
+        "main": [
+          [
+            {
+              "node": "DB Error SCO",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "DB Error SCO",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Record Success CB": {
+        "main": [
+          [
+            {
+              "node": "Release Lock Success",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Release Lock Success",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Release Lock Success": {
+        "main": [
+          [
+            {
+              "node": "Success SCO",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Success SCO",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "callerPolicy": "workflowsFromSameOwner",
+      "availableInMCP": false
+    }
+  },
+  "customData": {}
+}
