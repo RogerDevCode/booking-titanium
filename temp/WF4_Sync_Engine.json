@@ -1,0 +1,765 @@
+{
+  "updatedAt": "2026-03-14T19:38:14.727Z",
+  "createdAt": "2026-03-13T23:22:25.732Z",
+  "id": "vsnXdMVEOJf1thmj",
+  "name": "WF4_Sync_Engine",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "sync-repair-manual",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        100
+      ],
+      "webhookId": "sync-repair-manual",
+      "id": "e7578c36-c3ba-4aa7-8dfe-6cd3f247c68a"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "91285da4-a2e9-414a-825a-7c6f62eae860"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "name": "Cron Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        200
+      ],
+      "id": "95750b25-127a-4e44-ba0c-0d4deaf5aab1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT b.id, b.provider_id, b.service_id, b.start_time, b.end_time, b.user_id, b.status, s.name AS service_name, p.name AS provider_name, p.gcal_calendar_id FROM bookings b LEFT JOIN services s ON s.id = b.service_id LEFT JOIN providers p ON p.id = b.provider_id WHERE b.gcal_event_id IS NULL AND b.status = 'CONFIRMED' AND b.start_time > NOW() - INTERVAL '1 day' ORDER BY b.created_at ASC LIMIT 10;"
+      },
+      "name": "Get Unsynced",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        250,
+        100
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "id": "2de1e606-c0d3-4961-97b3-f9b5fe68da8d"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        500,
+        100
+      ],
+      "id": "784685f9-48b6-4bbc-9faf-a67adddac918"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "calendar": {
+          "__rl": true,
+          "value": "={{ $json.gcal_calendar_id || 'primary' }}",
+          "mode": "id"
+        },
+        "start": "={{ $json.start_time }}",
+        "end": "={{ $json.end_time || $json.start_time }}",
+        "additionalFields": {
+          "summary": "={{ $json.service_name || 'Reserva' }} - {{ $json.provider_name || 'Staff' }}",
+          "description": "=Booking ID: {{ $json.id }}\nUser ID: {{ $json.user_id }}\nSynced by Titanium Sync Engine"
+        },
+        "options": {
+          "includeInputData": true
+        }
+      },
+      "name": "Create GCal Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        750,
+        100
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "OsRBfz3Cs7Ph5uV5",
+          "name": "Google Calendar account"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "id": "fdc2fed3-a105-46bc-8998-5557474fd2cf"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst original = item.json || {}; // includeInputData puts original in .json\n\nif (item.error) {\n  return [{ json: { id: original.id, success: false, error: item.message } }];\n}\n\nreturn [{ json: { id: original.id, gcal_event_id: item.id, success: true } }];"
+      },
+      "name": "Normalize Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        100
+      ],
+      "id": "380b0a74-7b03-4d21-bc3d-04d4ce0fd15c"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "is_success",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Is Success?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1250,
+        100
+      ],
+      "id": "02189248-071b-4583-9db1-7a32361b312d"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE bookings SET gcal_event_id = $1::text, gcal_synced_at = NOW() WHERE id = $2::uuid;",
+        "options": {
+          "queryReplacement": "={{ $json.gcal_event_id }}, {{ $json.id }}"
+        }
+      },
+      "name": "Update Booking",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1500,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "id": "2f28703a-3761-4505-a856-1b00e9fb9276"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Just a pass-through to loop back\nreturn $input.all();"
+      },
+      "name": "Loop Connector",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1750,
+        100
+      ],
+      "id": "cefc625e-bacd-4d5d-9068-4f98083088c0"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: {\n  success: true,\n  data: { message: 'Sync cycle completed' },\n  _meta: { source: 'WF4_Sync_Engine', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];"
+      },
+      "name": "Sync SCO",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        300
+      ],
+      "id": "280aae3c-16d6-4c88-af91-79c6abfb677a"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Unsynced",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Unsynced",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cron Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Unsynced",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Unsynced": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "Create GCal Event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sync SCO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create GCal Event": {
+      "main": [
+        [
+          {
+            "node": "Normalize Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Result": {
+      "main": [
+        [
+          {
+            "node": "Is Success?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Success?": {
+      "main": [
+        [
+          {
+            "node": "Update Booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Connector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Booking": {
+      "main": [
+        [
+          {
+            "node": "Loop Connector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Connector": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Cron Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": null,
+  "versionId": "629e1377-d75c-4643-9267-b5f66051a9af",
+  "activeVersionId": "629e1377-d75c-4643-9267-b5f66051a9af",
+  "versionCounter": 47,
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2026-03-13T23:22:25.732Z",
+      "createdAt": "2026-03-13T23:22:25.732Z",
+      "role": "workflow:owner",
+      "workflowId": "vsnXdMVEOJf1thmj",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-14T19:38:14.728Z",
+    "createdAt": "2026-03-14T19:38:14.728Z",
+    "versionId": "629e1377-d75c-4643-9267-b5f66051a9af",
+    "workflowId": "vsnXdMVEOJf1thmj",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "sync-repair-manual",
+          "httpMethod": "POST",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "name": "Webhook Trigger",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          100
+        ],
+        "webhookId": "sync-repair-manual",
+        "id": "e7578c36-c3ba-4aa7-8dfe-6cd3f247c68a"
+      },
+      {
+        "parameters": {},
+        "name": "Manual Trigger",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "91285da4-a2e9-414a-825a-7c6f62eae860"
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 15
+              }
+            ]
+          }
+        },
+        "name": "Cron Trigger",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          0,
+          200
+        ],
+        "id": "95750b25-127a-4e44-ba0c-0d4deaf5aab1"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT b.id, b.provider_id, b.service_id, b.start_time, b.end_time, b.user_id, b.status, s.name AS service_name, p.name AS provider_name, p.gcal_calendar_id FROM bookings b LEFT JOIN services s ON s.id = b.service_id LEFT JOIN providers p ON p.id = b.provider_id WHERE b.gcal_event_id IS NULL AND b.status = 'CONFIRMED' AND b.start_time > NOW() - INTERVAL '1 day' ORDER BY b.created_at ASC LIMIT 10;"
+        },
+        "name": "Get Unsynced",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          250,
+          100
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "5LzvCP9BsQwCi9Z0",
+            "name": "Postgres account"
+          }
+        },
+        "id": "2de1e606-c0d3-4961-97b3-f9b5fe68da8d"
+      },
+      {
+        "parameters": {
+          "batchSize": 1,
+          "options": {}
+        },
+        "name": "Split In Batches",
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          500,
+          100
+        ],
+        "id": "784685f9-48b6-4bbc-9faf-a67adddac918"
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "calendar": {
+            "__rl": true,
+            "value": "={{ $json.gcal_calendar_id || 'primary' }}",
+            "mode": "id"
+          },
+          "start": "={{ $json.start_time }}",
+          "end": "={{ $json.end_time || $json.start_time }}",
+          "additionalFields": {
+            "summary": "={{ $json.service_name || 'Reserva' }} - {{ $json.provider_name || 'Staff' }}",
+            "description": "=Booking ID: {{ $json.id }}\nUser ID: {{ $json.user_id }}\nSynced by Titanium Sync Engine"
+          },
+          "options": {
+            "includeInputData": true
+          }
+        },
+        "name": "Create GCal Event",
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          750,
+          100
+        ],
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "OsRBfz3Cs7Ph5uV5",
+            "name": "Google Calendar account"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "id": "fdc2fed3-a105-46bc-8998-5557474fd2cf"
+      },
+      {
+        "parameters": {
+          "jsCode": "const item = $input.first().json;\nconst original = item.json || {}; // includeInputData puts original in .json\n\nif (item.error) {\n  return [{ json: { id: original.id, success: false, error: item.message } }];\n}\n\nreturn [{ json: { id: original.id, gcal_event_id: item.id, success: true } }];"
+        },
+        "name": "Normalize Result",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1000,
+          100
+        ],
+        "id": "380b0a74-7b03-4d21-bc3d-04d4ce0fd15c"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "is_success",
+                "leftValue": "={{ $json.success }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "name": "Is Success?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1250,
+          100
+        ],
+        "id": "02189248-071b-4583-9db1-7a32361b312d"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "UPDATE bookings SET gcal_event_id = $1::text, gcal_synced_at = NOW() WHERE id = $2::uuid;",
+          "options": {
+            "queryReplacement": "={{ $json.gcal_event_id }}, {{ $json.id }}"
+          }
+        },
+        "name": "Update Booking",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          1500,
+          0
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "5LzvCP9BsQwCi9Z0",
+            "name": "Postgres account"
+          }
+        },
+        "id": "2f28703a-3761-4505-a856-1b00e9fb9276"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Just a pass-through to loop back\nreturn $input.all();"
+        },
+        "name": "Loop Connector",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1750,
+          100
+        ],
+        "id": "cefc625e-bacd-4d5d-9068-4f98083088c0"
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{ json: {\n  success: true,\n  data: { message: 'Sync cycle completed' },\n  _meta: { source: 'WF4_Sync_Engine', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];"
+        },
+        "name": "Sync SCO",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          750,
+          300
+        ],
+        "id": "280aae3c-16d6-4c88-af91-79c6abfb677a"
+      }
+    ],
+    "connections": {
+      "Webhook Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get Unsynced",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Manual Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get Unsynced",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Cron Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get Unsynced",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Unsynced": {
+        "main": [
+          [
+            {
+              "node": "Split In Batches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split In Batches": {
+        "main": [
+          [
+            {
+              "node": "Create GCal Event",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Sync SCO",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create GCal Event": {
+        "main": [
+          [
+            {
+              "node": "Normalize Result",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalize Result": {
+        "main": [
+          [
+            {
+              "node": "Is Success?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Success?": {
+        "main": [
+          [
+            {
+              "node": "Update Booking",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Loop Connector",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Booking": {
+        "main": [
+          [
+            {
+              "node": "Loop Connector",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Connector": {
+        "main": [
+          [
+            {
+              "node": "Split In Batches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Roger Gallegos",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-14T19:38:14.766Z",
+        "id": 742,
+        "workflowId": "vsnXdMVEOJf1thmj",
+        "versionId": "629e1377-d75c-4643-9267-b5f66051a9af",
+        "event": "deactivated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-14T19:38:14.794Z",
+        "id": 743,
+        "workflowId": "vsnXdMVEOJf1thmj",
+        "versionId": "629e1377-d75c-4643-9267-b5f66051a9af",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-14T19:38:14.838Z",
+        "id": 744,
+        "workflowId": "vsnXdMVEOJf1thmj",
+        "versionId": "629e1377-d75c-4643-9267-b5f66051a9af",
+        "event": "deactivated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-14T19:38:14.862Z",
+        "id": 745,
+        "workflowId": "vsnXdMVEOJf1thmj",
+        "versionId": "629e1377-d75c-4643-9267-b5f66051a9af",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    ]
+  }
+}

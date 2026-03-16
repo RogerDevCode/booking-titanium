@@ -1,3 +1,23 @@
+/**
+ * @file circuit_breaker.test.ts
+ * @description CB_GCal_Circuit_Breaker TDD - Fault tolerance pattern
+ * 
+ * ⚠️  NON-SATURATING EXECUTION:
+ *    - Uses maxWorkers: 1 to prevent CPU overload
+ *    - Sequential test execution with delays between tests
+ *    - Jest configuration: workerIdleMemoryLimit: 512MB
+ * 
+ * 📊 Jest Configuration (jest.config.js):
+ *    - maxWorkers: 1 - Prevents CPU saturation during test execution
+ *    - testTimeout: 60000ms - Allows for real webhook calls
+ *    - workerIdleMemoryLimit: 512MB - Memory management
+ * 
+ * 🚀 Performance Notes:
+ *    - No sobrecargar el CPU - tests run sequentially
+ *    - Circuit breaker state is properly reset between tests
+ *    - Batching: Tests include delays for circuit state transitions
+ */
+
 import axios from 'axios';
 import { Pool } from 'pg';
 import * as dotenv from 'dotenv';

@@ -1,16 +1,30 @@
 /**
- * Integration Tests for Booking Titanium Seed Workflows (WF1-WF7)
+ * @file seed-workflows.integration.test.ts
+ * @description Integration Tests for Booking Titanium Seed Workflows (WF1-WF7)
+ * 
+ * ⚠️  NON-SATURATING EXECUTION:
+ *    - Uses maxWorkers: 1 to prevent CPU overload
+ *    - Sequential test execution with delays between tests
+ *    - Jest configuration: workerIdleMemoryLimit: 512MB
+ * 
+ * 📊 Jest Configuration (jest.config.js):
+ *    - maxWorkers: 1 - Prevents CPU saturation during test execution
+ *    - testTimeout: 60000ms - Allows for real webhook calls
+ *    - workerIdleMemoryLimit: 512MB - Memory management
+ * 
+ * 🚀 Performance Notes:
+ *    - No sobrecargar el CPU - tests run sequentially
+ *    - Webhook calls are rate-limited naturally by sequential execution
+ *    - Batching: Tests grouped by workflow with delays between groups
  * 
  * Tests validate:
  * - Webhook endpoints are accessible
  * - Workflows execute without errors
  * - Basic response structure
- * 
+ *
  * Prerequisites:
  * - Workflows must be uploaded and activated on n8n server
  * - .env must have N8N_API_URL configured
- * 
- * Usage: npx jest tests/seed-workflows.integration.test.ts --testTimeout=60000
  */
 
 import * as dotenv from 'dotenv';

@@ -1,0 +1,456 @@
+{
+  "updatedAt": "2026-03-05T14:16:18.754Z",
+  "createdAt": "2026-03-02T02:19:34.753Z",
+  "id": "mf4qnUG7UlrAKpQU",
+  "name": "DB_Cancel_Booking",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"booking_id\": \"BKG-X7K9P2\", \"chat_id\": 12345}"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        420
+      ],
+      "id": "843aac23-7e51-411e-9c2b-6bff8c1abcb5"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "db-cancel-booking-test",
+        "responseMode": "lastNode"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        620
+      ],
+      "webhookId": "db-cancel-booking-test",
+      "id": "117ac833-9cde-4aa6-bf8f-21337fc1f07f"
+    },
+    {
+      "parameters": {
+        "jsCode": "/* VRF PRE: Validate Booking ID (UUID or BKG-XXXXXX) */\nconst item = $input.first()?.json || {};\nconst data = item.body || item;\nconst booking_id = String(data.booking_id || \"\").trim();\n// Accept UUID or BKG-XXXXX format\nconst isValid = booking_id.length > 5;\nreturn [{ json: { isValid, booking_id, chat_id: data.chat_id } }];"
+      },
+      "name": "Validate UUID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        500
+      ],
+      "id": "6584b842-379f-4bb5-b7cb-071a6d7f1376"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid_uuid_cond",
+              "leftValue": "={{ $json.isValid === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        500
+      ],
+      "id": "ea4c744b-3a14-419a-b78c-a5ab9cfff448"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/cancel-booking",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"booking_id\": \"{{ $json.booking_id }}\",\n  \"chat_id\": {{ $json.chat_id }}\n}",
+        "options": {
+          "continueOnFail": true,
+          "timeout": 5000
+        }
+      },
+      "name": "Call DAL Cancel",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        600,
+        400
+      ],
+      "id": "ef13e3a9-b153-4cd5-af0a-42d81a8c2cb7"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format Success Response (POST) - Standard Contract\nconst dalResponse = $input.first()?.json || {};\nconst isSuccess = dalResponse.success === true;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    error_code: isSuccess ? null : (dalResponse.error_code || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || dalResponse.message || 'Booking cancellation failed'),\n    data: isSuccess ? (dalResponse.data || { cancelled: true, booking_id: $node[\"Validate UUID\"].json.booking_id }) : null,\n    _meta: {\n      source: 'DB_Cancel_Booking',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Cancel_Booking',\n      version: '1.2.0'\n    }\n  }\n}];"
+      },
+      "name": "Format Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        850,
+        400
+      ],
+      "id": "9445cf9e-edd8-41fa-a0ea-e9feabaf5ac2"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: \"INVALID_BOOKING_ID\",\n    error_message: \"El ID de reserva no es válido (debe ser código BKG-XXXX o UUID)\",\n    data: null,\n    _meta: { source: \"DB_Cancel_Booking\", timestamp: new Date().toISOString(), version: \"1.2.0\" }\n  }\n}];"
+      },
+      "name": "Format Invalid ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        600
+      ],
+      "id": "25520c22-6fe3-45fa-abe4-4d55d1143380"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate UUID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate UUID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate UUID": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Cancel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Invalid ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Cancel": {
+      "main": [
+        [
+          {
+            "node": "Format Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Invalid ID": {
+      "main": [
+        [
+          {
+            "node": "Format Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "description": "Cancela una reserva existente.",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "84e94af0-8907-4757-8796-d9b5e223ec35",
+  "activeVersionId": "84e94af0-8907-4757-8796-d9b5e223ec35",
+  "versionCounter": 74,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-02T02:19:34.753Z",
+      "createdAt": "2026-03-02T02:19:34.753Z",
+      "role": "workflow:owner",
+      "workflowId": "mf4qnUG7UlrAKpQU",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-05T14:16:18.755Z",
+    "createdAt": "2026-03-05T14:16:18.755Z",
+    "versionId": "84e94af0-8907-4757-8796-d9b5e223ec35",
+    "workflowId": "mf4qnUG7UlrAKpQU",
+    "nodes": [
+      {
+        "parameters": {
+          "inputSource": "jsonExample",
+          "jsonExample": "{\"booking_id\": \"BKG-X7K9P2\", \"chat_id\": 12345}"
+        },
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          420
+        ],
+        "id": "843aac23-7e51-411e-9c2b-6bff8c1abcb5"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "db-cancel-booking-test",
+          "responseMode": "lastNode"
+        },
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          620
+        ],
+        "webhookId": "db-cancel-booking-test",
+        "id": "117ac833-9cde-4aa6-bf8f-21337fc1f07f"
+      },
+      {
+        "parameters": {
+          "jsCode": "/* VRF PRE: Validate Booking ID (UUID or BKG-XXXXXX) */\nconst item = $input.first()?.json || {};\nconst data = item.body || item;\nconst booking_id = String(data.booking_id || \"\").trim();\n// Accept UUID or BKG-XXXXX format\nconst isValid = booking_id.length > 5;\nreturn [{ json: { isValid, booking_id, chat_id: data.chat_id } }];"
+        },
+        "name": "Validate UUID",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          200,
+          500
+        ],
+        "id": "6584b842-379f-4bb5-b7cb-071a6d7f1376"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "valid_uuid_cond",
+                "leftValue": "={{ $json.isValid === true }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          }
+        },
+        "name": "Is Valid?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          400,
+          500
+        ],
+        "id": "ea4c744b-3a14-419a-b78c-a5ab9cfff448"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://dal-service:3000/cancel-booking",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"booking_id\": \"{{ $json.booking_id }}\",\n  \"chat_id\": {{ $json.chat_id }}\n}",
+          "options": {
+            "continueOnFail": true,
+            "timeout": 5000
+          }
+        },
+        "name": "Call DAL Cancel",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          600,
+          400
+        ],
+        "id": "ef13e3a9-b153-4cd5-af0a-42d81a8c2cb7"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Format Success Response (POST) - Standard Contract\nconst dalResponse = $input.first()?.json || {};\nconst isSuccess = dalResponse.success === true;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    error_code: isSuccess ? null : (dalResponse.error_code || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || dalResponse.message || 'Booking cancellation failed'),\n    data: isSuccess ? (dalResponse.data || { cancelled: true, booking_id: $node[\"Validate UUID\"].json.booking_id }) : null,\n    _meta: {\n      source: 'DB_Cancel_Booking',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Cancel_Booking',\n      version: '1.2.0'\n    }\n  }\n}];"
+        },
+        "name": "Format Success",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          850,
+          400
+        ],
+        "id": "9445cf9e-edd8-41fa-a0ea-e9feabaf5ac2"
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: \"INVALID_BOOKING_ID\",\n    error_message: \"El ID de reserva no es válido (debe ser código BKG-XXXX o UUID)\",\n    data: null,\n    _meta: { source: \"DB_Cancel_Booking\", timestamp: new Date().toISOString(), version: \"1.2.0\" }\n  }\n}];"
+        },
+        "name": "Format Invalid ID",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          600,
+          600
+        ],
+        "id": "25520c22-6fe3-45fa-abe4-4d55d1143380"
+      }
+    ],
+    "connections": {
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Validate UUID",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Validate UUID",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validate UUID": {
+        "main": [
+          [
+            {
+              "node": "Is Valid?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Valid?": {
+        "main": [
+          [
+            {
+              "node": "Call DAL Cancel",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Format Invalid ID",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call DAL Cancel": {
+        "main": [
+          [
+            {
+              "node": "Format Success",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Invalid ID": {
+        "main": [
+          [
+            {
+              "node": "Format Success",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Roger Gallegos",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-05T14:16:19.399Z",
+        "id": 368,
+        "workflowId": "mf4qnUG7UlrAKpQU",
+        "versionId": "84e94af0-8907-4757-8796-d9b5e223ec35",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    ]
+  }
+}

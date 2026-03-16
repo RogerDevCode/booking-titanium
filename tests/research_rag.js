@@ -97,7 +97,7 @@ const RESULTS = {
     }
     
     // Save results
-    const outputPath = '/home/manager/Sync/N8N Projects/booking-titanium/docs/sourceRAG-QWEN.md';
+    const outputPath = '/home/manager/Sync/N8N_Projects/booking-titanium/docs/sourceRAG-QWEN.md';
     let markdown = `# 🔍 FUENTES TÉCNICAS RAG (Retrieval-Augmented Generation)
 
 **Fecha de investigación:** ${new Date().toISOString().split('T')[0]}  

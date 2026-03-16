@@ -56,7 +56,7 @@ const { chromium } = require('playwright');
         console.log(`📝 Preview: ${status.bodyText || '(vacío)'}...`);
         
         // Screenshot
-        const screenshotPath = `/home/manager/Sync/N8N Projects/booking-titanium/tests/n8n_${url.split('/').pop() || 'home'}.png`;
+        const screenshotPath = `/home/manager/Sync/N8N_Projects/booking-titanium/tests/n8n_${url.split('/').pop() || 'home'}.png`;
         await page.screenshot({ path: screenshotPath, fullPage: true });
         console.log(`📸 Screenshot: ${screenshotPath}`);
         

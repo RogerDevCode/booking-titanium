@@ -24,7 +24,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1); const date = tomorrow.toISOString().split('T')[0]; const slots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00']; return slots.map((time, i) => ({ json: { provider_id: 1, service_id: 1, start_time: `${date}T${time}:00.000-03:00`, chat_id: 9800000 + i, user_name: 'Seed Patient ' + String.fromCharCode(65+i), user_email: 'seed@test.local', calendar_id: 'primary' } }));"
+        "jsCode": "const today = new Date();\nconst tomorrow = new Date(today);\ntomorrow.setDate(tomorrow.getDate() + 1);\n\nconst dateStr = tomorrow.toISOString().split('T')[0];\nconst slots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];\n\nreturn slots.map((time, i) => ({\n  json: {\n    provider_id: 1,\n    service_id: 1,\n    start_time: `${dateStr}T${time}:00.000-03:00`,\n    duration_minutes: 60,\n    chat_id: `980000${i}`,\n    customer_id: `seed-cust-${i}`,\n    user_name: `Seed Patient ${String.fromCharCode(65 + i)}`,\n    user_email: `seed${i}@test.local`,\n    event_title: `[SEED] Booking - Patient ${String.fromCharCode(65 + i)}`\n  }\n}));"
       },
       "id": "build_config",
       "name": "Build Seed Config",
@@ -36,7 +36,7 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "8h2HMDoNQTJEkiZL",
+          "value": "2G9ffjvKyF5bqDT5",
           "mode": "id"
         },
         "mode": "each",
@@ -64,5 +64,8 @@
     "Webhook": { "main": [[{ "node": "Build Seed Config", "type": "main", "index": 0 }]] },
     "Build Seed Config": { "main": [[{ "node": "Execute Sub-workflow", "type": "main", "index": 0 }]] },
     "Execute Sub-workflow": { "main": [[{ "node": "Standard Contract Output", "type": "main", "index": 0 }]] }
+  },
+  "settings": {
+    "executionOrder": "v1"
   }
 }

@@ -1,0 +1,231 @@
+{
+  "updatedAt": "2026-03-15T02:59:46.651Z",
+  "createdAt": "2026-03-13T23:18:37.268Z",
+  "id": "DW3wMB9KP5BR4JoM",
+  "name": "WF2_Booking_Orchestrator_Error_Handler",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0089068e-ec13-4dea-a57e-8eb17f778f10"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst err = $input.first().json;\nreturn [{ json: {\n  workflow_name: err.workflow?.name || 'unknown',\n  execution_id: err.execution?.id || 'unknown',\n  error_message: err.execution?.error?.message || 'Unknown catastrophic error',\n  last_node: err.execution?.lastNodeExecuted || 'unknown',\n  timestamp: new Date().toISOString()\n}}];"
+      },
+      "name": "Extract Metadata",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        0
+      ],
+      "id": "37714158-1f5a-4395-9eea-74e9cff5bd1e"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO system_logs (workflow_name, execution_id, level, message, details) VALUES ($1, $2, 'CRITICAL', $3, $4);",
+        "options": {
+          "queryReplacement": "={{ $json.workflow_name }}, {{ $json.execution_id }}, {{ 'CATASTROPHIC: ' + $json.error_message }}, {{ JSON.stringify($json) }}"
+        }
+      },
+      "name": "Log to DB",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        500,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "id": "c84c85e0-b6b4-4f61-85f6-ebfc5bbb7f1b"
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Metadata": {
+      "main": [
+        [
+          {
+            "node": "Log to DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "32fbe532-4ffd-424e-9acb-d1bc5b438511",
+  "activeVersionId": "32fbe532-4ffd-424e-9acb-d1bc5b438511",
+  "versionCounter": 81,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-13T23:18:37.268Z",
+      "createdAt": "2026-03-13T23:18:37.268Z",
+      "role": "workflow:owner",
+      "workflowId": "DW3wMB9KP5BR4JoM",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-15T02:59:46.652Z",
+    "createdAt": "2026-03-15T02:59:46.652Z",
+    "versionId": "32fbe532-4ffd-424e-9acb-d1bc5b438511",
+    "workflowId": "DW3wMB9KP5BR4JoM",
+    "nodes": [
+      {
+        "parameters": {},
+        "name": "Error Trigger",
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "0089068e-ec13-4dea-a57e-8eb17f778f10"
+      },
+      {
+        "parameters": {
+          "jsCode": "\nconst err = $input.first().json;\nreturn [{ json: {\n  workflow_name: err.workflow?.name || 'unknown',\n  execution_id: err.execution?.id || 'unknown',\n  error_message: err.execution?.error?.message || 'Unknown catastrophic error',\n  last_node: err.execution?.lastNodeExecuted || 'unknown',\n  timestamp: new Date().toISOString()\n}}];"
+        },
+        "name": "Extract Metadata",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          250,
+          0
+        ],
+        "id": "37714158-1f5a-4395-9eea-74e9cff5bd1e"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "INSERT INTO system_logs (workflow_name, execution_id, level, message, details) VALUES ($1, $2, 'CRITICAL', $3, $4);",
+          "options": {
+            "queryReplacement": "={{ $json.workflow_name }}, {{ $json.execution_id }}, {{ 'CATASTROPHIC: ' + $json.error_message }}, {{ JSON.stringify($json) }}"
+          }
+        },
+        "name": "Log to DB",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          500,
+          0
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "5LzvCP9BsQwCi9Z0",
+            "name": "Postgres account"
+          }
+        },
+        "id": "c84c85e0-b6b4-4f61-85f6-ebfc5bbb7f1b"
+      }
+    ],
+    "connections": {
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "Extract Metadata",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Metadata": {
+        "main": [
+          [
+            {
+              "node": "Log to DB",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Roger Gallegos",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-15T02:59:46.668Z",
+        "id": 926,
+        "workflowId": "DW3wMB9KP5BR4JoM",
+        "versionId": "32fbe532-4ffd-424e-9acb-d1bc5b438511",
+        "event": "deactivated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-15T02:59:46.683Z",
+        "id": 927,
+        "workflowId": "DW3wMB9KP5BR4JoM",
+        "versionId": "32fbe532-4ffd-424e-9acb-d1bc5b438511",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-15T02:59:46.702Z",
+        "id": 928,
+        "workflowId": "DW3wMB9KP5BR4JoM",
+        "versionId": "32fbe532-4ffd-424e-9acb-d1bc5b438511",
+        "event": "deactivated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-15T02:59:46.714Z",
+        "id": 929,
+        "workflowId": "DW3wMB9KP5BR4JoM",
+        "versionId": "32fbe532-4ffd-424e-9acb-d1bc5b438511",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    ]
+  }
+}

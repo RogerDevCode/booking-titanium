@@ -1,0 +1,245 @@
+{
+  "updatedAt": "2026-03-05T17:31:39.547Z",
+  "createdAt": "2026-03-05T15:57:35.085Z",
+  "id": "N2mFFyKLf7365OB9",
+  "name": "DB_Get_Services",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"provider_id\": 1}"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        432
+      ],
+      "id": "898c6d30-a1c0-495d-9bfb-b9710825aaa8"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        232
+      ],
+      "id": "21260806-58c9-4bef-b1db-d5d76b9c89a5"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'http://dal-service:3000/services-by-provider/' + ($json.provider_id || 1) }}",
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "name": "Call DAL Services",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        250,
+        432
+      ],
+      "id": "b4b407d3-876c-468a-a566-d13f36d45c59"
+    },
+    {
+      "parameters": {
+        "jsCode": "const dalResponse = $input.first()?.json || {};\nconst isSuccess = dalResponse.success === true;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    error_code: isSuccess ? null : (dalResponse.error_code || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || dalResponse.message || 'Failed to list services'),\n    data: isSuccess ? (dalResponse.data || dalResponse) : null,\n    _meta: {\n      source: 'DB_Get_Services',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Get_Services',\n      version: '1.0.0'\n    }\n  }\n}];"
+      },
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        432
+      ],
+      "id": "1a07efee-fa1e-4aa9-adb5-91509431b1db"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Services",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Services",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Services": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "e06140a0-222c-463f-a0f2-e03f6faae1ea",
+  "activeVersionId": "e06140a0-222c-463f-a0f2-e03f6faae1ea",
+  "versionCounter": 22,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-05T15:57:35.085Z",
+      "createdAt": "2026-03-05T15:57:35.085Z",
+      "role": "workflow:owner",
+      "workflowId": "N2mFFyKLf7365OB9",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-05T17:31:39.548Z",
+    "createdAt": "2026-03-05T17:31:39.548Z",
+    "versionId": "e06140a0-222c-463f-a0f2-e03f6faae1ea",
+    "workflowId": "N2mFFyKLf7365OB9",
+    "nodes": [
+      {
+        "parameters": {
+          "inputSource": "jsonExample",
+          "jsonExample": "{\"provider_id\": 1}"
+        },
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          432
+        ],
+        "id": "898c6d30-a1c0-495d-9bfb-b9710825aaa8"
+      },
+      {
+        "parameters": {},
+        "name": "Manual Trigger",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          232
+        ],
+        "id": "21260806-58c9-4bef-b1db-d5d76b9c89a5"
+      },
+      {
+        "parameters": {
+          "method": "GET",
+          "url": "={{ 'http://dal-service:3000/services-by-provider/' + ($json.provider_id || 1) }}",
+          "options": {
+            "timeout": 5000
+          }
+        },
+        "name": "Call DAL Services",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          250,
+          432
+        ],
+        "id": "b4b407d3-876c-468a-a566-d13f36d45c59"
+      },
+      {
+        "parameters": {
+          "jsCode": "const dalResponse = $input.first()?.json || {};\nconst isSuccess = dalResponse.success === true;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    error_code: isSuccess ? null : (dalResponse.error_code || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || dalResponse.message || 'Failed to list services'),\n    data: isSuccess ? (dalResponse.data || dalResponse) : null,\n    _meta: {\n      source: 'DB_Get_Services',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Get_Services',\n      version: '1.0.0'\n    }\n  }\n}];"
+        },
+        "name": "Format Output",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          500,
+          432
+        ],
+        "id": "1a07efee-fa1e-4aa9-adb5-91509431b1db"
+      }
+    ],
+    "connections": {
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Call DAL Services",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Manual Trigger": {
+        "main": [
+          [
+            {
+              "node": "Call DAL Services",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call DAL Services": {
+        "main": [
+          [
+            {
+              "node": "Format Output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Roger Gallegos",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-05T17:31:40.432Z",
+        "id": 377,
+        "workflowId": "N2mFFyKLf7365OB9",
+        "versionId": "e06140a0-222c-463f-a0f2-e03f6faae1ea",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    ]
+  }
+}

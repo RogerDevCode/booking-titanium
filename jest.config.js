@@ -5,6 +5,11 @@ module.exports = {
   roots: ['<rootDir>/tests'],
   testMatch: ['**/?(*.)+(spec|test).ts'],
   maxWorkers: 1,  // Prevent CPU saturation - run single worker
-  workerIdleMemoryLimit: '512MB',
-  testTimeout: 90000,
+  workerIdleMemoryLimit: '256MB',
+  testTimeout: 120000,
+  globals: {
+    'ts-jest': {
+      isolatedModules: true,  // Reduce memory usage
+    },
+  },
 };

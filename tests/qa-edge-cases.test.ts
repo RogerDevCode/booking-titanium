@@ -1,14 +1,29 @@
 /**
- * QA EDGE CASES & PARANOID TEST SUITE
- * Based on PROJECT_DEEP_AUDIT_2026-03-10.md - Section 3: ESTRATEGIA DE PRUEBAS
+ * @file qa-edge-cases.test.ts
+ * @description QA EDGE CASES & PARANOID TEST SUITE
+ * 
+ * ⚠️  NON-SATURATING EXECUTION:
+ *    - Uses maxWorkers: 1 to prevent CPU overload
+ *    - Sequential test execution with delays between tests
+ *    - Jest configuration: workerIdleMemoryLimit: 512MB
+ * 
+ * 📊 Jest Configuration (jest.config.js):
+ *    - maxWorkers: 1 - Prevents CPU saturation during test execution
+ *    - testTimeout: 120000ms - Allows for complex edge case scenarios
+ *    - workerIdleMemoryLimit: 512MB - Memory management
+ * 
+ * 🚀 Performance Notes:
+ *    - No sobrecargar el CPU - tests run sequentially
+ *    - Concurrency tests are controlled to avoid system overload
+ *    - Batching: Tests grouped by category (Edge Cases, Paranoid, Capacity, Concurrency)
+ * 
+ * Based on: PROJECT_DEEP_AUDIT_2026-03-10.md - Section 3: ESTRATEGIA DE PRUEBAS
  *
  * This suite focuses on:
  * - Edge Cases (reservas en pasado, cancelaciones restringidas, emails inválidos)
  * - Paranoid Tests (SQL injection, identidad colisión)
  * - Capacity Tests (reservar todo un día, luego verificar respuesta)
- * - Concurrency Tests (múltiples peticiones simultáneas)
- *
- * Run: npx jest tests/qa-edge-cases.test.ts --testTimeout=120000 --forceExit
+ * - Concurrency Tests (múltiples peticiones simultáneas - CONTROLLED)
  */
 
 import * as dotenv from 'dotenv';

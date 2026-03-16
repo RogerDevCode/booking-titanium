@@ -1,3 +1,23 @@
+/**
+ * @file availability.test.ts
+ * @description WF3_Availability_Service TDD - DB + GCal collision detection
+ * 
+ * ⚠️  NON-SATURATING EXECUTION:
+ *    - Uses maxWorkers: 1 to prevent CPU overload
+ *    - Sequential test execution with delays between tests
+ *    - Jest configuration: workerIdleMemoryLimit: 512MB
+ * 
+ * 📊 Jest Configuration (jest.config.js):
+ *    - maxWorkers: 1 - Prevents CPU saturation during test execution
+ *    - testTimeout: 30000ms - Allows for real webhook calls
+ *    - workerIdleMemoryLimit: 512MB - Memory management
+ * 
+ * 🚀 Performance Notes:
+ *    - No sobrecargar el CPU - tests run sequentially
+ *    - Database connections are reused via connection pool
+ *    - Batching: Tests execute one at a time to avoid DB contention
+ */
+
 import axios from 'axios';
 import { Pool } from 'pg';
 import * as dotenv from 'dotenv';

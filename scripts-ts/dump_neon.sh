@@ -2,5 +2,5 @@
 set -euo pipefail
 
 # Dump de Neon DB sin exponer password
-pg_dump 'postgresql://neondb_owner@ep-small-bread-aijl410v-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require' > schema.sql
+pg_dump 'postgresql://neondb_owner@ep-small-bread-aijl410v-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require' > /home/manager/Sync/N8N_Projects/booking-titanium/database/schema.sql
 echo "Dump guardado en schema.sql ($(du -h schema.sql | cut -f1))"

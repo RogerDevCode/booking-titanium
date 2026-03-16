@@ -6,7 +6,7 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 CONTAINER_NAME="n8n_titanium"
-CREDS_DIR="$HOME/Sync/N8N Projects/credentials"
+CREDS_DIR="$HOME/Sync/N8N_Projects/booking-titanium/credentials"
 
 echo -e "${GREEN}🔑 Importando credenciales (Fix: Array Wrapper)...${NC}"
 echo ""

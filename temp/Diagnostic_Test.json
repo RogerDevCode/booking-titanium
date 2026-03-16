@@ -1,0 +1,153 @@
+{
+  "updatedAt": "2026-03-14T00:14:55.079Z",
+  "createdAt": "2026-03-14T00:14:55.079Z",
+  "id": "3qjxakUfnVlfvlwj",
+  "name": "Diagnostic Test",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "test-diagnostic",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        250,
+        300
+      ],
+      "webhookId": "test-diagnostic",
+      "id": "8094299d-513d-4e70-b64f-8b3162ca6900"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { status: 'ok', message: 'Diagnostic test successful', timestamp: new Date().toISOString() } }];",
+        "options": {}
+      },
+      "name": "Return Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        300
+      ],
+      "id": "2d9a51fb-57fa-4f94-a68b-ce6e5b202d6e"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Return Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "c9f663df-ebbb-4bfa-aa42-69c3f225caec",
+  "activeVersionId": "c9f663df-ebbb-4bfa-aa42-69c3f225caec",
+  "versionCounter": 11,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-14T00:14:55.079Z",
+      "createdAt": "2026-03-14T00:14:55.079Z",
+      "role": "workflow:owner",
+      "workflowId": "3qjxakUfnVlfvlwj",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-14T00:14:55.086Z",
+    "createdAt": "2026-03-14T00:14:55.086Z",
+    "versionId": "c9f663df-ebbb-4bfa-aa42-69c3f225caec",
+    "workflowId": "3qjxakUfnVlfvlwj",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "test-diagnostic",
+          "httpMethod": "POST",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          250,
+          300
+        ],
+        "webhookId": "test-diagnostic",
+        "id": "8094299d-513d-4e70-b64f-8b3162ca6900"
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{ json: { status: 'ok', message: 'Diagnostic test successful', timestamp: new Date().toISOString() } }];",
+          "options": {}
+        },
+        "name": "Return Success",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          500,
+          300
+        ],
+        "id": "2d9a51fb-57fa-4f94-a68b-ce6e5b202d6e"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Return Success",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Roger Gallegos",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-14T00:14:55.426Z",
+        "id": 487,
+        "workflowId": "3qjxakUfnVlfvlwj",
+        "versionId": "c9f663df-ebbb-4bfa-aa42-69c3f225caec",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    ]
+  }
+}

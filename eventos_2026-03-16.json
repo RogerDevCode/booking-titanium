@@ -1,0 +1,64 @@
+[
+  {
+    "kind": "calendar#event",
+    "etag": "\"3547409397456254\"",
+    "id": "aks5t03kbrrstenh9q5u73ggjs",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=YWtzNXQwM2ticnJzdGVuaDlxNXU3M2dnanMgZGV2Lm44bi5zdGF4QG0",
+    "created": "2026-03-16T23:44:58.000Z",
+    "updated": "2026-03-16T23:44:58.728Z",
+    "creator": {
+      "email": "dev.n8n.stax@gmail.com",
+      "self": true
+    },
+    "organizer": {
+      "email": "dev.n8n.stax@gmail.com",
+      "self": true
+    },
+    "start": {
+      "dateTime": "2026-03-16T20:44:58-03:00",
+      "timeZone": "America/New_York"
+    },
+    "end": {
+      "dateTime": "2026-03-16T21:44:58-03:00",
+      "timeZone": "America/New_York"
+    },
+    "iCalUID": "aks5t03kbrrstenh9q5u73ggjs@google.com",
+    "sequence": 0,
+    "reminders": {
+      "useDefault": true
+    },
+    "eventType": "default"
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"3547409493395262\"",
+    "id": "gcqf09bmau1bvok88i19klflf4",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=Z2NxZjA5Ym1hdTFidm9rODhpMTlrbGZsZjQgZGV2Lm44bi5zdGF4QG0",
+    "created": "2026-03-16T23:45:46.000Z",
+    "updated": "2026-03-16T23:45:46.697Z",
+    "creator": {
+      "email": "dev.n8n.stax@gmail.com",
+      "self": true
+    },
+    "organizer": {
+      "email": "dev.n8n.stax@gmail.com",
+      "self": true
+    },
+    "start": {
+      "dateTime": "2026-03-16T20:45:46-03:00",
+      "timeZone": "America/New_York"
+    },
+    "end": {
+      "dateTime": "2026-03-16T21:45:46-03:00",
+      "timeZone": "America/New_York"
+    },
+    "iCalUID": "gcqf09bmau1bvok88i19klflf4@google.com",
+    "sequence": 0,
+    "reminders": {
+      "useDefault": true
+    },
+    "eventType": "default"
+  }
+]

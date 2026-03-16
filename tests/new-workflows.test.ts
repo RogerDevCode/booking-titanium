@@ -1,5 +1,21 @@
 /**
- * Unit Tests for New/Modified Workflows (PASO 1-4)
+ * @file new-workflows.test.ts
+ * @description Unit Tests for New/Modified Workflows (PASO 1-4)
+ * 
+ * ⚠️  NON-SATURATING EXECUTION:
+ *    - Uses maxWorkers: 1 to prevent CPU overload
+ *    - Sequential test execution with delays between tests
+ *    - Jest configuration: workerIdleMemoryLimit: 512MB
+ * 
+ * 📊 Jest Configuration (jest.config.js):
+ *    - maxWorkers: 1 - Prevents CPU saturation during test execution
+ *    - testTimeout: 30000ms - Allows for JSON validation
+ *    - workerIdleMemoryLimit: 512MB - Memory management
+ * 
+ * 🚀 Performance Notes:
+ *    - No sobrecargar el CPU - tests run sequentially
+ *    - File I/O operations are synchronous but lightweight
+ *    - Batching: Tests grouped by feature (Circuit Breaker, DLQ, Error Handler)
  * 
  * Tests validate:
  * - Workflow JSON structure
@@ -7,8 +23,6 @@
  * - Required parameters
  * - Connection integrity
  * - Specific features (Circuit Breaker, DLQ, Error Handler, etc.)
- * 
- * Usage: npx jest tests/new-workflows.test.ts
  */
 
 import * as fs from 'fs';

@@ -1,0 +1,89 @@
+================================================================================
+                    REPORTE DE COMPARACIÓN DE WORKFLOWS
+                         SERVER vs LOCAL (seed_clean)
+================================================================================
+
+WORKFLOWS CRÍTICOS - ESTADO:
+
+✅ MATCH PERFECTO (Server == Local):
+   - CB_01_Check_State.json (14 nodes)
+   - CB_02_Record_Result.json (6 nodes)
+   - DLQ_01_Add_Entry.json (6 nodes)
+   - DLQ_02_Get_Status.json (3 nodes)
+   - DLQ_Retry.json (11 nodes)
+   - WF3_Availability_Service.json (13 nodes)
+   - WF4_Sync_Engine.json (11 nodes)
+   - WF4_Sync_Engine_Event_Driven.json (10 nodes)
+   - WF5_GCal_Collision_Check.json (8 nodes)
+   - WF6_Rollback_Workflow.json (14 nodes)
+   - WF7_Distributed_Lock_System.json (12 nodes)
+
+⚠️  MATCH CON DIFERENCIA (REVIEW REQUIRED):
+   - WF1_Booking_API_Gateway.json
+     SERVER: 9 nodes | ACTIVE
+     LOCAL: 4 nodes (wf1_booking_api_gateway.json) | INACTIVE
+     → LOCAL DESACTUALIZADO! Falta sincronizar
+
+❌ EN SERVER PERO NO EN LOCAL (FALTAN):
+   - BB_00_Config.json (4 nodes)
+   - DB_Cancel_Booking.json (7 nodes)
+   - DB_Create_Booking.json (6 nodes)
+   - DB_Find_Next_Available.json (5 nodes)
+   - DB_Get_Availability.json (5 nodes)
+   - DB_Get_Providers.json (4 nodes)
+   - DB_Get_Providers_By_Service.json (4 nodes)
+   - DB_Get_Services.json (4 nodes)
+   - DB_Reschedule_Booking.json (7 nodes)
+   - FRONTEND_Landing_Page.json (3 nodes)
+   - GCAL_Create_Event.json (7 nodes)
+   - GCAL_Delete_Event.json (5 nodes)
+   - GMAIL_Send_Confirmation.json (5 nodes)
+   - NN_00_Global_Error_Handler.json (11 nodes)
+   - NN_01_Booking_Gateway.json (11 nodes)
+   - NN_02_Message_Parser.json (4 nodes)
+   - NN_03-B_Pipeline_Agent.json (28 nodes)
+   - NN_03_AI_Agent.json (16 nodes)
+   - NN_04_Telegram_Sender.json (11 nodes)
+   - NN_05_Reminder_Cron.json (8 nodes)
+   - SEED_Book_Tomorrow.json (5 nodes)
+   - TEST_GCal_Connection.json (4 nodes)
+   - TEST_GCal_Minimal.json (3 nodes)
+   - WF2_Booking_Orchestrator_FIXED.json (19 nodes) ← VERSIÓN ACTIVA EN SERVER
+
+📁 SOLO EN LOCAL (NO ESTÁN EN SERVER):
+   - WF2_Booking_Orchestrator.json (37 nodes) ← OLD VERSION
+   - WF2_Booking_Orchestrator_CLEAN.json (17 nodes)
+   - WF2_Booking_Orchestrator_FINAL.json (17 nodes)
+   - WF2_Booking_Orchestrator_STRICT.json (17 nodes)
+   - wf1_booking_api_gateway.json (4 nodes) ← DESACTUALIZADO
+   - wf1_booking_api_gateway_v2.json (9 nodes)
+   - wf1_booking_api_gateway_v2_clean.json (9 nodes)
+   - wf2_booking_orchestrator.json (17 nodes)
+   - wf2_booking_orchestrator_minimal.json (2 nodes)
+   - wf2_booking_orchestrator_v2.json (17 nodes)
+   - wf2_booking_orchestrator_v2_final.json (18 nodes) ← POSIBLEMENTE ACTUALIZADA
+   - wf2_booking_orchestrator_v2_repaired.json (19 nodes) ← COINCIDE CON SERVER FIXED
+
+================================================================================
+                              RECOMENDACIONES
+================================================================================
+
+1. ⚠️  WF2_Booking_Orchestrator:
+   - SERVER tiene: WF2_Booking_Orchestrator_FIXED.json (19 nodes, ACTIVE)
+   - LOCAL tiene múltiples versiones, la más cercana es:
+     → wf2_booking_orchestrator_v2_repaired.json (19 nodes)
+   - NO SOBRESCRIBIR con otras versiones de 17 nodes!
+
+2. ⚠️  WF1_Booking_API_Gateway:
+   - SERVER: 9 nodes (ACTIVE)
+   - LOCAL: wf1_booking_api_gateway_v2.json o wf1_booking_api_gateway_v2_clean.json (9 nodes)
+   - NO usar wf1_booking_api_gateway.json (solo 4 nodes, desactualizado)
+
+3. ✅ WORKFLOWS SEGUROS PARA USAR (match perfecto):
+   - WF3, WF4, WF5, WF6, WF7, CB_*, DLQ_* → Todos OK en seed_clean/
+
+4. ❌ WORKFLOWS FALTANTES EN LOCAL:
+   - Todos los DB_*, NN_*, GCAL_*, GMAIL_*, FRONTEND_*, TEST_*
+   - Si los necesitas, descárgalos de temp/ a workflows/seed_clean/
+
+================================================================================

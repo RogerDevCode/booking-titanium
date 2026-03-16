@@ -108,26 +108,22 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://n8n.stax.ink/webhook/db-get-availability-test",
+        "url": "http://n8n_titanium:5678/webhook/db-get-availability-test",
         "sendBody": true,
         "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ provider_id: $json.ctx.provider_id, service_id: $json.ctx.service_id, start_time: $json.ctx.start_time }) }}",
         "options": {
           "timeout": 30000
         },
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "provider_id",
-              "value": "={{ $json.ctx.provider_id }}"
-            },
-            {
-              "name": "service_id",
-              "value": "={{ $json.ctx.service_id }}"
-            },
-            {
-              "name": "start_time",
-              "value": "={{ $json.ctx.start_time }}"
-            }
+        "retryOnFail": {
+          "maxTries": 3,
+          "waitBetweenTries": 1000,
+          "errorCodes": [
+            "429",
+            "500",
+            "502",
+            "503",
+            "504"
           ]
         }
       },
@@ -182,33 +178,11 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "https://n8n.stax.ink/webhook/acquire-lock",
-        "sendBody": true,
-        "specifyBody": "json",
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "provider_id",
-              "value": "={{ $json.ctx.provider_id }}"
-            },
-            {
-              "name": "start_time",
-              "value": "={{ $json.ctx.start_time }}"
-            },
-            {
-              "name": "lock_duration_minutes",
-              "value": "5"
-            }
-          ]
-        },
-        "options": {
-          "timeout": 30000
-        }
+        "jsCode": "// MERGE CONTEXT - After Is Available? (true branch)\n// Get ctx from Generate Idempotency Key node and merge with availability response\nconst ctx = $(\"Generate Idempotency Key\").first()?.json?.ctx || {};\nconst availResponse = $input.first().json;\n\n// Preserve availability data in context\nctx._availability = {\n  checked: true,\n  available: true,\n  slots: availResponse.data?.slots || [],\n  timestamp: new Date().toISOString()\n};\n\nreturn [{ json: { ctx } }];"
       },
-      "name": "Acquire Lock",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
+      "name": "Merge Context After Availability",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         1000,
         200
@@ -216,31 +190,61 @@
     },
     {
       "parameters": {
-        "url": "https://n8n.stax.ink/webhook/circuit-breaker/check",
+        "method": "POST",
+        "url": "http://n8n_titanium:5678/webhook/acquire-lock",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ provider_id: $json.ctx.provider_id, start_time: $json.ctx.start_time, lock_duration_minutes: 5 }) }}",
+        "options": {
+          "timeout": 30000
+        },
+        "retryOnFail": {
+          "maxTries": 3,
+          "waitBetweenTries": 1000,
+          "errorCodes": [
+            "429",
+            "500",
+            "502",
+            "503",
+            "504"
+          ]
+        }
+      },
+      "name": "Acquire Lock",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1250,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://n8n_titanium:5678/webhook/circuit-breaker/check",
         "method": "POST",
         "sendBody": true,
         "specifyBody": "json",
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "service_id",
-              "value": "google_calendar"
-            },
-            {
-              "name": "action",
-              "value": "check"
-            }
-          ]
-        },
+        "jsonBody": "={{ JSON.stringify({ service_id: \"google_calendar\", action: \"check\" }) }}",
         "options": {
-          "timeout": 10000
+          "timeout": 30000
+        },
+        "retryOnFail": {
+          "maxTries": 3,
+          "waitBetweenTries": 1000,
+          "errorCodes": [
+            "429",
+            "500",
+            "502",
+            "503",
+            "504"
+          ]
         }
       },
       "name": "Check Circuit Breaker",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        1250,
+        1500,
         200
       ]
     },
@@ -269,7 +273,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1500,
+        1750,
         200
       ]
     },
@@ -281,7 +285,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1750,
+        2000,
         350
       ]
     },
@@ -298,7 +302,7 @@
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.3,
       "position": [
-        1750,
+        2000,
         200
       ],
       "credentials": {
@@ -310,29 +314,31 @@
     },
     {
       "parameters": {
-        "url": "https://n8n.stax.ink/webhook/circuit-breaker/record",
+        "url": "http://n8n_titanium:5678/webhook/circuit-breaker/record",
         "method": "POST",
         "sendBody": true,
         "specifyBody": "json",
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "service_id",
-              "value": "google_calendar"
-            },
-            {
-              "name": "success",
-              "value": "true"
-            }
-          ]
+        "jsonBody": "={{ JSON.stringify({ service_id: \"google_calendar\", success: true }) }}",
+        "options": {
+          "timeout": 30000
         },
-        "options": {}
+        "retryOnFail": {
+          "maxTries": 3,
+          "waitBetweenTries": 1000,
+          "errorCodes": [
+            "429",
+            "500",
+            "502",
+            "503",
+            "504"
+          ]
+        }
       },
       "name": "Record GCal Success",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        2000,
+        2250,
         200
       ]
     },
@@ -348,7 +354,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        2250,
+        2500,
         200
       ],
       "credentials": {
@@ -366,7 +372,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2500,
+        2750,
         200
       ]
     }
@@ -449,7 +455,7 @@
       "main": [
         [
           {
-            "node": "Acquire Lock",
+            "node": "Merge Context After Availability",
             "type": "main",
             "index": 0
           }
@@ -457,6 +463,17 @@
         [
           {
             "node": "Error - No Availability",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Context After Availability": {
+      "main": [
+        [
+          {
+            "node": "Acquire Lock",
             "type": "main",
             "index": 0
           }

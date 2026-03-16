@@ -1,0 +1,871 @@
+{
+  "updatedAt": "2026-03-14T15:46:22.774Z",
+  "createdAt": "2026-03-14T15:38:07.347Z",
+  "id": "Ns2XLxQCaVsVTpSC",
+  "name": "DLQ_Retry",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "name": "Cron Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "58c379c5-0054-4ec2-a92a-6ba4bc94f467"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -200
+      ],
+      "id": "c73eefde-883e-4093-9204-1a53568df725"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE booking_dlq \nSET status = 'processing', updated_at = NOW() \nWHERE id IN (\n  SELECT id FROM booking_dlq \n  WHERE status = 'pending' \n    AND next_retry_at <= NOW() \n    AND failure_count < max_retries\n  FOR UPDATE SKIP LOCKED \n  LIMIT 10\n) \nRETURNING *;",
+        "options": {}
+      },
+      "name": "Lock & Fetch Items",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        250,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "id": "ac67444d-9e90-4f6f-aa1c-5159a5d02f21"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        500,
+        0
+      ],
+      "id": "be70faf9-cdf1-4443-b7b0-e8f38754aa34"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://n8n:5678/webhook/booking-orchestrator",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "provider_id",
+              "value": "={{ $json.provider_id }}"
+            },
+            {
+              "name": "service_id",
+              "value": "={{ $json.service_id }}"
+            },
+            {
+              "name": "start_time",
+              "value": "={{ $json.original_payload?.start_time }}"
+            },
+            {
+              "name": "customer_id",
+              "value": "={{ $json.original_payload?.customer_id }}"
+            },
+            {
+              "name": "chat_id",
+              "value": "={{ $json.original_payload?.chat_id }}"
+            },
+            {
+              "name": "idempotency_key",
+              "value": "={{ $json.idempotency_key }}"
+            },
+            {
+              "name": "retry_attempt",
+              "value": "={{ $json.failure_count + 1 }}"
+            }
+          ]
+        },
+        "options": {
+          "includeInputData": true
+        }
+      },
+      "name": "Retry Booking",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        750,
+        0
+      ],
+      "onError": "continueRegularOutput",
+      "id": "02107ee0-a096-4215-84f1-0bfc52191c39"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "retry_success",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Retry Success?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1000,
+        0
+      ],
+      "id": "c8f63e45-c251-4229-b231-a9ea1618f8ac"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT booking_dlq_resolve($1::bigint, 'auto_retry', 'Successfully retried via DLQ');",
+        "options": {
+          "queryReplacement": "={{ $json.id }}"
+        }
+      },
+      "name": "Mark Resolved",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1250,
+        -100
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "id": "39e74be1-690e-4418-b37d-abb37d8ca0a4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n// Access original data because includeInputData: true was set in HTTP Request\nconst dlq = input.json || input;\nconst errorMsg = input.error?.message || (dlq.success === false ? dlq.error_message : 'Unknown error');\n\nconst failure_count = dlq.failure_count + 1;\nconst next_retry_minutes = Math.pow(2, failure_count);\nconst should_discard = failure_count >= dlq.max_retries;\n\n// 📦 Base64 encode the error to avoid comma splitting in next node\nconst b64Error = Buffer.from(errorMsg).toString('base64');\n\nreturn [{ json: {\n  dlq_id: dlq.id,\n  failure_count,\n  next_retry_minutes,\n  should_discard,\n  b64_error: b64Error\n}}];"
+      },
+      "name": "Calc Backoff",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1250,
+        100
+      ],
+      "id": "a0432276-97db-4d7c-ba09-aea46d9dceb2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "discard_limit",
+              "leftValue": "={{ $json.should_discard }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Should Discard?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1500,
+        100
+      ],
+      "id": "e74447ba-0e15-432d-a89f-4e1db71151cc"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT booking_dlq_discard($1::bigint, 'Max retries exceeded');",
+        "options": {
+          "queryReplacement": "={{ $json.dlq_id }}"
+        }
+      },
+      "name": "Discard Item",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1750,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "id": "a487f715-3c00-4a07-b384-950ac30a8891"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE booking_dlq \nSET status = 'pending', \n    failure_count = $2::int, \n    next_retry_at = NOW() + ($3::int * INTERVAL '1 minute'),\n    last_error_message = convert_from(decode($4, 'base64'), 'utf-8')\nWHERE id = $1::bigint;",
+        "options": {
+          "queryReplacement": "={{ $json.dlq_id }}, {{ $json.failure_count }}, {{ $json.next_retry_minutes }}, {{ $json.b64_error }}"
+        }
+      },
+      "name": "Update Failure Count",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1750,
+        200
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "id": "3c04f844-5de4-44ae-97ed-d701f6099819"
+    }
+  ],
+  "connections": {
+    "Cron Trigger": {
+      "main": [
+        [
+          {
+            "node": "Lock & Fetch Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Lock & Fetch Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lock & Fetch Items": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "Retry Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry Booking": {
+      "main": [
+        [
+          {
+            "node": "Retry Success?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry Success?": {
+      "main": [
+        [
+          {
+            "node": "Mark Resolved",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Calc Backoff",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calc Backoff": {
+      "main": [
+        [
+          {
+            "node": "Should Discard?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Discard?": {
+      "main": [
+        [
+          {
+            "node": "Discard Item",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Failure Count",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Resolved": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discard Item": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Failure Count": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "dc60aaa0-a537-4b02-9687-88497017e504",
+  "activeVersionId": "dc60aaa0-a537-4b02-9687-88497017e504",
+  "versionCounter": 12,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-14T15:38:07.347Z",
+      "createdAt": "2026-03-14T15:38:07.347Z",
+      "role": "workflow:owner",
+      "workflowId": "Ns2XLxQCaVsVTpSC",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-14T15:46:22.775Z",
+    "createdAt": "2026-03-14T15:46:22.775Z",
+    "versionId": "dc60aaa0-a537-4b02-9687-88497017e504",
+    "workflowId": "Ns2XLxQCaVsVTpSC",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes"
+              }
+            ]
+          }
+        },
+        "name": "Cron Trigger",
+        "type": "n8n-nodes-base.cron",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "58c379c5-0054-4ec2-a92a-6ba4bc94f467"
+      },
+      {
+        "parameters": {},
+        "name": "Manual Trigger",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          -200
+        ],
+        "id": "c73eefde-883e-4093-9204-1a53568df725"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "UPDATE booking_dlq \nSET status = 'processing', updated_at = NOW() \nWHERE id IN (\n  SELECT id FROM booking_dlq \n  WHERE status = 'pending' \n    AND next_retry_at <= NOW() \n    AND failure_count < max_retries\n  FOR UPDATE SKIP LOCKED \n  LIMIT 10\n) \nRETURNING *;",
+          "options": {}
+        },
+        "name": "Lock & Fetch Items",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          250,
+          0
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "5LzvCP9BsQwCi9Z0",
+            "name": "Postgres account"
+          }
+        },
+        "id": "ac67444d-9e90-4f6f-aa1c-5159a5d02f21"
+      },
+      {
+        "parameters": {
+          "batchSize": 1,
+          "options": {}
+        },
+        "name": "Split In Batches",
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          500,
+          0
+        ],
+        "id": "be70faf9-cdf1-4443-b7b0-e8f38754aa34"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://n8n:5678/webhook/booking-orchestrator",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "provider_id",
+                "value": "={{ $json.provider_id }}"
+              },
+              {
+                "name": "service_id",
+                "value": "={{ $json.service_id }}"
+              },
+              {
+                "name": "start_time",
+                "value": "={{ $json.original_payload?.start_time }}"
+              },
+              {
+                "name": "customer_id",
+                "value": "={{ $json.original_payload?.customer_id }}"
+              },
+              {
+                "name": "chat_id",
+                "value": "={{ $json.original_payload?.chat_id }}"
+              },
+              {
+                "name": "idempotency_key",
+                "value": "={{ $json.idempotency_key }}"
+              },
+              {
+                "name": "retry_attempt",
+                "value": "={{ $json.failure_count + 1 }}"
+              }
+            ]
+          },
+          "options": {
+            "includeInputData": true
+          }
+        },
+        "name": "Retry Booking",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          750,
+          0
+        ],
+        "onError": "continueRegularOutput",
+        "id": "02107ee0-a096-4215-84f1-0bfc52191c39"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "retry_success",
+                "leftValue": "={{ $json.success }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "name": "Retry Success?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1000,
+          0
+        ],
+        "id": "c8f63e45-c251-4229-b231-a9ea1618f8ac"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT booking_dlq_resolve($1::bigint, 'auto_retry', 'Successfully retried via DLQ');",
+          "options": {
+            "queryReplacement": "={{ $json.id }}"
+          }
+        },
+        "name": "Mark Resolved",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          1250,
+          -100
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "5LzvCP9BsQwCi9Z0",
+            "name": "Postgres account"
+          }
+        },
+        "id": "39e74be1-690e-4418-b37d-abb37d8ca0a4"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.first().json;\n// Access original data because includeInputData: true was set in HTTP Request\nconst dlq = input.json || input;\nconst errorMsg = input.error?.message || (dlq.success === false ? dlq.error_message : 'Unknown error');\n\nconst failure_count = dlq.failure_count + 1;\nconst next_retry_minutes = Math.pow(2, failure_count);\nconst should_discard = failure_count >= dlq.max_retries;\n\n// 📦 Base64 encode the error to avoid comma splitting in next node\nconst b64Error = Buffer.from(errorMsg).toString('base64');\n\nreturn [{ json: {\n  dlq_id: dlq.id,\n  failure_count,\n  next_retry_minutes,\n  should_discard,\n  b64_error: b64Error\n}}];"
+        },
+        "name": "Calc Backoff",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1250,
+          100
+        ],
+        "id": "a0432276-97db-4d7c-ba09-aea46d9dceb2"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "discard_limit",
+                "leftValue": "={{ $json.should_discard }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "name": "Should Discard?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1500,
+          100
+        ],
+        "id": "e74447ba-0e15-432d-a89f-4e1db71151cc"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT booking_dlq_discard($1::bigint, 'Max retries exceeded');",
+          "options": {
+            "queryReplacement": "={{ $json.dlq_id }}"
+          }
+        },
+        "name": "Discard Item",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          1750,
+          0
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "5LzvCP9BsQwCi9Z0",
+            "name": "Postgres account"
+          }
+        },
+        "id": "a487f715-3c00-4a07-b384-950ac30a8891"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "UPDATE booking_dlq \nSET status = 'pending', \n    failure_count = $2::int, \n    next_retry_at = NOW() + ($3::int * INTERVAL '1 minute'),\n    last_error_message = convert_from(decode($4, 'base64'), 'utf-8')\nWHERE id = $1::bigint;",
+          "options": {
+            "queryReplacement": "={{ $json.dlq_id }}, {{ $json.failure_count }}, {{ $json.next_retry_minutes }}, {{ $json.b64_error }}"
+          }
+        },
+        "name": "Update Failure Count",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          1750,
+          200
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "5LzvCP9BsQwCi9Z0",
+            "name": "Postgres account"
+          }
+        },
+        "id": "3c04f844-5de4-44ae-97ed-d701f6099819"
+      }
+    ],
+    "connections": {
+      "Cron Trigger": {
+        "main": [
+          [
+            {
+              "node": "Lock & Fetch Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Manual Trigger": {
+        "main": [
+          [
+            {
+              "node": "Lock & Fetch Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Lock & Fetch Items": {
+        "main": [
+          [
+            {
+              "node": "Split In Batches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split In Batches": {
+        "main": [
+          [
+            {
+              "node": "Retry Booking",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Retry Booking": {
+        "main": [
+          [
+            {
+              "node": "Retry Success?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Retry Success?": {
+        "main": [
+          [
+            {
+              "node": "Mark Resolved",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Calc Backoff",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calc Backoff": {
+        "main": [
+          [
+            {
+              "node": "Should Discard?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Should Discard?": {
+        "main": [
+          [
+            {
+              "node": "Discard Item",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Update Failure Count",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mark Resolved": {
+        "main": [
+          [
+            {
+              "node": "Split In Batches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Discard Item": {
+        "main": [
+          [
+            {
+              "node": "Split In Batches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Failure Count": {
+        "main": [
+          [
+            {
+              "node": "Split In Batches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Roger Gallegos",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-14T15:46:22.813Z",
+        "id": 675,
+        "workflowId": "Ns2XLxQCaVsVTpSC",
+        "versionId": "dc60aaa0-a537-4b02-9687-88497017e504",
+        "event": "deactivated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-14T15:46:22.829Z",
+        "id": 676,
+        "workflowId": "Ns2XLxQCaVsVTpSC",
+        "versionId": "dc60aaa0-a537-4b02-9687-88497017e504",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    ]
+  }
+}

@@ -1,6 +1,21 @@
 /**
- * Smoke tests for Booking Titanium critical workflows
- * Runs against REAL n8n server via webhooks (TEST_RIGOR: 100% real)
+ * @file smoke.test.ts
+ * @description Smoke tests for Booking Titanium critical workflows
+ * 
+ * ⚠️  NON-SATURATING EXECUTION:
+ *    - Uses maxWorkers: 1 to prevent CPU overload
+ *    - Sequential test execution with delays between tests
+ *    - Jest configuration: workerIdleMemoryLimit: 512MB
+ * 
+ * 📊 Jest Configuration (jest.config.js):
+ *    - maxWorkers: 1 - Prevents CPU saturation during test execution
+ *    - testTimeout: 60000ms - Allows for real webhook calls
+ *    - workerIdleMemoryLimit: 512MB - Memory management
+ * 
+ * 🚀 Performance Notes:
+ *    - No sobrecargar el CPU - tests run sequentially
+ *    - Runs against REAL n8n server via webhooks (TEST_RIGOR: 100% real)
+ *    - Batching: Tests include delays between webhook calls
  * 
  * Usage: npx jest tests/smoke.test.ts --testTimeout=30000
  */

@@ -10,8 +10,8 @@ set -e
 # Guardar directorio original
 ORIGINAL_DIR="$(pwd)"
 
-# Ruta al docker-compose
-DOCKER_COMPOSE_DIR="/home/manager/Sync/docker-compose/n8n"
+# Ruta al docker-compose (SSOT)
+DOCKER_COMPOSE_DIR="/home/manager/Sync/N8N_Projects/booking-titanium/docker-compose"
 
 echo "🚀 Iniciando docker-compose en $DOCKER_COMPOSE_DIR..."
 

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const SEED_DIR = '/home/manager/Sync/N8N Projects/booking-titanium/workflows/seed_clean/';
+const SEED_DIR = '/home/manager/Sync/N8N_Projects/booking-titanium/workflows/seed_clean/';
 
 const ALLOWED_SETTINGS = ['executionOrder'];
 

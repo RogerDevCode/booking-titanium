@@ -7,7 +7,7 @@
     "container": "n8n_titanium",
     "totalNodes": 543,
     "extractedAt": "2026-03-15T14:11:10.076Z",
-    "sourceWorkflowsDir": "/home/manager/Sync/N8N Projects/booking-titanium/workflows/seed",
+    "sourceWorkflowsDir": "/home/manager/Sync/N8N_Projects/booking-titanium/workflows/seed",
     "totalWorkflowsScanned": 14,
     "totalNodesUsed": 11,
     "nodesNotFound": 0

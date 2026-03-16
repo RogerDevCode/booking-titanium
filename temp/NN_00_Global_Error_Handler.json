@@ -1,0 +1,679 @@
+{
+  "updatedAt": "2026-03-03T19:34:17.178Z",
+  "createdAt": "2026-03-02T02:19:34.753Z",
+  "id": "B1VnkirO5dF20MHg",
+  "name": "NN_00_Global_Error_Handler",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "When clicking 'Test workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        208,
+        224
+      ],
+      "id": "5384f1c5-05df-4089-b08d-4988cccd1b08"
+    },
+    {
+      "parameters": {},
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        208,
+        432
+      ],
+      "id": "30611f2a-eabf-43ad-9101-f150f8ec6f6b"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        640
+      ],
+      "id": "80e15af4-d972-4836-9713-caaa560ac4ea"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nn-00-global-error",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        848
+      ],
+      "webhookId": "nn-00-global-error",
+      "id": "26ca229f-2a25-4d2c-960e-b68d733b3d93"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "N8N_EDITOR_BASE_URL",
+              "name": "N8N_EDITOR_BASE_URL",
+              "value": "https://n8n.stax.ink",
+              "type": "string"
+            },
+            {
+              "id": "TELEGRAM_ADMIN_ID",
+              "name": "TELEGRAM_ADMIN_ID",
+              "value": "5391760292",
+              "type": "string"
+            },
+            {
+              "id": "BUSINESS_EMAIL",
+              "name": "BUSINESS_EMAIL",
+              "value": "baba.orere@gmail.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Global Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        432
+      ],
+      "id": "b95e559c-d5cb-4269-8c0c-5cfd347241be"
+    },
+    {
+      "parameters": {
+        "jsCode": "/*\n  Format Error Payload — isolates 4 sources into common format.\n  - Error Trigger: { execution, workflow }\n  - Webhook / Execute / Manual: manual payload\n*/\nconst incoming = $input.first()?.json || {};\nconst isSystemError = !!incoming.execution;\nconst payload = isSystemError ? incoming : incoming.body || incoming;\n\nreturn {\n  workflow_id: payload.workflow?.id || \"UNKNOWN\",\n  workflow_name: payload.workflow?.name || \"UNKNOWN\",\n  execution_id: payload.execution?.id || \"MANUAL_TEST_ID\",\n  error_message: payload.execution?.error?.message || payload.error_message || \"Unknown Error\",\n  error_stack: payload.execution?.error?.stack || \"\",\n  last_node: payload.execution?.lastNodeExecuted || \"\",\n  mode: payload.execution?.mode || \"manual\"\n};"
+      },
+      "name": "Format Error Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        432
+      ],
+      "id": "12041585-ed88-4d8c-a1fd-ad644bbaf715"
+    },
+    {
+      "parameters": {
+        "jsCode": "// VRF — Build Safe SQL (SEC_02: escape backslash + single quote + length limit)\nconst esc = (v) => String(v || '').replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nconst data = $input.first()?.json || {};\n\nconst wfName = esc(data.workflow_name);\nconst execId = esc(data.execution_id);\nconst errMsg = esc(data.error_message);\nconst details = esc(JSON.stringify(data));\n\nreturn [{\n  json: {\n    query: `INSERT INTO system_logs (workflow_name, execution_id, level, message, details) VALUES ('${wfName}', '${execId}', 'ERROR', '${errMsg}', '${details}') RETURNING id;`,\n    ...data\n  }\n}];"
+      },
+      "name": "Build Safe SQL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        432
+      ],
+      "id": "bdfd215b-ed1e-42bf-a2b8-3046797f324a"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $node[\"Build Safe SQL\"].json.query }}",
+        "options": {}
+      },
+      "name": "Log to Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1100,
+        432
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "continueOnFail": true,
+      "id": "8dfd9df3-49eb-4680-835f-02d4d24d3516"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"Global Config\"].json.TELEGRAM_ADMIN_ID }}",
+        "text": "=*🚨 ERROR en N8N Workflow 🚨*\n\n*Workflow:* {{ $node[\"Format Error Payload\"].json[\"workflow_name\"] }}\n*Error:* {{ $node[\"Format Error Payload\"].json[\"error_message\"] }}\n*Node:* {{ $node[\"Format Error Payload\"].json[\"last_node\"] }}\n*Exec ID:* {{ $node[\"Format Error Payload\"].json[\"execution_id\"] }}\n\n[Ver Detalles]({{ $node[\"Global Config\"].json.N8N_EDITOR_BASE_URL }}/workflow/{{ $node[\"Format Error Payload\"].json[\"workflow_id\"] }}/executions/{{ $node[\"Format Error Payload\"].json[\"execution_id\"] }})",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "name": "Telegram Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1350,
+        432
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "WR4umwQYS9Gx0cTO",
+          "name": "Telegram account"
+        }
+      },
+      "continueOnFail": true,
+      "id": "696da924-a9a7-4ed0-8117-c268d51428c7"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $node[\"Global Config\"].json.BUSINESS_EMAIL }}",
+        "subject": "=ERROR N8N: {{ $node[\"Format Error Payload\"].json[\"workflow_name\"] }}",
+        "message": "=Se ha producido un error crítico de ejecución.\n\nMensaje: {{ $node[\"Format Error Payload\"].json[\"error_message\"] }}\nNodo: {{ $node[\"Format Error Payload\"].json[\"last_node\"] }}\nEjecución: {{ $node[\"Global Config\"].json.N8N_EDITOR_BASE_URL }}/workflow/{{ $node[\"Format Error Payload\"].json[\"workflow_id\"] }}/executions/{{ $node[\"Format Error Payload\"].json[\"execution_id\"] }}\n\nStack:\n{{ $node[\"Format Error Payload\"].json[\"error_stack\"] }}",
+        "options": {}
+      },
+      "name": "Gmail Alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1600,
+        432
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "2oXMGEYDP70ILkBs",
+          "name": "Gmail account"
+        }
+      },
+      "continueOnFail": true,
+      "id": "932863da-9cf4-440b-b759-16a3acb51ab7"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  success: true,\n  error_code: null,\n  error_message: null,\n  data: {\n    log_id: $node[\"Log to Postgres\"].json?.id || null,\n    telegram_sent: !$node[\"Telegram Alert\"].json?.error,\n    gmail_sent: !$node[\"Gmail Alert\"].json?.error\n  },\n  _meta: {\n    source: \"NN_00_Global_Error_Handler\",\n    timestamp: new Date().toISOString(),\n    workflow_id: \"NN_00\",\n    version: \"1.2.0\"\n  }\n};"
+      },
+      "name": "Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1850,
+        432
+      ],
+      "id": "61a66624-bc49-45cf-84c6-806a74036ef5"
+    }
+  ],
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [
+        [
+          {
+            "node": "Global Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Global Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Global Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Global Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Global Config": {
+      "main": [
+        [
+          {
+            "node": "Format Error Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Error Payload": {
+      "main": [
+        [
+          {
+            "node": "Build Safe SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Safe SQL": {
+      "main": [
+        [
+          {
+            "node": "Log to Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Postgres": {
+      "main": [
+        [
+          {
+            "node": "Telegram Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Alert": {
+      "main": [
+        [
+          {
+            "node": "Gmail Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Alert": {
+      "main": [
+        [
+          {
+            "node": "Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "d2175047-c905-4b73-a2ca-e0bc208ab719",
+  "activeVersionId": "d2175047-c905-4b73-a2ca-e0bc208ab719",
+  "versionCounter": 83,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-02T02:19:34.753Z",
+      "createdAt": "2026-03-02T02:19:34.753Z",
+      "role": "workflow:owner",
+      "workflowId": "B1VnkirO5dF20MHg",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-03T19:34:17.179Z",
+    "createdAt": "2026-03-03T19:34:17.179Z",
+    "versionId": "d2175047-c905-4b73-a2ca-e0bc208ab719",
+    "workflowId": "B1VnkirO5dF20MHg",
+    "nodes": [
+      {
+        "parameters": {},
+        "name": "When clicking 'Test workflow'",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          208,
+          224
+        ],
+        "id": "5384f1c5-05df-4089-b08d-4988cccd1b08"
+      },
+      {
+        "parameters": {},
+        "name": "Error Trigger",
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          208,
+          432
+        ],
+        "id": "30611f2a-eabf-43ad-9101-f150f8ec6f6b"
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          208,
+          640
+        ],
+        "id": "80e15af4-d972-4836-9713-caaa560ac4ea"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "nn-00-global-error",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          208,
+          848
+        ],
+        "webhookId": "nn-00-global-error",
+        "id": "26ca229f-2a25-4d2c-960e-b68d733b3d93"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "N8N_EDITOR_BASE_URL",
+                "name": "N8N_EDITOR_BASE_URL",
+                "value": "https://n8n.stax.ink",
+                "type": "string"
+              },
+              {
+                "id": "TELEGRAM_ADMIN_ID",
+                "name": "TELEGRAM_ADMIN_ID",
+                "value": "5391760292",
+                "type": "string"
+              },
+              {
+                "id": "BUSINESS_EMAIL",
+                "name": "BUSINESS_EMAIL",
+                "value": "baba.orere@gmail.com",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "name": "Global Config",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          480,
+          432
+        ],
+        "id": "b95e559c-d5cb-4269-8c0c-5cfd347241be"
+      },
+      {
+        "parameters": {
+          "jsCode": "/*\n  Format Error Payload — isolates 4 sources into common format.\n  - Error Trigger: { execution, workflow }\n  - Webhook / Execute / Manual: manual payload\n*/\nconst incoming = $input.first()?.json || {};\nconst isSystemError = !!incoming.execution;\nconst payload = isSystemError ? incoming : incoming.body || incoming;\n\nreturn {\n  workflow_id: payload.workflow?.id || \"UNKNOWN\",\n  workflow_name: payload.workflow?.name || \"UNKNOWN\",\n  execution_id: payload.execution?.id || \"MANUAL_TEST_ID\",\n  error_message: payload.execution?.error?.message || payload.error_message || \"Unknown Error\",\n  error_stack: payload.execution?.error?.stack || \"\",\n  last_node: payload.execution?.lastNodeExecuted || \"\",\n  mode: payload.execution?.mode || \"manual\"\n};"
+        },
+        "name": "Format Error Payload",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          700,
+          432
+        ],
+        "id": "12041585-ed88-4d8c-a1fd-ad644bbaf715"
+      },
+      {
+        "parameters": {
+          "jsCode": "// VRF — Build Safe SQL (SEC_02: escape backslash + single quote + length limit)\nconst esc = (v) => String(v || '').replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nconst data = $input.first()?.json || {};\n\nconst wfName = esc(data.workflow_name);\nconst execId = esc(data.execution_id);\nconst errMsg = esc(data.error_message);\nconst details = esc(JSON.stringify(data));\n\nreturn [{\n  json: {\n    query: `INSERT INTO system_logs (workflow_name, execution_id, level, message, details) VALUES ('${wfName}', '${execId}', 'ERROR', '${errMsg}', '${details}') RETURNING id;`,\n    ...data\n  }\n}];"
+        },
+        "name": "Build Safe SQL",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          900,
+          432
+        ],
+        "id": "bdfd215b-ed1e-42bf-a2b8-3046797f324a"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "={{ $node[\"Build Safe SQL\"].json.query }}",
+          "options": {}
+        },
+        "name": "Log to Postgres",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          1100,
+          432
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "5LzvCP9BsQwCi9Z0",
+            "name": "Postgres account"
+          }
+        },
+        "continueOnFail": true,
+        "id": "8dfd9df3-49eb-4680-835f-02d4d24d3516"
+      },
+      {
+        "parameters": {
+          "chatId": "={{ $node[\"Global Config\"].json.TELEGRAM_ADMIN_ID }}",
+          "text": "=*🚨 ERROR en N8N Workflow 🚨*\n\n*Workflow:* {{ $node[\"Format Error Payload\"].json[\"workflow_name\"] }}\n*Error:* {{ $node[\"Format Error Payload\"].json[\"error_message\"] }}\n*Node:* {{ $node[\"Format Error Payload\"].json[\"last_node\"] }}\n*Exec ID:* {{ $node[\"Format Error Payload\"].json[\"execution_id\"] }}\n\n[Ver Detalles]({{ $node[\"Global Config\"].json.N8N_EDITOR_BASE_URL }}/workflow/{{ $node[\"Format Error Payload\"].json[\"workflow_id\"] }}/executions/{{ $node[\"Format Error Payload\"].json[\"execution_id\"] }})",
+          "additionalFields": {
+            "parse_mode": "Markdown"
+          }
+        },
+        "name": "Telegram Alert",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1350,
+          432
+        ],
+        "credentials": {
+          "telegramApi": {
+            "id": "WR4umwQYS9Gx0cTO",
+            "name": "Telegram account"
+          }
+        },
+        "continueOnFail": true,
+        "id": "696da924-a9a7-4ed0-8117-c268d51428c7"
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $node[\"Global Config\"].json.BUSINESS_EMAIL }}",
+          "subject": "=ERROR N8N: {{ $node[\"Format Error Payload\"].json[\"workflow_name\"] }}",
+          "message": "=Se ha producido un error crítico de ejecución.\n\nMensaje: {{ $node[\"Format Error Payload\"].json[\"error_message\"] }}\nNodo: {{ $node[\"Format Error Payload\"].json[\"last_node\"] }}\nEjecución: {{ $node[\"Global Config\"].json.N8N_EDITOR_BASE_URL }}/workflow/{{ $node[\"Format Error Payload\"].json[\"workflow_id\"] }}/executions/{{ $node[\"Format Error Payload\"].json[\"execution_id\"] }}\n\nStack:\n{{ $node[\"Format Error Payload\"].json[\"error_stack\"] }}",
+          "options": {}
+        },
+        "name": "Gmail Alert",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          1600,
+          432
+        ],
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "2oXMGEYDP70ILkBs",
+            "name": "Gmail account"
+          }
+        },
+        "continueOnFail": true,
+        "id": "932863da-9cf4-440b-b759-16a3acb51ab7"
+      },
+      {
+        "parameters": {
+          "jsCode": "return {\n  success: true,\n  error_code: null,\n  error_message: null,\n  data: {\n    log_id: $node[\"Log to Postgres\"].json?.id || null,\n    telegram_sent: !$node[\"Telegram Alert\"].json?.error,\n    gmail_sent: !$node[\"Gmail Alert\"].json?.error\n  },\n  _meta: {\n    source: \"NN_00_Global_Error_Handler\",\n    timestamp: new Date().toISOString(),\n    workflow_id: \"NN_00\",\n    version: \"1.2.0\"\n  }\n};"
+        },
+        "name": "Standard Contract Output",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1850,
+          432
+        ],
+        "id": "61a66624-bc49-45cf-84c6-806a74036ef5"
+      }
+    ],
+    "connections": {
+      "When clicking 'Test workflow'": {
+        "main": [
+          [
+            {
+              "node": "Global Config",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "Global Config",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Global Config",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Global Config",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Global Config": {
+        "main": [
+          [
+            {
+              "node": "Format Error Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Error Payload": {
+        "main": [
+          [
+            {
+              "node": "Build Safe SQL",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Safe SQL": {
+        "main": [
+          [
+            {
+              "node": "Log to Postgres",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log to Postgres": {
+        "main": [
+          [
+            {
+              "node": "Telegram Alert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram Alert": {
+        "main": [
+          [
+            {
+              "node": "Gmail Alert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gmail Alert": {
+        "main": [
+          [
+            {
+              "node": "Standard Contract Output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Roger Gallegos",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-03T19:34:17.991Z",
+        "id": 240,
+        "workflowId": "B1VnkirO5dF20MHg",
+        "versionId": "d2175047-c905-4b73-a2ca-e0bc208ab719",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    ]
+  }
+}

@@ -1,0 +1,301 @@
+{
+  "updatedAt": "2026-03-15T22:33:56.688Z",
+  "createdAt": "2026-03-15T22:33:56.688Z",
+  "id": "LIPSYlD7LHfFnAHW",
+  "name": "SEED_Book_Tomorrow",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual_trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "seed-tomorrow",
+        "responseMode": "lastNode"
+      },
+      "id": "webhook_trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        200
+      ],
+      "webhookId": "seed-tomorrow"
+    },
+    {
+      "parameters": {
+        "jsCode": "const today = new Date();\nconst tomorrow = new Date(today);\ntomorrow.setDate(tomorrow.getDate() + 1);\n\nconst dateStr = tomorrow.toISOString().split('T')[0];\nconst slots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];\n\nreturn slots.map((time, i) => ({\n  json: {\n    provider_id: 1,\n    service_id: 1,\n    start_time: `${dateStr}T${time}:00.000-03:00`,\n    duration_minutes: 60,\n    chat_id: `980000${i}`,\n    customer_id: `seed-cust-${i}`,\n    user_name: `Seed Patient ${String.fromCharCode(65 + i)}`,\n    user_email: `seed${i}@test.local`,\n    event_title: `[SEED] Booking - Patient ${String.fromCharCode(65 + i)}`\n  }\n}));"
+      },
+      "id": "build_config",
+      "name": "Build Seed Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "2G9ffjvKyF5bqDT5",
+          "mode": "id"
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "id": "execute_sub",
+      "name": "Execute Sub-workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { success: true } }];"
+      },
+      "id": "sco",
+      "name": "Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        100
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Seed Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build Seed Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Seed Config": {
+      "main": [
+        [
+          {
+            "node": "Execute Sub-workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Sub-workflow": {
+      "main": [
+        [
+          {
+            "node": "Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "8db447a5-ea85-44d9-84bb-8f3f282956c7",
+  "activeVersionId": "8db447a5-ea85-44d9-84bb-8f3f282956c7",
+  "versionCounter": 4,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-15T22:33:56.688Z",
+      "createdAt": "2026-03-15T22:33:56.688Z",
+      "role": "workflow:owner",
+      "workflowId": "LIPSYlD7LHfFnAHW",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-15T22:33:56.708Z",
+    "createdAt": "2026-03-15T22:33:56.708Z",
+    "versionId": "8db447a5-ea85-44d9-84bb-8f3f282956c7",
+    "workflowId": "LIPSYlD7LHfFnAHW",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "manual_trigger",
+        "name": "Manual Trigger",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "seed-tomorrow",
+          "responseMode": "lastNode"
+        },
+        "id": "webhook_trigger",
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          200
+        ],
+        "webhookId": "seed-tomorrow"
+      },
+      {
+        "parameters": {
+          "jsCode": "const today = new Date();\nconst tomorrow = new Date(today);\ntomorrow.setDate(tomorrow.getDate() + 1);\n\nconst dateStr = tomorrow.toISOString().split('T')[0];\nconst slots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];\n\nreturn slots.map((time, i) => ({\n  json: {\n    provider_id: 1,\n    service_id: 1,\n    start_time: `${dateStr}T${time}:00.000-03:00`,\n    duration_minutes: 60,\n    chat_id: `980000${i}`,\n    customer_id: `seed-cust-${i}`,\n    user_name: `Seed Patient ${String.fromCharCode(65 + i)}`,\n    user_email: `seed${i}@test.local`,\n    event_title: `[SEED] Booking - Patient ${String.fromCharCode(65 + i)}`\n  }\n}));"
+        },
+        "id": "build_config",
+        "name": "Build Seed Config",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          200,
+          100
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "2G9ffjvKyF5bqDT5",
+            "mode": "id"
+          },
+          "mode": "each",
+          "options": {}
+        },
+        "id": "execute_sub",
+        "name": "Execute Sub-workflow",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          400,
+          100
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{ json: { success: true } }];"
+        },
+        "id": "sco",
+        "name": "Standard Contract Output",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          600,
+          100
+        ]
+      }
+    ],
+    "connections": {
+      "Manual Trigger": {
+        "main": [
+          [
+            {
+              "node": "Build Seed Config",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Build Seed Config",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Seed Config": {
+        "main": [
+          [
+            {
+              "node": "Execute Sub-workflow",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Sub-workflow": {
+        "main": [
+          [
+            {
+              "node": "Standard Contract Output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Roger Gallegos",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-15T22:33:57.148Z",
+        "id": 1014,
+        "workflowId": "LIPSYlD7LHfFnAHW",
+        "versionId": "8db447a5-ea85-44d9-84bb-8f3f282956c7",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    ]
+  }
+}

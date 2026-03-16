@@ -1,0 +1,469 @@
+{
+  "updatedAt": "2026-03-03T19:07:36.274Z",
+  "createdAt": "2026-03-02T02:19:34.753Z",
+  "id": "trmFIo0zClyF38L8",
+  "name": "NN_05_Reminder_Cron",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        432
+      ],
+      "id": "72e9c53f-fdf0-4927-b7f3-bc3d7b80101b"
+    },
+    {
+      "parameters": {},
+      "name": "When clicking 'Test workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        232
+      ],
+      "id": "fd622e46-de8b-414d-81bf-a64c536fed07"
+    },
+    {
+      "parameters": {
+        "url": "http://dal-service:3000/pending-reminders",
+        "options": {}
+      },
+      "name": "Fetch Pending",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        250,
+        432
+      ],
+      "id": "0a43eb8e-ca88-44e8-ba06-3441eb4b3350"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "name": "Split Bookings",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        500,
+        432
+      ],
+      "id": "146a8f25-d00f-449f-bce0-d7926ff40f68"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare Reminder — maps dal-service booking to NN_04 payload\nconst item = $input.first()?.json || {};\n\nconst chat_id = String(item.user_id || '');\nconst service = item.service_name || 'Cita';\nconst provider = item.provider_name || 'Profesional';\nconst startRaw = item.start_time || '';\nconst reminder_type = parseInt(item.reminder_type) || 1;\n\n// Format time for display\nlet timeDisplay = startRaw;\ntry {\n  const d = new Date(startRaw);\n  timeDisplay = d.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' });\n} catch(e) {}\n\nconst text = `⏰ Recordatorio: Tienes una cita de ${service} con ${provider} — ${timeDisplay}`;\n\nreturn [{\n  json: {\n    chat_id,\n    text,\n    booking_id: item.id || '',\n    reminder_type\n  }\n}];"
+      },
+      "name": "Prepare Reminder",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        432
+      ],
+      "id": "7a6f5dcc-4e3e-4b9c-9ea4-251bbc439131"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "WE7DxLKAECtsA8Up",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "name": "Notify Telegram",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1000,
+        432
+      ],
+      "id": "f73a82d4-2b14-4000-8efe-fc070996877b"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/mark-reminder-sent",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"booking_id\": \"{{ $node[\"Prepare Reminder\"].json.booking_id }}\",\n  \"type\": {{ $node[\"Prepare Reminder\"].json.reminder_type }}\n}",
+        "options": {}
+      },
+      "name": "Mark as Sent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1250,
+        432
+      ],
+      "id": "6d34fe0f-1486-4ed4-8385-b4d221c06f5e"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      reminders_sent: $node[\"Split Bookings\"].json ? 1 : 0\n    },\n    _meta: {\n      source: \"NN_05_Reminder_Cron\",\n      timestamp: new Date().toISOString(),\n      workflow_id: \"NN_05\",\n      version: \"1.1.0\"\n    }\n  }\n}];"
+      },
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        432
+      ],
+      "id": "3b6d0edd-a68f-456b-af1f-21aacae85f75"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking 'Test workflow'": {
+      "main": [
+        [
+          {
+            "node": "Fetch Pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Pending": {
+      "main": [
+        [
+          {
+            "node": "Split Bookings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Bookings": {
+      "main": [
+        [
+          {
+            "node": "Prepare Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Reminder": {
+      "main": [
+        [
+          {
+            "node": "Notify Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Telegram": {
+      "main": [
+        [
+          {
+            "node": "Mark as Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as Sent": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "ab2974b7-2b00-45fc-a9c1-87743b766cbf",
+  "activeVersionId": "ab2974b7-2b00-45fc-a9c1-87743b766cbf",
+  "versionCounter": 64,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-02T02:19:34.753Z",
+      "createdAt": "2026-03-02T02:19:34.753Z",
+      "role": "workflow:owner",
+      "workflowId": "trmFIo0zClyF38L8",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-03T19:07:36.276Z",
+    "createdAt": "2026-03-03T19:07:36.276Z",
+    "versionId": "ab2974b7-2b00-45fc-a9c1-87743b766cbf",
+    "workflowId": "trmFIo0zClyF38L8",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 15
+              }
+            ]
+          }
+        },
+        "name": "Schedule Trigger",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          432
+        ],
+        "id": "72e9c53f-fdf0-4927-b7f3-bc3d7b80101b"
+      },
+      {
+        "parameters": {},
+        "name": "When clicking 'Test workflow'",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          232
+        ],
+        "id": "fd622e46-de8b-414d-81bf-a64c536fed07"
+      },
+      {
+        "parameters": {
+          "url": "http://dal-service:3000/pending-reminders",
+          "options": {}
+        },
+        "name": "Fetch Pending",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          250,
+          432
+        ],
+        "id": "0a43eb8e-ca88-44e8-ba06-3441eb4b3350"
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "data",
+          "options": {}
+        },
+        "name": "Split Bookings",
+        "type": "n8n-nodes-base.splitOut",
+        "typeVersion": 1,
+        "position": [
+          500,
+          432
+        ],
+        "id": "146a8f25-d00f-449f-bce0-d7926ff40f68"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Prepare Reminder — maps dal-service booking to NN_04 payload\nconst item = $input.first()?.json || {};\n\nconst chat_id = String(item.user_id || '');\nconst service = item.service_name || 'Cita';\nconst provider = item.provider_name || 'Profesional';\nconst startRaw = item.start_time || '';\nconst reminder_type = parseInt(item.reminder_type) || 1;\n\n// Format time for display\nlet timeDisplay = startRaw;\ntry {\n  const d = new Date(startRaw);\n  timeDisplay = d.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' });\n} catch(e) {}\n\nconst text = `⏰ Recordatorio: Tienes una cita de ${service} con ${provider} — ${timeDisplay}`;\n\nreturn [{\n  json: {\n    chat_id,\n    text,\n    booking_id: item.id || '',\n    reminder_type\n  }\n}];"
+        },
+        "name": "Prepare Reminder",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          750,
+          432
+        ],
+        "id": "7a6f5dcc-4e3e-4b9c-9ea4-251bbc439131"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "WE7DxLKAECtsA8Up",
+            "mode": "id"
+          },
+          "options": {}
+        },
+        "name": "Notify Telegram",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          1000,
+          432
+        ],
+        "id": "f73a82d4-2b14-4000-8efe-fc070996877b"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://dal-service:3000/mark-reminder-sent",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"booking_id\": \"{{ $node[\"Prepare Reminder\"].json.booking_id }}\",\n  \"type\": {{ $node[\"Prepare Reminder\"].json.reminder_type }}\n}",
+          "options": {}
+        },
+        "name": "Mark as Sent",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1250,
+          432
+        ],
+        "id": "6d34fe0f-1486-4ed4-8385-b4d221c06f5e"
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      reminders_sent: $node[\"Split Bookings\"].json ? 1 : 0\n    },\n    _meta: {\n      source: \"NN_05_Reminder_Cron\",\n      timestamp: new Date().toISOString(),\n      workflow_id: \"NN_05\",\n      version: \"1.1.0\"\n    }\n  }\n}];"
+        },
+        "name": "Format Output",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1500,
+          432
+        ],
+        "id": "3b6d0edd-a68f-456b-af1f-21aacae85f75"
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Fetch Pending",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When clicking 'Test workflow'": {
+        "main": [
+          [
+            {
+              "node": "Fetch Pending",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fetch Pending": {
+        "main": [
+          [
+            {
+              "node": "Split Bookings",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split Bookings": {
+        "main": [
+          [
+            {
+              "node": "Prepare Reminder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Reminder": {
+        "main": [
+          [
+            {
+              "node": "Notify Telegram",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Notify Telegram": {
+        "main": [
+          [
+            {
+              "node": "Mark as Sent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mark as Sent": {
+        "main": [
+          [
+            {
+              "node": "Format Output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Roger Gallegos",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-03T19:07:36.949Z",
+        "id": 235,
+        "workflowId": "trmFIo0zClyF38L8",
+        "versionId": "ab2974b7-2b00-45fc-a9c1-87743b766cbf",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    ]
+  }
+}

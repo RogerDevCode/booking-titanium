@@ -1,5 +1,22 @@
 /**
- * NN_03-C Agent — Test Suite E2E (Paso 4)
+ * @file qa-agent-v3.test.ts
+ * @description NN_03-C Agent — Test Suite E2E (Paso 4)
+ * 
+ * ⚠️  NON-SATURATING EXECUTION:
+ *    - Uses maxWorkers: 1 to prevent CPU overload
+ *    - Sequential test execution with delays between tests
+ *    - Jest configuration: workerIdleMemoryLimit: 512MB
+ * 
+ * 📊 Jest Configuration (jest.config.js):
+ *    - maxWorkers: 1 - Prevents CPU saturation during test execution
+ *    - testTimeout: 60000ms - Allows for AI agent responses
+ *    - workerIdleMemoryLimit: 512MB - Memory management
+ * 
+ * 🚀 Performance Notes:
+ *    - No sobrecargar el CPU - tests run sequentially
+ *    - AI agent calls are rate-limited naturally by sequential execution
+ *    - Batching: Tests grouped by category (Memory Isolation, Missing Parameters, Cancellation)
+ * 
  * =========================================
  * Ejecutar: npx tsx tests/qa-agent-v3.test.ts
  *
@@ -18,6 +35,9 @@
  *   T16-T17  RAG sin resultados
  *   T18      Flujo completo happy path (smoke test)
  */
+
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 
 import 'dotenv/config';
 

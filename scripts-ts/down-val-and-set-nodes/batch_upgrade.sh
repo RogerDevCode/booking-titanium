@@ -12,9 +12,9 @@
 #set -e
 
 # 2. Definición de rutas y flags
-SCRIPT_PATH="/home/manager/Sync/N8N Projects/booking-titanium/scripts-ts/down-val-and-set-nodes/upgrade_workflow.ts"
-SSOT_FILE="/home/manager/Sync/N8N Projects/booking-titanium/scripts-ts/down-val-and-set-nodes/ssot-nodes.json"
-WORKFLOW_DIR="/home/manager/Sync/N8N Projects/booking-titanium/workflows"
+SCRIPT_PATH="/home/manager/Sync/N8N_Projects/booking-titanium/scripts-ts/down-val-and-set-nodes/upgrade_workflow.ts"
+SSOT_FILE="/home/manager/Sync/N8N_Projects/booking-titanium/scripts-ts/down-val-and-set-nodes/ssot-nodes.json"
+WORKFLOW_DIR="/home/manager/Sync/N8N_Projects/booking-titanium/workflows"
 
 # Flags adicionales (puedes descomentar --dry-run para prueba segura)
 # FLAGS="--dry-run"

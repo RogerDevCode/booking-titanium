@@ -1,3 +1,23 @@
+/**
+ * @file orchestrator.test.ts
+ * @description WF2_Booking_Orchestrator v3.2 TDD - End-to-end testing
+ * 
+ * ⚠️  NON-SATURATING EXECUTION:
+ *    - Uses maxWorkers: 1 to prevent CPU overload
+ *    - Sequential test execution with delays between tests
+ *    - Jest configuration: workerIdleMemoryLimit: 512MB
+ * 
+ * 📊 Jest Configuration (jest.config.js):
+ *    - maxWorkers: 1 - Prevents CPU saturation during test execution
+ *    - testTimeout: 90000ms - Allows for real webhook calls
+ *    - workerIdleMemoryLimit: 512MB - Memory management
+ * 
+ * 🚀 Performance Notes:
+ *    - No sobrecargar el CPU - tests run sequentially
+ *    - Each test waits for previous to complete
+ *    - Database connections are properly closed after each test
+ */
+
 import axios from 'axios';
 import { Pool } from 'pg';
 import * as dotenv from 'dotenv';

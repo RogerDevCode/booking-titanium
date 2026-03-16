@@ -1,0 +1,336 @@
+{
+  "updatedAt": "2026-03-03T18:53:34.311Z",
+  "createdAt": "2026-03-02T02:19:34.753Z",
+  "id": "uHSnVdLiMkEmpJZE",
+  "name": "GMAIL_Send_Confirmation",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        400
+      ],
+      "id": "1838347c-2422-49d1-a73a-e4e519d0190b"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "id": "304e7b97-a3c5-4f5f-8788-c59e62666f9b"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gmail-send-confirmation",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        600
+      ],
+      "webhookId": "gmail-send-confirmation",
+      "id": "e121e520-8ad0-48b2-8c0f-16a6827bf33a"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.user_email || $json.final_email || 'baba.orere@gmail.com' }}",
+        "subject": "📅 Reserva Confirmada - Booking Titanium",
+        "message": "=Hola,\n\nTu cita ha sido agendada.\n\nFecha: {{ $json.start_time }}\n\nGracias.",
+        "appendAttributions": false
+      },
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        350,
+        432
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "2oXMGEYDP70ILkBs",
+          "name": "Gmail account"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "id": "4d00812f-95d5-425b-ad26-e47955e6dc3b"
+    },
+    {
+      "parameters": {
+        "jsCode": "const gmailResponse = $input.first()?.json || {};\nconst isError = !!gmailResponse.error;\n\nreturn [{\n  json: {\n    success: !isError,\n    error_code: isError ? 'GMAIL_ERROR' : null,\n    error_message: isError ? (gmailResponse.error?.message || 'Gmail send failed') : null,\n    data: isError ? null : {\n      message_id: gmailResponse.id || null,\n      thread_id: gmailResponse.threadId || null\n    },\n    _meta: {\n      source: 'GMAIL_Send_Confirmation',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'GMAIL_Send_Confirmation',\n      version: '1.1.0'\n    }\n  }\n}];"
+      },
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        432
+      ],
+      "id": "e40d9b88-4829-422c-8365-6045a1850e18"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "Execute Workflow Trigger": [
+      {
+        "json": {
+          "user_email": "baba.orere@gmail.com",
+          "user_name": "Test User",
+          "service_name": "Consulta Test",
+          "start_time": "2026-03-04T10:00:00-03:00"
+        }
+      }
+    ]
+  },
+  "versionId": "4ae6edc4-ecec-4bab-8596-7fa31fa74820",
+  "activeVersionId": "4ae6edc4-ecec-4bab-8596-7fa31fa74820",
+  "versionCounter": 63,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-02T02:19:34.753Z",
+      "createdAt": "2026-03-02T02:19:34.753Z",
+      "role": "workflow:owner",
+      "workflowId": "uHSnVdLiMkEmpJZE",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-03T18:53:34.312Z",
+    "createdAt": "2026-03-03T18:53:34.312Z",
+    "versionId": "4ae6edc4-ecec-4bab-8596-7fa31fa74820",
+    "workflowId": "uHSnVdLiMkEmpJZE",
+    "nodes": [
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          400
+        ],
+        "id": "1838347c-2422-49d1-a73a-e4e519d0190b"
+      },
+      {
+        "parameters": {},
+        "name": "Manual Trigger",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          200
+        ],
+        "id": "304e7b97-a3c5-4f5f-8788-c59e62666f9b"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "gmail-send-confirmation",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          600
+        ],
+        "webhookId": "gmail-send-confirmation",
+        "id": "e121e520-8ad0-48b2-8c0f-16a6827bf33a"
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $json.user_email || $json.final_email || 'baba.orere@gmail.com' }}",
+          "subject": "📅 Reserva Confirmada - Booking Titanium",
+          "message": "=Hola,\n\nTu cita ha sido agendada.\n\nFecha: {{ $json.start_time }}\n\nGracias.",
+          "appendAttributions": false
+        },
+        "name": "Gmail",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          350,
+          432
+        ],
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "2oXMGEYDP70ILkBs",
+            "name": "Gmail account"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "id": "4d00812f-95d5-425b-ad26-e47955e6dc3b"
+      },
+      {
+        "parameters": {
+          "jsCode": "const gmailResponse = $input.first()?.json || {};\nconst isError = !!gmailResponse.error;\n\nreturn [{\n  json: {\n    success: !isError,\n    error_code: isError ? 'GMAIL_ERROR' : null,\n    error_message: isError ? (gmailResponse.error?.message || 'Gmail send failed') : null,\n    data: isError ? null : {\n      message_id: gmailResponse.id || null,\n      thread_id: gmailResponse.threadId || null\n    },\n    _meta: {\n      source: 'GMAIL_Send_Confirmation',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'GMAIL_Send_Confirmation',\n      version: '1.1.0'\n    }\n  }\n}];"
+        },
+        "name": "Format Output",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          600,
+          432
+        ],
+        "id": "e40d9b88-4829-422c-8365-6045a1850e18"
+      }
+    ],
+    "connections": {
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Gmail",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Manual Trigger": {
+        "main": [
+          [
+            {
+              "node": "Gmail",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Gmail",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gmail": {
+        "main": [
+          [
+            {
+              "node": "Format Output",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Format Output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Roger Gallegos",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-03T18:53:35.004Z",
+        "id": 227,
+        "workflowId": "uHSnVdLiMkEmpJZE",
+        "versionId": "4ae6edc4-ecec-4bab-8596-7fa31fa74820",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    ]
+  }
+}

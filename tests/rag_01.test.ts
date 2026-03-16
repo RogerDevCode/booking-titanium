@@ -1,8 +1,23 @@
 /**
- * Basic tests for RAG_01_Document_Ingestion workflow
+ * @file rag_01.test.ts
+ * @description Basic tests for RAG_01_Document_Ingestion workflow
+ * 
+ * ⚠️  NON-SATURATING EXECUTION:
+ *    - Uses maxWorkers: 1 to prevent CPU overload
+ *    - Sequential test execution with delays between tests
+ *    - Jest configuration: workerIdleMemoryLimit: 512MB
+ * 
+ * 📊 Jest Configuration (jest.config.js):
+ *    - maxWorkers: 1 - Prevents CPU saturation during test execution
+ *    - testTimeout: 60000ms - Allows for document ingestion
+ *    - workerIdleMemoryLimit: 512MB - Memory management
+ * 
+ * 🚀 Performance Notes:
+ *    - No sobrecargar el CPU - tests run sequentially
+ *    - Document processing is memory-intensive, sequential execution prevents OOM
+ *    - Batching: Tests include delays for embedding generation
+ * 
  * Tests document ingestion with RAG pattern (embedding + PostgreSQL + pgvector)
- *
- * Usage: npx jest tests/rag_01.test.ts --testTimeout=60000
  */
 
 import * as dotenv from 'dotenv';

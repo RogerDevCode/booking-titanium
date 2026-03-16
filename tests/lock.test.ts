@@ -1,3 +1,23 @@
+/**
+ * @file lock.test.ts
+ * @description WF7_Distributed_Lock_System TDD - Race condition prevention
+ * 
+ * ⚠️  NON-SATURATING EXECUTION:
+ *    - Uses maxWorkers: 1 to prevent CPU overload
+ *    - Sequential test execution with delays between tests
+ *    - Jest configuration: workerIdleMemoryLimit: 512MB
+ * 
+ * 📊 Jest Configuration (jest.config.js):
+ *    - maxWorkers: 1 - Prevents CPU saturation during test execution
+ *    - testTimeout: 30000ms - Allows for real webhook calls
+ *    - workerIdleMemoryLimit: 512MB - Memory management
+ * 
+ * 🚀 Performance Notes:
+ *    - No sobrecargar el CPU - tests run sequentially
+ *    - Database locks are properly cleaned up between tests
+ *    - Batching: Lock tests include TTL wait times to avoid conflicts
+ */
+
 import axios from 'axios';
 import { Pool } from 'pg';
 import * as dotenv from 'dotenv';

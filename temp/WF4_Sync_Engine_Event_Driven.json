@@ -1,0 +1,677 @@
+{
+  "updatedAt": "2026-03-14T19:38:14.937Z",
+  "createdAt": "2026-03-13T23:18:44.824Z",
+  "id": "mEe6l6iIoXzIABJW",
+  "name": "WF4_Sync_Engine_Event_Driven",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "gcal-sync-trigger",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "gcal-sync-trigger",
+      "id": "a7ec8ac9-c8e4-4847-be98-6d0bdbe5b12f"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -200
+      ],
+      "id": "1df1a452-b51e-49b5-ac28-9a31eb80c692"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        200
+      ],
+      "id": "dd4399bd-f1f1-42ca-af03-2814b2b858b4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst body = input.body || input;\n\nif (body.source !== 'google_apps_script') {\n  throw new Error('Unauthorized source');\n}\n\nconst event = body.event || {};\nconst event_id = String(event.id || '').substring(0, 255);\nif (!event_id) throw new Error('Missing event.id');\n\nreturn [{ json: {\n  event_id,\n  status: String(event.status || 'unknown').toLowerCase(),\n  calendar_id: String(body.calendar_id || 'unknown').substring(0, 255),\n  _is_cancelled: event.status === 'cancelled'\n}}];"
+      },
+      "name": "Validate & Extract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        0
+      ],
+      "id": "f30ef420-848b-4a50-a7a5-74b94633a012"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "is_cancelled",
+              "leftValue": "={{ $json._is_cancelled }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Is Cancelled?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        500,
+        0
+      ],
+      "id": "0a38502b-06de-4169-bf79-ad9948d99e76"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE bookings SET status = 'CANCELLED', cancelled_at = NOW(), cancellation_reason = 'GCal Event Deleted' WHERE gcal_event_id = $1::text AND status != 'CANCELLED' RETURNING id, user_id;",
+        "options": {
+          "queryReplacement": "={{ $json.event_id }}"
+        }
+      },
+      "name": "Cancel Booking",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        750,
+        -100
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "id": "b707820c-1ebd-47b8-b235-9e78aac8df80"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst wasCancelled = !!input.id;\nreturn [{ json: { action: wasCancelled ? 'booking_cancelled' : 'no_booking_found', booking_id: input.id || null, error: input.message || null } }];"
+      },
+      "name": "Post Cancel",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        -100
+      ],
+      "id": "75be1623-16f2-4cdc-82b9-d5796035d5cb"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE bookings SET gcal_synced_at = NOW(), status = CASE WHEN status = 'PENDING' THEN 'CONFIRMED' ELSE status END WHERE gcal_event_id = $1::text RETURNING id;",
+        "options": {
+          "queryReplacement": "={{ $json.event_id }}"
+        }
+      },
+      "name": "Update Sync Status",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        750,
+        100
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "id": "a5f9cbe0-b65b-43dd-adaa-31f3942cd770"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst wasUpdated = !!input.id;\nreturn [{ json: { action: wasUpdated ? 'sync_updated' : 'no_booking_found', booking_id: input.id || null, error: input.message || null } }];"
+      },
+      "name": "Post Sync",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        100
+      ],
+      "id": "b4d0c835-7f85-4413-a5cd-fff3a199db69"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst webhookData = $('Validate & Extract').first().json;\nconst hasError = !!input.error;\n\nreturn [{ json: {\n  success: !hasError,\n  data: {\n    updated: input.action !== 'no_booking_found' && !hasError,\n    booking_id: input.booking_id,\n    action_taken: input.action,\n    event_id: webhookData.event_id,\n    error: input.error\n  },\n  _meta: {\n    source: 'WF4_Sync_Engine_Event_Driven',\n    timestamp: new Date().toISOString(),\n    workflow_id: $workflow.id\n  }\n}}];"
+      },
+      "name": "Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1250,
+        0
+      ],
+      "id": "16d7abb6-dafd-45e7-a4e3-892c29a2b92b"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate & Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate & Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate & Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate & Extract": {
+      "main": [
+        [
+          {
+            "node": "Is Cancelled?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Cancelled?": {
+      "main": [
+        [
+          {
+            "node": "Cancel Booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Sync Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cancel Booking": {
+      "main": [
+        [
+          {
+            "node": "Post Cancel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post Cancel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Cancel": {
+      "main": [
+        [
+          {
+            "node": "Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Sync Status": {
+      "main": [
+        [
+          {
+            "node": "Post Sync",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post Sync",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Sync": {
+      "main": [
+        [
+          {
+            "node": "Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "3cd4e8ba-bcb5-433f-83bc-22c1b4bd1605",
+  "activeVersionId": "3cd4e8ba-bcb5-433f-83bc-22c1b4bd1605",
+  "versionCounter": 37,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-13T23:18:44.824Z",
+      "createdAt": "2026-03-13T23:18:44.824Z",
+      "role": "workflow:owner",
+      "workflowId": "mEe6l6iIoXzIABJW",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-14T19:38:14.938Z",
+    "createdAt": "2026-03-14T19:38:14.938Z",
+    "versionId": "3cd4e8ba-bcb5-433f-83bc-22c1b4bd1605",
+    "workflowId": "mEe6l6iIoXzIABJW",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "gcal-sync-trigger",
+          "httpMethod": "POST",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "webhookId": "gcal-sync-trigger",
+        "id": "a7ec8ac9-c8e4-4847-be98-6d0bdbe5b12f"
+      },
+      {
+        "parameters": {},
+        "name": "Manual Trigger",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          -200
+        ],
+        "id": "1df1a452-b51e-49b5-ac28-9a31eb80c692"
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "name": "Execute Workflow Trigger",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          200
+        ],
+        "id": "dd4399bd-f1f1-42ca-af03-2814b2b858b4"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.first().json;\nconst body = input.body || input;\n\nif (body.source !== 'google_apps_script') {\n  throw new Error('Unauthorized source');\n}\n\nconst event = body.event || {};\nconst event_id = String(event.id || '').substring(0, 255);\nif (!event_id) throw new Error('Missing event.id');\n\nreturn [{ json: {\n  event_id,\n  status: String(event.status || 'unknown').toLowerCase(),\n  calendar_id: String(body.calendar_id || 'unknown').substring(0, 255),\n  _is_cancelled: event.status === 'cancelled'\n}}];"
+        },
+        "name": "Validate & Extract",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          250,
+          0
+        ],
+        "id": "f30ef420-848b-4a50-a7a5-74b94633a012"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "is_cancelled",
+                "leftValue": "={{ $json._is_cancelled }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          }
+        },
+        "name": "Is Cancelled?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          500,
+          0
+        ],
+        "id": "0a38502b-06de-4169-bf79-ad9948d99e76"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "UPDATE bookings SET status = 'CANCELLED', cancelled_at = NOW(), cancellation_reason = 'GCal Event Deleted' WHERE gcal_event_id = $1::text AND status != 'CANCELLED' RETURNING id, user_id;",
+          "options": {
+            "queryReplacement": "={{ $json.event_id }}"
+          }
+        },
+        "name": "Cancel Booking",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          750,
+          -100
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "5LzvCP9BsQwCi9Z0",
+            "name": "Postgres account"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "id": "b707820c-1ebd-47b8-b235-9e78aac8df80"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.first().json;\nconst wasCancelled = !!input.id;\nreturn [{ json: { action: wasCancelled ? 'booking_cancelled' : 'no_booking_found', booking_id: input.id || null, error: input.message || null } }];"
+        },
+        "name": "Post Cancel",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1000,
+          -100
+        ],
+        "id": "75be1623-16f2-4cdc-82b9-d5796035d5cb"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "UPDATE bookings SET gcal_synced_at = NOW(), status = CASE WHEN status = 'PENDING' THEN 'CONFIRMED' ELSE status END WHERE gcal_event_id = $1::text RETURNING id;",
+          "options": {
+            "queryReplacement": "={{ $json.event_id }}"
+          }
+        },
+        "name": "Update Sync Status",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          750,
+          100
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "5LzvCP9BsQwCi9Z0",
+            "name": "Postgres account"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "id": "a5f9cbe0-b65b-43dd-adaa-31f3942cd770"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.first().json;\nconst wasUpdated = !!input.id;\nreturn [{ json: { action: wasUpdated ? 'sync_updated' : 'no_booking_found', booking_id: input.id || null, error: input.message || null } }];"
+        },
+        "name": "Post Sync",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1000,
+          100
+        ],
+        "id": "b4d0c835-7f85-4413-a5cd-fff3a199db69"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.first().json;\nconst webhookData = $('Validate & Extract').first().json;\nconst hasError = !!input.error;\n\nreturn [{ json: {\n  success: !hasError,\n  data: {\n    updated: input.action !== 'no_booking_found' && !hasError,\n    booking_id: input.booking_id,\n    action_taken: input.action,\n    event_id: webhookData.event_id,\n    error: input.error\n  },\n  _meta: {\n    source: 'WF4_Sync_Engine_Event_Driven',\n    timestamp: new Date().toISOString(),\n    workflow_id: $workflow.id\n  }\n}}];"
+        },
+        "name": "Standard Contract Output",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1250,
+          0
+        ],
+        "id": "16d7abb6-dafd-45e7-a4e3-892c29a2b92b"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Validate & Extract",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Manual Trigger": {
+        "main": [
+          [
+            {
+              "node": "Validate & Extract",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow Trigger": {
+        "main": [
+          [
+            {
+              "node": "Validate & Extract",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validate & Extract": {
+        "main": [
+          [
+            {
+              "node": "Is Cancelled?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Cancelled?": {
+        "main": [
+          [
+            {
+              "node": "Cancel Booking",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Update Sync Status",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Cancel Booking": {
+        "main": [
+          [
+            {
+              "node": "Post Cancel",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Post Cancel",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Post Cancel": {
+        "main": [
+          [
+            {
+              "node": "Standard Contract Output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Sync Status": {
+        "main": [
+          [
+            {
+              "node": "Post Sync",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Post Sync",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Post Sync": {
+        "main": [
+          [
+            {
+              "node": "Standard Contract Output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Roger Gallegos",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-14T19:38:14.971Z",
+        "id": 746,
+        "workflowId": "mEe6l6iIoXzIABJW",
+        "versionId": "3cd4e8ba-bcb5-433f-83bc-22c1b4bd1605",
+        "event": "deactivated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-14T19:38:14.992Z",
+        "id": 747,
+        "workflowId": "mEe6l6iIoXzIABJW",
+        "versionId": "3cd4e8ba-bcb5-433f-83bc-22c1b4bd1605",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-14T19:38:15.042Z",
+        "id": 748,
+        "workflowId": "mEe6l6iIoXzIABJW",
+        "versionId": "3cd4e8ba-bcb5-433f-83bc-22c1b4bd1605",
+        "event": "deactivated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-14T19:38:15.073Z",
+        "id": 749,
+        "workflowId": "mEe6l6iIoXzIABJW",
+        "versionId": "3cd4e8ba-bcb5-433f-83bc-22c1b4bd1605",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    ]
+  }
+}

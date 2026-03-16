@@ -1,0 +1,279 @@
+{
+  "updatedAt": "2026-03-06T16:32:36.085Z",
+  "createdAt": "2026-03-06T15:56:17.974Z",
+  "id": "WIHlHlgqRAWEFuWv",
+  "name": "My workflow",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking-ai-agent",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2208,
+        496
+      ],
+      "id": "aa76c106-2675-4ad1-9936-533f6c303692",
+      "webhookId": "02308bfe-583d-43b2-bd86-90d6955c980f"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nconst chat_id = Number(item.chat_id);\nconst text = String(item.text || \"\").trim();\n\nif(!chat_id || text.length < 2){\n return [{json:{valid:false}}]\n}\n\nreturn [{json:{valid:true,chat_id,text}}]"
+      },
+      "name": "Extract & Validate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2016,
+        496
+      ],
+      "id": "1a313c20-b7ac-46ed-a54d-9bda590600a2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text=$json.text;\n\nconst blocked=[\"ignore previous instructions\",\"system prompt\",\"reveal tools\"];\n\nfor(const b of blocked){\n if(text.toLowerCase().includes(b)){\n  return [{json:{blocked:true,text}}]\n }\n}\n\nreturn [{json:{blocked:false,...$json}}]"
+      },
+      "name": "Prompt Firewall",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1808,
+        496
+      ],
+      "id": "771cefd1-1943-4014-9db5-041050bcd9d4"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "name": "Intent Classifier",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "position": [
+        -1616,
+        496
+      ],
+      "id": "65d7a91c-c72d-4cd9-a465-c9748259d773",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw=$json.content;\n\nlet intent=\"GENERAL\";\n\ntry{\n const obj=JSON.parse(raw);\n intent=obj.intent;\n}catch{}\n\nreturn [{json:{...$json,intent}}]"
+      },
+      "name": "Intent Parser",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1408,
+        496
+      ],
+      "id": "9d86f95a-046e-4d92-aa0f-e9b8d0c4a471"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {},
+            {},
+            {},
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "name": "Intent Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1216,
+        496
+      ],
+      "id": "97c221c0-8888-437c-8104-1702f163d9c8"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "name": "Parameter Extractor",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "position": [
+        -1008,
+        400
+      ],
+      "id": "4e879dad-14c1-4830-b6c7-b044e28db61f",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "let params={};\n\ntry{\n params=JSON.parse($json.content)\n}catch{}\n\nreturn [{json:{...$json,...params}}]"
+      },
+      "name": "Parameter Parser",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -816,
+        400
+      ],
+      "id": "88aa0906-adb4-42dd-8630-70385fcaa031"
+    },
+    {
+      "parameters": {
+        "workflowId": "CHECK_AVAILABILITY_WORKFLOW",
+        "options": {}
+      },
+      "name": "Tool: Check Availability",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -560,
+        272
+      ],
+      "id": "8a8adcdb-d26f-42f0-8350-113265290d7b"
+    },
+    {
+      "parameters": {
+        "workflowId": "CREATE_BOOKING_WORKFLOW",
+        "options": {}
+      },
+      "name": "Tool: Create Booking",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -560,
+        416
+      ],
+      "id": "6de0af91-5539-4b4c-8798-782badf0f71c"
+    },
+    {
+      "parameters": {
+        "workflowId": "CANCEL_BOOKING_WORKFLOW",
+        "options": {}
+      },
+      "name": "Tool: Cancel Booking",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -560,
+        560
+      ],
+      "id": "810feefc-40ae-41ec-8ea2-e39ae94a86cb"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "name": "Response Generator",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "position": [
+        -368,
+        448
+      ],
+      "id": "d3f12d38-7403-4fce-83c8-b610956c0bc2",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json:{success:true,response:$json.content}}]"
+      },
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        448
+      ],
+      "id": "20f2cc36-9ec5-4ed2-a80d-87adad7d7ae6"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract & Validate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract & Validate": {
+      "main": [
+        [
+          {
+            "node": "Prompt Firewall",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intent Parser": {
+      "main": [
+        [
+          {
+            "node": "Intent Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parameter Parser": {
+      "main": [
+        [
+          {
+            "node": "Tool: Check Availability",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "379652d3-eadc-4ec1-a742-7c0458ccdfe3",
+  "activeVersionId": null,
+  "versionCounter": 6,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-06T15:56:17.974Z",
+      "createdAt": "2026-03-06T15:56:17.974Z",
+      "role": "workflow:owner",
+      "workflowId": "WIHlHlgqRAWEFuWv",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}

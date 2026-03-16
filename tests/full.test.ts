@@ -1,14 +1,27 @@
 /**
- * FULL TEST SUITE — Booking Titanium
- * Bottom-up execution: Leaf workflows → Root workflows → Integration → E2E
- *
+ * @file full.test.ts
+ * @description FULL TEST SUITE — Booking Titanium End-to-End
+ * 
+ * ⚠️  NON-SATURATING EXECUTION:
+ *    - Uses maxWorkers: 1 to prevent CPU overload
+ *    - Sequential test execution with delays between tests
+ *    - Jest configuration: workerIdleMemoryLimit: 512MB
+ * 
+ * 📊 Jest Configuration (jest.config.js):
+ *    - maxWorkers: 1 - Prevents CPU saturation during test execution
+ *    - testTimeout: 120000ms - Allows for real webhook calls
+ *    - workerIdleMemoryLimit: 512MB - Memory management
+ * 
+ * 🚀 Performance Notes:
+ *    - No sobrecargar el CPU - tests run sequentially
+ *    - Bottom-up execution: Leaf workflows → Root workflows → Integration → E2E
+ *    - Batching: Tests grouped by level (L0, L1, L2, L3) with delays between levels
+ * 
  * Levels:
  *   L0 (Leaf/Unit): BB_00_Config, GLOBAL_Config, DB_* workflows
  *   L1 (Services):  GCAL, GMAIL, NN_02, NN_04
  *   L2 (Core):      NN_00, NN_03
  *   L3 (E2E):       NN_01
- *
- * Run: npx jest tests/full.test.ts --testTimeout=120000 --forceExit
  */
 
 import * as dotenv from 'dotenv';

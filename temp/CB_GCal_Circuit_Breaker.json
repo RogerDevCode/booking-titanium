@@ -1,0 +1,460 @@
+{
+  "updatedAt": "2026-03-13T23:28:05.017Z",
+  "createdAt": "2026-03-13T23:18:14.786Z",
+  "id": "G15qrYLDth6n5WR7",
+  "name": "CB_GCal_Circuit_Breaker",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "circuit-breaker/check",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "circuit-breaker-check",
+      "id": "587f6fcc-c6cb-4807-add4-a1fb1ea5048a"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract service info from request\nconst input = $input.first().json;\n\nreturn [{\n  json: {\n    service_id: input.service_id || 'google_calendar',\n    action: input.action || 'check', // 'check', 'record_success', 'record_failure'\n    error_message: input.error_message || null,\n    metadata: input.metadata || {}\n  }\n}];",
+        "options": {}
+      },
+      "name": "Parse Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        0
+      ],
+      "id": "f82ab02a-5f2a-4058-967b-1f2d1f889a38"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM circuit_breaker_state WHERE service_id = $1::text;",
+        "options": {
+          "queryReplacement": "={{ $json.service_id }}"
+        }
+      },
+      "name": "Get Circuit State",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        500,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "id": "0373633f-32bf-4e7e-9c61-65b498507462"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value": "open",
+              "operation": "equals",
+              "property": "={{ $json.state }}"
+            }
+          ]
+        }
+      },
+      "name": "Is Circuit Open?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        750,
+        0
+      ],
+      "id": "6397fc1e-d1e3-4bc5-b2f4-5258f1c999c0"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Circuit is CLOSED - service is healthy\nconst state = $input.first().json;\n\nreturn [{\n  json: {\n    allowed: true,\n    circuit_state: 'closed',\n    message: 'Service is healthy - requests allowed',\n    failure_count: state.failure_count || 0,\n    service_id: state.service_id\n  }\n}];",
+        "options": {}
+      },
+      "name": "Return Closed State",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        -100
+      ],
+      "id": "604a352b-5dd5-4d54-95b7-187212b74ce0"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Circuit is OPEN - check if timeout has passed\nconst state = $input.first().json;\nconst now = new Date();\nconst openedAt = state.opened_at ? new Date(state.opened_at) : null;\nconst timeoutSeconds = state.timeout_seconds || 300;\n\nlet shouldTryHalfOpen = false;\nlet timeUntilRetry = 0;\n\nif (openedAt) {\n  const elapsedSeconds = (now - openedAt) / 1000;\n  if (elapsedSeconds >= timeoutSeconds) {\n    shouldTryHalfOpen = true;\n  } else {\n    timeUntilRetry = Math.ceil(timeoutSeconds - elapsedSeconds);\n  }\n}\n\nreturn [{\n  json: {\n    ...state,\n    should_try_half_open: shouldTryHalfOpen,\n    time_until_retry_seconds: timeUntilRetry,\n    elapsed_since_open: openedAt ? Math.floor((now - openedAt) / 1000) : null\n  }\n}];",
+        "options": {}
+      },
+      "name": "Check Timeout",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        100
+      ],
+      "id": "9fd2ccb8-e5db-4f2f-b437-b1f108cb8403"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value": true,
+              "operation": "equal",
+              "property": "={{ $json.should_try_half_open }}"
+            }
+          ]
+        }
+      },
+      "name": "Timeout Passed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1250,
+        100
+      ],
+      "id": "7181e7e3-867b-4fe6-afdd-e1970cd2ca33"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE circuit_breaker_state SET state = 'half-open', half_open_at = NOW(), success_count = 0 WHERE service_id = $1::text RETURNING *;",
+        "options": {
+          "queryReplacement": "={{ $json.service_id }}"
+        }
+      },
+      "name": "Set Half-Open",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1500,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "id": "01150962-7ed8-4e21-b2f1-1ed3a48b767c"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Return circuit breaker status\nconst state = $input.first().json;\n\nreturn [{\n  json: {\n    allowed: state.state === 'half-open' || state.should_try_half_open,\n    circuit_state: state.state === 'half-open' ? 'half-open' : 'open',\n    message: state.state === 'half-open' \n      ? 'Circuit in half-open state - test request allowed' \n      : `Circuit OPEN - retry in ${state.time_until_retry_seconds || 'unknown'}s`,\n    service_id: state.service_id,\n    failure_count: state.failure_count || 0,\n    opened_at: state.opened_at,\n    time_until_retry_seconds: state.time_until_retry_seconds || 0\n  }\n}];",
+        "options": {}
+      },
+      "name": "Return Open State",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1750,
+        100
+      ],
+      "id": "21538cc4-0b3e-4901-9330-a231d5b67df2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Circuit is OPEN and timeout not passed\nconst state = $input.first().json;\n\nreturn [{\n  json: {\n    allowed: false,\n    circuit_state: 'open',\n    message: `Circuit breaker OPEN - service unavailable. Retry in ${state.time_until_retry_seconds || 'unknown'} seconds`,\n    service_id: state.service_id,\n    retry_after_seconds: state.time_until_retry_seconds || 300,\n    failure_count: state.failure_count || 0\n  }\n}];",
+        "options": {}
+      },
+      "name": "Return Blocked",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        200
+      ],
+      "id": "2857190c-56af-4c63-ad8e-ceb5c81a06d1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Standard Contract Output\nconst cbResult = $('Return Closed State').first()?.json || \n                 $('Return Open State').first()?.json || \n                 $('Return Blocked').first()?.json;\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: cbResult,\n    _meta: {\n      source: 'CB_GCal_Circuit_BreakER',\n      timestamp: new Date().toISOString(),\n      version: '1.0.0'\n    }\n  }\n}];",
+        "options": {}
+      },
+      "name": "Standard Contract Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        0
+      ],
+      "id": "601ec743-cd15-4056-b142-2f54105e3f13"
+    },
+    {
+      "parameters": {
+        "path": "circuit-breaker/record",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Record Result Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        400
+      ],
+      "webhookId": "circuit-breaker-record",
+      "id": "8fbad4e6-f9a9-407c-a24b-4234e29c7d62"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Record success or failure\nconst input = $input.first().json;\nconst result = input.success ? 'success' : 'failure';\n\nreturn [{\n  json: {\n    service_id: input.service_id || 'google_calendar',\n    result: result,\n    error_message: input.error_message || null,\n    metadata: input.metadata || {}\n  }\n}];",
+        "options": {}
+      },
+      "name": "Parse Record Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        400
+      ],
+      "id": "4d40d24f-f771-49c1-946c-69c2d834ac21"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Record success/failure for circuit breaker\nWITH current_state AS (\n  SELECT * FROM circuit_breaker_state WHERE service_id = $1::text\n),\nupdate_result AS (\n  UPDATE circuit_breaker_state\n  SET \n    failure_count = CASE \n      WHEN $2::text = 'success' THEN 0\n      ELSE failure_count + 1\n    END,\n    success_count = CASE \n      WHEN $2::text = 'success' THEN \n        CASE WHEN state = 'half-open' THEN success_count + 1 ELSE 1 END\n      ELSE 0\n    END,\n    state = CASE \n      WHEN $2::text = 'failure' AND failure_count + 1 >= failure_threshold THEN 'open'\n      WHEN $2::text = 'success' AND state = 'half-open' AND success_count + 1 >= success_threshold THEN 'closed'\n      WHEN $2::text = 'success' AND state = 'open' THEN 'closed'\n      ELSE state\n    END,\n    opened_at = CASE \n      WHEN $2::text = 'failure' AND state = 'closed' AND failure_count + 1 >= failure_threshold THEN NOW()\n      ELSE opened_at\n    END,\n    last_failure_at = CASE WHEN $2::text = 'failure' THEN NOW() ELSE last_failure_at END,\n    last_success_at = CASE WHEN $2::text = 'success' THEN NOW() ELSE last_success_at END,\n    last_error_message = CASE WHEN $2::text = 'failure' THEN 'api_error' ELSE last_error_message END\n  WHERE service_id = $1::text\n  RETURNING *\n)\nSELECT * FROM update_result;",
+        "options": {
+          "queryReplacement": "={{ $json.service_id }}, {{ $json.result }}"
+        }
+      },
+      "name": "Record Result",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        500,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "id": "6b6675f3-ebfe-4feb-93d2-06ffba4e715f"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Return result of record operation\nconst state = $input.first().json;\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      recorded: true,\n      service_id: state.service_id,\n      new_state: state.state,\n      failure_count: state.failure_count,\n      success_count: state.success_count,\n      message: `Recorded ${state.failure_count > 0 ? 'failure' : 'success'} for ${state.service_id}`\n    },\n    _meta: {\n      source: 'CB_GCal_Circuit_BreakER',\n      timestamp: new Date().toISOString(),\n      version: '1.0.0'\n    }\n  }\n}];",
+        "options": {}
+      },
+      "name": "Record SCO",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        400
+      ],
+      "id": "b283e353-1b00-412c-861d-4dd04d16c449"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Request": {
+      "main": [
+        [
+          {
+            "node": "Get Circuit State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Circuit State": {
+      "main": [
+        [
+          {
+            "node": "Is Circuit Open?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Circuit Open?": {
+      "main": [
+        [
+          {
+            "node": "Return Closed State",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Timeout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Timeout": {
+      "main": [
+        [
+          {
+            "node": "Timeout Passed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Timeout Passed?": {
+      "main": [
+        [
+          {
+            "node": "Set Half-Open",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return Blocked",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Half-Open": {
+      "main": [
+        [
+          {
+            "node": "Return Open State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Return Closed State": {
+      "main": [
+        [
+          {
+            "node": "Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Return Open State": {
+      "main": [
+        [
+          {
+            "node": "Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Return Blocked": {
+      "main": [
+        [
+          {
+            "node": "Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Result Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Record Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Record Request": {
+      "main": [
+        [
+          {
+            "node": "Record Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Result": {
+      "main": [
+        [
+          {
+            "node": "Record SCO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "9998c6c1-04f0-4f19-9980-da776874d3b6",
+  "activeVersionId": null,
+  "versionCounter": 22,
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2026-03-13T23:18:14.786Z",
+      "createdAt": "2026-03-13T23:18:14.786Z",
+      "role": "workflow:owner",
+      "workflowId": "G15qrYLDth6n5WR7",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}

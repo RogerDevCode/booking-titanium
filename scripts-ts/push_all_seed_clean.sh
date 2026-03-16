@@ -1,5 +1,5 @@
 #!/bin/bash
-PROJECT_ROOT="/home/manager/Sync/N8N Projects/booking-titanium"
+PROJECT_ROOT="/home/manager/Sync/N8N_Projects/booking-titanium"
 SEED_DIR="$PROJECT_ROOT/workflows/seed_clean"
 
 cd "$PROJECT_ROOT"

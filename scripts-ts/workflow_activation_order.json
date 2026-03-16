@@ -358,5 +358,46 @@
     "id": "2G9ffjvKyF5bqDT5",
     "order": 63,
     "webhook_path": "book-appointment"
+  },
+  {
+    "name": "TEST_GCal_Connection",
+    "id": "OK1i9Rpk3T3o30jS",
+    "order": 62,
+    "webhook_path": "test-gcal"
+  },
+  {
+    "name": "TEST_GCal_Minimal",
+    "id": "74zsMccewOLqJ8lD",
+    "order": 63,
+    "webhook_path": "test-gcal-minimal"
+  },
+  {
+    "name": "SEED_Book_Tomorrow",
+    "id": "LIPSYlD7LHfFnAHW",
+    "order": 64,
+    "webhook_path": "seed-tomorrow"
+  },
+  {
+    "name": "WF8_Booking_Queue_Worker",
+    "id": "GaVFL3VwVy5qUrqf",
+    "order": 65
+  },
+  {
+    "name": "WF1_Booking_API_Gateway_Async",
+    "id": "T3peNeEvQz2HFtxr",
+    "order": 66,
+    "webhook_path": "book-appointment-async"
+  },
+  {
+    "name": "WF9_Booking_Intent_Status",
+    "id": "3wWhCGCVrjFtcLfP",
+    "order": 67,
+    "webhook_path": "booking-intents/:intent_id"
+  },
+  {
+    "name": "WF2_Booking_Orchestrator_Worker",
+    "id": "Ifx0Yb17cs3WYHbm",
+    "order": 68,
+    "webhook_path": "booking-orchestrator-worker"
   }
 ]

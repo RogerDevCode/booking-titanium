@@ -1,0 +1,168 @@
+{
+  "name": "WF1_Booking_API_Gateway_Async",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "book-appointment-async",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -250,
+        300
+      ],
+      "webhookId": "book-appointment-async"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst body = input.body || input;\n\n// provider_id: required, positive int\nconst provider_id = parseInt(body.provider_id, 10);\nif (isNaN(provider_id) || provider_id < 1) {\n  return [{ json: { _valid: false, _error: 'Invalid or missing provider_id: must be a positive integer' } }];\n}\n\n// service_id: required, positive int\nconst service_id = parseInt(body.service_id, 10);\nif (isNaN(service_id) || service_id < 1) {\n  return [{ json: { _valid: false, _error: 'Invalid or missing service_id: must be a positive integer' } }];\n}\n\n// start_time: required, ISO 8601\nconst start_time = String(body.start_time || '');\nif (!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/.test(start_time)) {\n  return [{ json: { _valid: false, _error: 'Invalid or missing start_time: must be ISO 8601' } }];\n}\nconst startDate = new Date(start_time);\nif (isNaN(startDate.getTime())) {\n  return [{ json: { _valid: false, _error: 'start_time is not a parseable date' } }];\n}\nif (startDate.getTime() < Date.now() - 60000) {\n  return [{ json: { _valid: false, _error: 'start_time must be in the future' } }];\n}\n\n// duration_minutes: optional, 15-480, default 60\nconst duration_minutes = parseInt(body.duration_minutes || 60, 10);\nif (isNaN(duration_minutes) || duration_minutes < 15 || duration_minutes > 480) {\n  return [{ json: { _valid: false, _error: 'Invalid duration_minutes: must be 15-480' } }];\n}\n\nconst endDate = new Date(startDate.getTime() + duration_minutes * 60000);\n\n// customer_id: optional, sanitize\nconst customer_id = body.customer_id ? String(body.customer_id).substring(0, 100) : null;\nconst chat_id = body.chat_id ? String(body.chat_id).substring(0, 100) : null;\nconst event_title = body.event_title ? String(body.event_title).substring(0, 200) : null;\nconst user_id = body.user_id ? parseInt(body.user_id, 10) : null;\n\nif (!customer_id && !chat_id) {\n  return [{ json: { _valid: false, _error: 'At least one of customer_id or chat_id is required' } }];\n}\n\n// Generate idempotency key\nconst idempotencyKey = `booking_${provider_id}_${service_id}_${start_time}_${customer_id || chat_id || 'anonymous'}`;\nconst sanitizedKey = idempotencyKey.replace(/[^a-zA-Z0-9_:-]/g, '_').substring(0, 255);\n\nreturn [{ json: {\n  _valid: true,\n  provider_id,\n  service_id,\n  start_time,\n  end_time: endDate.toISOString(),\n  duration_minutes,\n  customer_id,\n  chat_id,\n  user_id,\n  event_title,\n  idempotency_key: sanitizedKey,\n  _received_at: new Date().toISOString()\n}}];"
+      },
+      "name": "Validate Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json._valid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nreturn [{ json: {\n  success: false,\n  error_code: 'VALIDATION_ERROR',\n  error_message: input._error || 'Invalid input',\n  data: null,\n  _meta: {\n    source: 'WF1_Booking_API_Gateway_Async',\n    timestamp: new Date().toISOString(),\n    workflow_id: $workflow.id || 'unknown',\n    version: '3.0.0-async'\n  }\n}}];"
+      },
+      "name": "Return Validation Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        450
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO booking_intents (provider_id, service_id, start_time, end_time, duration_minutes, customer_id, chat_id, user_id, event_title, idempotency_key, status, metadata) VALUES ($1::int, $2::int, $3::timestamptz, $4::timestamptz, $5::int, $6::text, $7::bigint, $8::bigint, $9::text, $10::text, 'PENDING', $11::jsonb) RETURNING id, created_at;",
+        "options": {
+          "queryReplacement": "={{ [$json.provider_id, $json.service_id, $json.start_time, $json.end_time, $json.duration_minutes, $json.customer_id, $json.chat_id, $json.user_id, $json.event_title, $json.idempotency_key, JSON.stringify({ source: 'WF1_Async', received_at: $json._received_at })] }}"
+        }
+      },
+      "name": "Insert Booking Intent",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        500,
+        150
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Return immediate ACK response\nconst intent = $('Insert Booking Intent').first().json;\nconst validate = $('Validate Request').first().json;\n\nreturn [{ json: {\n  success: true,\n  error_code: null,\n  error_message: null,\n  data: {\n    intent_id: intent.id,\n    status: 'QUEUED',\n    provider_id: validate.provider_id,\n    service_id: validate.service_id,\n    start_time: validate.start_time,\n    message: 'Booking request queued for asynchronous processing',\n    estimated_processing_time: '30-60 seconds',\n    check_status_endpoint: '/api/v1/booking-intents/' + intent.id\n  },\n  _meta: {\n    source: 'WF1_Booking_API_Gateway_Async',\n    timestamp: new Date().toISOString(),\n    workflow_id: $workflow.id || 'unknown',\n    version: '3.0.0-async',\n    processing_mode: 'asynchronous'\n  }\n}}];"
+      },
+      "name": "Format ACK Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        150
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Request": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Insert Booking Intent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return Validation Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Booking Intent": {
+      "main": [
+        [
+          {
+            "node": "Format ACK Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true
+  }
+}

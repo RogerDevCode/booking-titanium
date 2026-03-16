@@ -1,5 +1,21 @@
 /**
- * Unit Tests for Booking Titanium Seed Workflows (WF1-WF7)
+ * @file seed-workflows.test.ts
+ * @description Unit Tests for Booking Titanium Seed Workflows (WF1-WF7)
+ * 
+ * ⚠️  NON-SATURATING EXECUTION:
+ *    - Uses maxWorkers: 1 to prevent CPU overload
+ *    - Sequential test execution with delays between tests
+ *    - Jest configuration: workerIdleMemoryLimit: 512MB
+ * 
+ * 📊 Jest Configuration (jest.config.js):
+ *    - maxWorkers: 1 - Prevents CPU saturation during test execution
+ *    - testTimeout: 30000ms - Allows for JSON validation
+ *    - workerIdleMemoryLimit: 512MB - Memory management
+ * 
+ * 🚀 Performance Notes:
+ *    - No sobrecargar el CPU - tests run sequentially
+ *    - File I/O operations are synchronous but lightweight
+ *    - Batching: Workflow validation grouped by workflow ID
  * 
  * Tests validate:
  * - Workflow JSON structure
@@ -7,8 +23,6 @@
  * - Required parameters
  * - Standard Contract Output pattern
  * - Connection integrity
- * 
- * Usage: npx jest tests/seed-workflows.test.ts
  */
 
 import * as fs from 'fs';

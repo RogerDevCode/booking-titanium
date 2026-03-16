@@ -1,3 +1,23 @@
+/**
+ * @file sync.test.ts
+ * @description WF4_Sync_Engine TDD - Manual repair & event-driven sync
+ * 
+ * ⚠️  NON-SATURATING EXECUTION:
+ *    - Uses maxWorkers: 1 to prevent CPU overload
+ *    - Sequential test execution with delays between tests
+ *    - Jest configuration: workerIdleMemoryLimit: 512MB
+ * 
+ * 📊 Jest Configuration (jest.config.js):
+ *    - maxWorkers: 1 - Prevents CPU saturation during test execution
+ *    - testTimeout: 60000ms - Allows for real webhook calls
+ *    - workerIdleMemoryLimit: 512MB - Memory management
+ * 
+ * 🚀 Performance Notes:
+ *    - No sobrecargar el CPU - tests run sequentially
+ *    - Database connections are properly managed
+ *    - Batching: Sync tests run with delays to avoid race conditions
+ */
+
 import axios from 'axios';
 import { Pool } from 'pg';
 import * as dotenv from 'dotenv';

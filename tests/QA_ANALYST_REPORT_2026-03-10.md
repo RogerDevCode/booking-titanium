@@ -299,7 +299,7 @@ npm install
 #### Paso 1: Sembrar Base de Datos
 
 ```bash
-cd "/home/manager/Sync/N8N Projects/booking-titanium"
+cd "/home/manager/Sync/N8N_Projects/booking-titanium"
 
 # Limpia datos de test anteriores y prepara BD
 npx tsx scripts-ts/seed_qa_database.ts --clean

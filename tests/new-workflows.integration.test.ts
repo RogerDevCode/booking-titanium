@@ -1,5 +1,21 @@
 /**
- * Integration Tests for New/Modified Workflows (PASO 1-4)
+ * @file new-workflows.integration.test.ts
+ * @description Integration Tests for New/Modified Workflows (PASO 1-4)
+ * 
+ * ⚠️  NON-SATURATING EXECUTION:
+ *    - Uses maxWorkers: 1 to prevent CPU overload
+ *    - Sequential test execution with delays between tests
+ *    - Jest configuration: workerIdleMemoryLimit: 512MB
+ * 
+ * 📊 Jest Configuration (jest.config.js):
+ *    - maxWorkers: 1 - Prevents CPU saturation during test execution
+ *    - testTimeout: 60000ms - Allows for real webhook calls
+ *    - workerIdleMemoryLimit: 512MB - Memory management
+ * 
+ * 🚀 Performance Notes:
+ *    - No sobrecargar el CPU - tests run sequentially
+ *    - Webhook calls are rate-limited naturally by sequential execution
+ *    - Batching: Tests grouped by workflow with delays between groups
  * 
  * Tests validate against Standard Contract Pattern [O02] from GEMINI.md:
  * {
@@ -9,8 +25,6 @@
  *   "data": {...} | null,
  *   "_meta": {"source", "timestamp", "workflow_id"}
  * }
- * 
- * Usage: npx jest tests/new-workflows.integration.test.ts --testTimeout=60000
  */
 
 import * as dotenv from 'dotenv';

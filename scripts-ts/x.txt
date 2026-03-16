@@ -1,0 +1,12 @@
+[OK] Variables de entorno cargadas desde:
+  /home/manager/Sync/N8N_Projects/booking-titanium/.env
+
+=== AUTENTICACIÓN GOOGLE CALENDAR ===
+
+1. Abre esta URL en tu navegador:
+https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.readonly&response_type=code&client_id=503298988790-k4g19jejb0tdb5tq1tulejblpntmvat3.apps.googleusercontent.com&redirect_uri=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob
+
+2. Inicia sesión con tu cuenta de Google y autoriza el acceso.
+3. Copia el código de autorización que aparece.
+
+Pega el código aquí: 
