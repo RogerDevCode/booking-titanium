@@ -310,3 +310,14 @@ docker inspect booking_queue_worker --format='{{.State.Health.Status}}'
 **Última actualización:** 2026-03-17  
 **Próxima revisión:** 2026-04-17 (1 mes)  
 **Responsable:** Equipo de Automatación
+# 🐛 WF2_V3 - BUG QUEUE MODE CONFIRMADO
+
+**Fecha:** 2026-03-17
+
+## WF2_v3 Intento (Todo Interno)
+
+WF2_v3 fue creado sin HTTP Request a sub-workflows (todo interno).
+
+**Resultado:** ⏸️ Mismo bug de queue mode
+
+**Conclusión:** El bug de queue mode afecta ejecuciones de webhook en general, no solo HTTP Request anidados.
