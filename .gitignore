@@ -150,3 +150,5 @@ current_tables_dump.sql
 .Trashes
 ehthumbs.db
 Thumbs.db
+token.json
+**/token.json
