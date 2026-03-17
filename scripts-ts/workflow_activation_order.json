@@ -411,5 +411,17 @@
     "id": "YCi9khCvt9a3QAAV",
     "order": 70,
     "webhook_path": "booking-orchestrator-v3"
+  },
+  {
+    "name": "WF2_Booking_Orchestrator_v4",
+    "id": "0bfZIU6cDKvXlUUZ",
+    "order": 71,
+    "webhook_path": "booking-orchestrator-v4"
+  },
+  {
+    "name": "WF2_Booking_Orchestrator_v4",
+    "id": "fE5W1RaBDfGM7nt1",
+    "order": 72,
+    "webhook_path": "booking-orchestrator-v4"
   }
 ]
