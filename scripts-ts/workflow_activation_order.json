@@ -399,5 +399,11 @@
     "id": "Ifx0Yb17cs3WYHbm",
     "order": 68,
     "webhook_path": "booking-orchestrator-worker"
+  },
+  {
+    "name": "WF2_Booking_Orchestrator_v2",
+    "id": "p7xNzqYZ7jWGo7Z8",
+    "order": 69,
+    "webhook_path": "booking-orchestrator-v2"
   }
 ]
