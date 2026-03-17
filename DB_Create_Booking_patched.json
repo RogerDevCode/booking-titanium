@@ -1,0 +1,158 @@
+{
+  "name": "DB_Create_Booking",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"start_time\": \"2026-03-04T10:00:00\", \"provider_id\": 1, \"service_id\": 1, \"user_name\": \"Juan\", \"user_email\": \"juan@example.com\", \"chat_id\": 12345}"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        432
+      ],
+      "id": "2de1917a-e3bd-481c-b92f-5e0d7d953b0f"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "db-create-booking-test",
+        "responseMode": "lastNode",
+        "options": {},
+        "responseData": "firstEntryJson"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        600
+      ],
+      "webhookId": "db-create-booking-test",
+      "id": "b839a78f-06d0-4d3b-8159-8e2c24e9cab8"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        232
+      ],
+      "id": "6a84616e-c7c9-478a-bcbd-be8c89d3fb68"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.body || $input.first().json;\n\n// VRF — GUARD + VALIDATE\nconst chat_id = parseInt(input.chat_id);\nconst provider_id = parseInt(input.provider_id);\nconst service_id = parseInt(input.service_id);\nconst start_time = input.start_time;\nconst user_email = input.user_email || '';\nconst user_name = input.user_name || 'Paciente';\n\nif (!chat_id || !provider_id || !service_id || !start_time) {\n  throw new Error('Missing required fields: chat_id, provider_id, service_id, start_time');\n}\n\nreturn [{\n  json: {\n    chat_id,\n    provider_id,\n    service_id,\n    start_time,\n    user_email,\n    user_name\n  }\n}];"
+      },
+      "name": "Build Secure JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        432
+      ],
+      "id": "c7e86981-ea24-432c-b7b3-de3f89eab8d6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://dal-service:3000/create-booking",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {
+          "neverError": true,
+          "timeout": 5000
+        }
+      },
+      "name": "Call DAL Create",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        500,
+        432
+      ],
+      "id": "9c127d9a-960e-411e-a8a8-5876cfb4553c"
+    },
+    {
+      "parameters": {
+        "jsCode": "const dalResponse = $input.first()?.json || {};\nconst isSuccess = dalResponse.success === true;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    error_code: isSuccess ? null : (dalResponse.error_code || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || dalResponse.message || 'Booking creation failed'),\n    data: isSuccess ? (dalResponse.data || dalResponse) : null,\n    _meta: {\n      source: 'DB_Create_Booking',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Create_Booking',\n      version: '1.1.0'\n    }\n  }\n}];"
+      },
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        432
+      ],
+      "id": "b8bb95a4-48ef-4135-8b98-9d2e33741efd"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Secure JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build Secure JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Secure JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Secure JSON": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Create",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Create": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "description": "Crea una reserva en la base de datos de PostgreSQL con la informacion del cliente.",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  }
+}

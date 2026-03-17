@@ -1,0 +1,381 @@
+{
+  "updatedAt": "2026-03-17T14:36:09.177Z",
+  "createdAt": "2026-03-02T02:19:34.753Z",
+  "id": "ilA6a6sM5CvDsSBi",
+  "name": "DB_Create_Booking",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "db-create-booking-test",
+        "responseMode": "lastNode",
+        "responseData": "firstEntryJson",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e2c34d56-789a-012b-cdef-34567890abcd",
+      "webhookId": "db-create-booking-test"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.body || $input.first().json;\n\n// Basic extraction\nconst provider_id = parseInt(input.provider_id, 10);\nconst service_id = parseInt(input.service_id, 10);\nconst start_time = input.start_time;\nconst end_time = input.end_time;\nconst idempotency_key = input.idempotency_key || null;\nconst gcal_event_id = input.gcal_event_id || null;\nconst user_id = parseInt(input.user_id, 10) || parseInt(input.chat_id, 10);\n\nif (!provider_id || !service_id || !start_time || !user_id) {\n  return [{\n    json: {\n      success: false,\n      error_code: 'MISSING_FIELDS',\n      error_message: 'Missing required fields for direct DB booking creation',\n      _valid: false\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    _valid: true,\n    provider_id,\n    service_id,\n    start_time,\n    end_time,\n    idempotency_key,\n    gcal_event_id,\n    user_id\n  }\n}];"
+      },
+      "name": "Extract & Validate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        0
+      ],
+      "id": "c98b7a65-4321-fedc-ba09-87654321fedc"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "valid_check",
+              "leftValue": "={{ $json._valid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        500,
+        0
+      ],
+      "id": "a1b2c3d4-e5f6-4a5b-8c7d-9e0f1a2b3c4d"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO bookings (provider_id, service_id, start_time, end_time, idempotency_key, gcal_event_id, user_id, status, created_at) VALUES ($1::int, $2::int, $3::timestamp, $4::timestamp, $5::text, $6::text, $7::bigint, 'CONFIRMED', NOW()) RETURNING id;",
+        "options": {
+          "queryReplacement": "={{ [$json.provider_id, $json.service_id, $json.start_time, $json.end_time, $json.idempotency_key, $json.gcal_event_id, $json.user_id] }}"
+        }
+      },
+      "name": "Insert Booking",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        750,
+        -100
+      ],
+      "id": "f5e6d7c8-b9a0-1234-5678-90abcdef1234",
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const booking = $input.first().json;\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      booking_id: booking.id || booking[0]?.id\n    },\n    _meta: {\n      source: 'DB_Create_Booking',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Create_Booking'\n    }\n  }\n}];"
+      },
+      "name": "Format Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        -100
+      ],
+      "id": "d4c3b2a1-0987-6543-2109-876543210987"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract & Validate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract & Validate": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Insert Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Booking": {
+      "main": [
+        [
+          {
+            "node": "Format Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "description": "Crea una reserva en la base de datos de PostgreSQL con la informacion del cliente.",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "b4794f44-0e1a-4250-a22d-513f677e82b5",
+  "activeVersionId": "b4794f44-0e1a-4250-a22d-513f677e82b5",
+  "versionCounter": 82,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-02T02:19:34.753Z",
+      "createdAt": "2026-03-02T02:19:34.753Z",
+      "role": "workflow:owner",
+      "workflowId": "ilA6a6sM5CvDsSBi",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-17T14:36:09.178Z",
+    "createdAt": "2026-03-17T14:36:09.178Z",
+    "versionId": "b4794f44-0e1a-4250-a22d-513f677e82b5",
+    "workflowId": "ilA6a6sM5CvDsSBi",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "db-create-booking-test",
+          "responseMode": "lastNode",
+          "responseData": "firstEntryJson",
+          "options": {}
+        },
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "e2c34d56-789a-012b-cdef-34567890abcd"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.first().json.body || $input.first().json;\n\n// Basic extraction\nconst provider_id = parseInt(input.provider_id, 10);\nconst service_id = parseInt(input.service_id, 10);\nconst start_time = input.start_time;\nconst end_time = input.end_time;\nconst idempotency_key = input.idempotency_key || null;\nconst gcal_event_id = input.gcal_event_id || null;\nconst user_id = parseInt(input.user_id, 10) || parseInt(input.chat_id, 10);\n\nif (!provider_id || !service_id || !start_time || !user_id) {\n  return [{\n    json: {\n      success: false,\n      error_code: 'MISSING_FIELDS',\n      error_message: 'Missing required fields for direct DB booking creation',\n      _valid: false\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    _valid: true,\n    provider_id,\n    service_id,\n    start_time,\n    end_time,\n    idempotency_key,\n    gcal_event_id,\n    user_id\n  }\n}];"
+        },
+        "name": "Extract & Validate",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          250,
+          0
+        ],
+        "id": "c98b7a65-4321-fedc-ba09-87654321fedc"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "valid_check",
+                "leftValue": "={{ $json._valid }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          }
+        },
+        "name": "Is Valid?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          500,
+          0
+        ],
+        "id": "a1b2c3d4-e5f6-4a5b-8c7d-9e0f1a2b3c4d"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "INSERT INTO bookings (provider_id, service_id, start_time, end_time, idempotency_key, gcal_event_id, user_id, status, created_at) VALUES ($1::int, $2::int, $3::timestamp, $4::timestamp, $5::text, $6::text, $7::bigint, 'CONFIRMED', NOW()) RETURNING id;",
+          "options": {
+            "queryReplacement": "={{ [$json.provider_id, $json.service_id, $json.start_time, $json.end_time, $json.idempotency_key, $json.gcal_event_id, $json.user_id] }}"
+          }
+        },
+        "name": "Insert Booking",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          750,
+          -100
+        ],
+        "id": "f5e6d7c8-b9a0-1234-5678-90abcdef1234",
+        "credentials": {
+          "postgres": {
+            "id": "5LzvCP9BsQwCi9Z0",
+            "name": "Postgres account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const booking = $input.first().json;\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      booking_id: booking.id || booking[0]?.id\n    },\n    _meta: {\n      source: 'DB_Create_Booking',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Create_Booking'\n    }\n  }\n}];"
+        },
+        "name": "Format Success",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1000,
+          -100
+        ],
+        "id": "d4c3b2a1-0987-6543-2109-876543210987"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Extract & Validate",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract & Validate": {
+        "main": [
+          [
+            {
+              "node": "Is Valid?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is Valid?": {
+        "main": [
+          [
+            {
+              "node": "Insert Booking",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Insert Booking": {
+        "main": [
+          [
+            {
+              "node": "Format Success",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Roger Gallegos",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-17T14:36:09.209Z",
+        "id": 1106,
+        "workflowId": "ilA6a6sM5CvDsSBi",
+        "versionId": "b4794f44-0e1a-4250-a22d-513f677e82b5",
+        "event": "deactivated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-17T14:36:09.229Z",
+        "id": 1107,
+        "workflowId": "ilA6a6sM5CvDsSBi",
+        "versionId": "b4794f44-0e1a-4250-a22d-513f677e82b5",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-17T14:37:53.892Z",
+        "id": 1108,
+        "workflowId": "ilA6a6sM5CvDsSBi",
+        "versionId": "b4794f44-0e1a-4250-a22d-513f677e82b5",
+        "event": "deactivated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-17T14:38:00.735Z",
+        "id": 1109,
+        "workflowId": "ilA6a6sM5CvDsSBi",
+        "versionId": "b4794f44-0e1a-4250-a22d-513f677e82b5",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    ]
+  }
+}
