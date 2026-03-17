@@ -186,3 +186,20 @@ El bug de queue mode afecta solo el caso async (worker externo), que tiene worka
 **Estado:** ✅ FUNCIONANDO (arquitectura híbrida)  
 **Última actualización:** 2026-03-17  
 **Próxima revisión:** After n8n queue mode fix
+# 🔄 REINICIO N8N - RESULTADO
+
+**Fecha:** 2026-03-17
+**Estado:** ⏸️ Bug queue mode confirmado
+
+## Resultado del Reinicio
+
+- ✅ n8n reiniciado correctamente
+- ✅ Webhooks se registran
+- ⏸️ WF2 queue mode bug persiste (runData null)
+
+## Bug Confirmado
+
+- runData es null en queue mode
+- Error no se registra correctamente
+- Sub-workflows ejecutan pero WF2 falla
+- Bug conocido n8n post-v1.121.0
