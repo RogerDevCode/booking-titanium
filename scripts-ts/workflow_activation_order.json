@@ -34,12 +34,6 @@
     "webhook_path": "db-get-availability-test"
   },
   {
-    "name": "DB_Create_Booking",
-    "id": "ilA6a6sM5CvDsSBi",
-    "order": 6,
-    "webhook_path": "db-create-booking-test"
-  },
-  {
     "name": "DB_Cancel_Booking",
     "id": "mf4qnUG7UlrAKpQU",
     "order": 7,
@@ -56,12 +50,6 @@
     "id": "oi5AiSoJRbzDf2A8",
     "order": 9,
     "webhook_path": "db-find-next-available"
-  },
-  {
-    "name": "GCAL_Create_Event",
-    "id": "SAx7al0OwTqzs4XJ",
-    "order": 10,
-    "webhook_path": "gcal-create-event"
   },
   {
     "name": "GCAL_Delete_Event",
@@ -185,7 +173,7 @@
   },
   {
     "name": "SEED_Book_Tomorrow",
-    "id": "HxMojMqbRiNgquvd",
+    "id": "LIPSYlD7LHfFnAHW",
     "order": 32,
     "webhook_path": "seed-tomorrow",
     "version": "2.0.0"
@@ -354,16 +342,16 @@
     "webhook_path": "dlq/status"
   },
   {
-    "name": "WF1_Booking_API_Gateway",
-    "id": "2G9ffjvKyF5bqDT5",
-    "order": 63,
-    "webhook_path": "book-appointment"
-  },
-  {
     "name": "TEST_GCal_Connection",
     "id": "OK1i9Rpk3T3o30jS",
     "order": 62,
     "webhook_path": "test-gcal"
+  },
+  {
+    "name": "WF1_Booking_API_Gateway",
+    "id": "2G9ffjvKyF5bqDT5",
+    "order": 63,
+    "webhook_path": "book-appointment"
   },
   {
     "name": "TEST_GCal_Minimal",
@@ -380,7 +368,8 @@
   {
     "name": "WF8_Booking_Queue_Worker",
     "id": "GaVFL3VwVy5qUrqf",
-    "order": 65
+    "order": 65,
+    "webhook_path": "wf8-worker-trigger"
   },
   {
     "name": "WF1_Booking_API_Gateway_Async",
@@ -393,35 +382,5 @@
     "id": "3wWhCGCVrjFtcLfP",
     "order": 67,
     "webhook_path": "booking-intents/:intent_id"
-  },
-  {
-    "name": "WF2_Booking_Orchestrator_Worker",
-    "id": "Ifx0Yb17cs3WYHbm",
-    "order": 68,
-    "webhook_path": "booking-orchestrator-worker"
-  },
-  {
-    "name": "WF2_Booking_Orchestrator_v2",
-    "id": "p7xNzqYZ7jWGo7Z8",
-    "order": 69,
-    "webhook_path": "booking-orchestrator-v2"
-  },
-  {
-    "name": "WF2_Booking_Orchestrator_v3",
-    "id": "YCi9khCvt9a3QAAV",
-    "order": 70,
-    "webhook_path": "booking-orchestrator-v3"
-  },
-  {
-    "name": "WF2_Booking_Orchestrator_v4",
-    "id": "0bfZIU6cDKvXlUUZ",
-    "order": 71,
-    "webhook_path": "booking-orchestrator-v4"
-  },
-  {
-    "name": "WF2_Booking_Orchestrator_v4",
-    "id": "fE5W1RaBDfGM7nt1",
-    "order": 72,
-    "webhook_path": "booking-orchestrator-v4"
   }
 ]

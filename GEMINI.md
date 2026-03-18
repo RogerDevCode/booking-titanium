@@ -15,7 +15,9 @@ n8n v2.10.2+ · Cloud-Native · 2026-03-14
 [2.1] NO Python. Local scripts: TypeScript via `npx tsx` from scripts-ts/. Code nodes: JS only. Tests: Jest + fetch/axios.
 [2.2] NO queryParameters in sub-workflows. Bug #11835: lost via Execute Workflow. Use direct interpolation with pre-validated values.
 [2.3] NO $env/$process.env in Code nodes. Blocked by default (N8N_BLOCK_ENV_ACCESS_IN_NODE=true). Use $vars (Enterprise) or pass via prior nodes.
-[2.4] NO workflow management outside standard. Only tool: scripts-ts/n8n_crud_agent.ts. Always verify workflow_activation_order.json before and after.
+[2.4] NO workflow management outside standard. Tools: scripts-ts/n8n_crud_agent.ts, scripts-ts/n8n_activate_workflow.ts. Always verify workflow_activation_order.json before and after.
+
+[2.8] NO cambiar nombres de workflows existentes. Mantener nombre original al actualizar. Evita crear duplicados y archivos huérfanos.
 [2.5] NO /webhook-test/ URLs. Production only: /webhook/.
 [2.6] NO localhost in Docker. Use Docker network aliases (e.g. http://dal-service:3000).
 [2.7] NO secrets in code. API keys, tokens, PII → n8n Credential Store for WFs, dotenv/.env for scripts. Never in .json/.md/.ts/.js files.
@@ -105,6 +107,8 @@ n8n v2.10.2+ · Cloud-Native · 2026-03-14
 [8.4] One-off logic (audit, patch, transform) → inline code block in chat response. Not a file.
 [8.5] Before creating any file: (a) test? → /tests/ (b) temporary? → /temp/ (c) neither? → edit existing file in place. No new file without permanent purpose.
 [8.6] Never create files outside /tests/ and /temp/ unless explicitly requested as a permanent named tool.
+[8.7] Ephemeral scripts (workers/tests) must be killed and deleted immediately after use to prevent background loops.
+[8.8] Files containing secrets (keys, API keys, etc.) must be added to .gitignore immediately.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 §9 REFERENCE SOURCES
@@ -132,3 +136,34 @@ n8n v2.10.2+ · Cloud-Native · 2026-03-14
 [11.4] Groq rate limits: switch to Llama 3.1 8B Instant for fast debug cycles.
 [11.5] ToolWorkflow + small LLMs: require "required":true in schema; instruct silent assumption (ID=1); suppress code output.
 [11.6] IF v2.3 conditions format: the #1 recurring bug across all audited workflows. See [5.1].
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+§12 MCP CAPABILITIES (2026-03-18)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[12.1] MCP Direct Operations (NO scripts needed):
+      ✅ create_workflow: Crea workflows completos con nodos y conexiones
+      ✅ update_workflow: Actualiza nodos, conexiones, settings
+      ✅ delete_workflow: Elimina workflows
+      ✅ get_workflow: Obtiene estructura completa
+      ✅ list_workflows: Lista todos los workflows
+      ✅ list_executions: Lista ejecuciones con paginación
+      ✅ get_tags: Obtiene tags disponibles
+
+[12.2] Script Required (solo para activación):
+      - n8n_activate_workflow.ts: Activar/desactivar workflows
+      - Razón: MCP activate_workflow usa endpoint no soportado en n8n v2.x
+      - Endpoint correcto: POST /api/v1/workflows/{id}/activate|deactivate
+
+[12.3] Flujo Recomendado:
+      1. MCP: create_workflow → Crear workflow completo
+      2. MCP: get_workflow → Verificar estructura
+      3. SCRIPT: n8n_activate_workflow.ts --activate → Activar
+      4. MCP: get_workflow → Confirmar active: true
+
+[12.4] Important Notes:
+      - NO crear scripts .ts para crear/modificar workflows
+      - MCP puede crear workflows complejos directamente (28+ nodos)
+      - n8n v2.x: "Activate" via API ≠ "Publish" in UI
+      - Webhook registration puede requerir "Publish" manual en UI (Issue #551)
+      - n8n_push_v2.ts: Solo para upload masivo desde archivos locales

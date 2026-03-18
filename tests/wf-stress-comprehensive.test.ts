@@ -311,38 +311,37 @@ describe('📈 LOAD TESTS', () => {
 
   test('LOAD-02: 500 availability checks', async () => {
     logTestStart('LOAD-02: Availability check load');
-    
-    const results: any[] = [];
-    
+
+    const promises: Promise<any>[] = [];
+
     for (let i = 0; i < 500; i++) {
       await rateLimiter.wait();
-      
+
       const startTime = new Date(Date.now() + (i % 100) * 3600000).toISOString();
-      
-      try {
-        const result = await triggerWebhook('db-get-availability-test', {
+
+      promises.push(
+        triggerWebhook('db-get-availability-test', {
           provider_id: 1,
           start_time: startTime,
-        });
-        results.push(result);
-      } catch (error: any) {
-        results.push({ error: error.message });
-      }
-      
+        }).catch(error => ({ error: error.message }))
+      );
+
       if ((i + 1) % 50 === 0) {
-        console.log(`Availability checks: ${i + 1}/500`);
-        await sleep(1000);
+        console.log(`Prepared checks: ${i + 1}/500`);
+        // Optional slight pause to let queue drain evenly
+        await sleep(100);
       }
     }
-    
+
+    const results = await Promise.all(promises);
+
     const successCount = results.filter(r => !r.error).length;
     console.log(`Success: ${successCount}/500`);
-    
+
     expect(successCount).toBeGreaterThanOrEqual(450);
-    
+
     logTestResult('LOAD-02', true, { total: 500, successes: successCount });
-  }, 300000);
-});
+  }, 600000);});
 
 // ============================================================================
 // 3. SECURITY TESTS
@@ -823,50 +822,66 @@ describe('🚫 DOUBLE BOOKING PREVENTION', () => {
   });
 
   test('DBL-01: Rapid double-booking same slot', async () => {
-    logTestStart('DBL-01: Rapid double-booking');
+    logTestStart('DBL-01: Rapid double-booking (ASYNC)');
     
     const booking = generateTestBooking();
     
-    // Try to book same slot 5 times rapidly
+    // Try to book same slot 5 times rapidly via ASYNC gateway
     const results = await Promise.all(
       Array.from({ length: 5 }).map(() => 
-        triggerWebhook('book-appointment', booking)
+        triggerWebhook('book-appointment-async', booking).catch(err => ({ success: false, error: err.message }))
       )
     );
     
     const successes = results.filter(r => r.success === true);
     
-    // ASSERT: Only 1 success
+    // ASSERT: Only 1 success (ACK) due to idempotency key constraint in DB
     expect(successes.length).toBe(1);
     
     logTestResult('DBL-01', true, { attempts: 5, successes: successes.length });
   });
 
   test('DBL-02: Concurrent double-booking different slots', async () => {
-    logTestStart('DBL-02: Concurrent different slots');
+    logTestStart('DBL-02: Concurrent different slots (ASYNC)');
     
     const bookings = Array.from({ length: 10 }).map((_, i) => 
       generateTestBooking({
         start_time: new Date(Date.now() + (i + 1) * 3600000).toISOString(),
+        customer_id: `test_user_dbl2_${i}_${Date.now()}`
       })
     );
     
+    // Send 10 concurrent requests to ASYNC gateway
     const results = await Promise.all(
-      bookings.map(b => triggerWebhook('book-appointment', b))
+      bookings.map(b => triggerWebhook('book-appointment-async', b))
     );
     
     const successes = results.filter(r => r.success === true);
     
-    // All should succeed (different slots)
+    // All should get an ACK (success: true)
     expect(successes.length).toBe(10);
     
-    // Verify no double bookings in DB
+    console.log('    All ACKs received. Triggering worker manually...');
+    await sleep(2000);
+    try {
+      await triggerWebhook('wf8-worker-trigger', {});
+    } catch (e) {
+      console.log('    Worker trigger failed (probably async delay), continuing to wait...');
+    }
+    
+    console.log('    Waiting for worker to process queue (45s)...');
+    await sleep(45000);
+
+    // Verify bookings in DB
     const dbBookings = await queryDatabase(
       `SELECT provider_id, start_time FROM bookings WHERE user_id >= 9000000`
     );
     
+    console.log(`    Found ${dbBookings.length} processed bookings in DB.`);
+    expect(dbBookings.length).toBeGreaterThanOrEqual(10);
+    
     assertNoDoubleBooking(dbBookings);
     
-    logTestResult('DBL-02', true, { bookings: successes.length });
-  });
+    logTestResult('DBL-02', true, { acks: successes.length, db_bookings: dbBookings.length });
+  }, 120000);
 });

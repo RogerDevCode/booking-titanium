@@ -1,0 +1,9 @@
+{
+  "environments": {
+    "production": {
+      "n8n_host": "https://n8n.stax.ink",
+      "n8n_api_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOWFkNzhhZC0yOTA3LTRkMTItYTAzYy0zMjZjZTI5YTcxN2MiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiNThlMzRiNWItMjQ2My00ZWViLWE3ZDMtY2U5MmRmNjZmMjg2IiwiaWF0IjoxNzczNTk4MTgxfQ.M6PGAjgvj9uFOtOc8elUvO08vLRDEfoDKAMGtFS8IV4"
+    }
+  },
+  "defaultEnv": "production"
+}

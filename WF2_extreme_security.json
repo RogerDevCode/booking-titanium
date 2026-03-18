@@ -15,11 +15,12 @@
         -750,
         300
       ],
-      "webhookId": "booking-orchestrator"
+      "webhookId": "booking-orchestrator",
+      "id": "80371f74-ab71-4013-97df-133ba1d4624d"
     },
     {
       "parameters": {
-        "jsCode": "// Idempotency Check v2.0 - Context Preservation Pattern\nconst input = $input.first().json;\nconst body = input.body || input;\n\n// Validación de input requerido (SEC02 - PRE validation)\nconst required = ['provider_id', 'service_id', 'start_time'];\nfor (const field of required) {\n  if (!body[field]) {\n    return [{ json: { _error: true, _error_message: `Missing required field: ${field}` } }];\n  }\n}\n\n// Generar idempotency_key determinístico\nconst idempotencyKey = `booking_${body.provider_id}_${body.service_id}_${body.start_time}_${body.customer_id || body.chat_id || 'anonymous'}`;\n\n// Sanitizar string (SEC05)\nconst sanitizedKey = idempotencyKey.replace(/[^a-zA-Z0-9_:-]/g, '_').substring(0, 255);\n\n// Construir contexto único que viajará por todo el workflow\nconst ctx = {\n  provider_id: parseInt(body.provider_id, 10),\n  service_id: parseInt(body.service_id, 10),\n  start_time: body.start_time,\n  end_time: body.end_time || null,\n  customer_id: body.customer_id || null,\n  chat_id: body.chat_id || null,\n  user_id: body.user_id || null,\n  duration_minutes: parseInt(body.duration_minutes || 60, 10),\n  event_title: body.event_title || null,\n  idempotency_key: sanitizedKey,\n  _idempotency: {\n    key: sanitizedKey,\n    created_at: new Date().toISOString()\n  },\n  _meta: {\n    source: 'WF2_BOOKING_ORCHESTRATOR',\n    version: '2.0.0',\n    started_at: new Date().toISOString()\n  }\n};\n\nreturn [{ json: { ctx } }];"
+        "jsCode": "\n// Idempotency Check v2.3 - Extreme Sanitization & Robustness Pattern (Fix ATTACK 02, 03, 05)\ntry {\n  const input = $input.first().json;\n  const body = input.body || input;\n\n  // 1. Sanitización de Campos y Tipos (Fix ATTACK-02 & ATTACK-05)\n  const sanitizeInt = (val) => {\n    if (Array.isArray(val)) val = val[0];\n    const parsed = parseInt(val, 10);\n    return isNaN(parsed) ? null : parsed;\n  };\n\n  const sanitizeStr = (val, maxLen = 255) => {\n    if (Array.isArray(val)) val = val[0];\n    if (typeof val !== 'string') val = String(val || '');\n    // Remover caracteres peligrosos y truncar (Fix ATTACK-03)\n    return val.replace(/[^\\w\\s@.-]/gi, '_').substring(0, maxLen);\n  };\n\n  const provider_id = sanitizeInt(body.provider_id);\n  const service_id = sanitizeInt(body.service_id);\n  const start_time = sanitizeStr(body.start_time, 50); \n  const user_name = sanitizeStr(body.user_name || body.name, 100);\n  const chat_id = sanitizeStr(body.chat_id || body.customer_id, 50);\n\n  // 2. Validación de Campos Requeridos\n  if (!provider_id || !service_id || !start_time) {\n    return [{ json: { success: false, error_code: 'INVALID_INPUT', error_message: 'Missing or invalid required fields' } }];\n  }\n\n  // 3. Validación de FECHA Estricta (Fix ATTACK-04)\n  const parts = start_time.match(/^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})/);\n  if (!parts) {\n    return [{ json: { success: false, error_code: 'INVALID_DATE_FORMAT', error_message: 'Format must be ISO 8601' } }];\n  }\n\n  const [full, y, m, d] = parts.map(p => parseInt(p, 10));\n  const dateObj = new Date(start_time);\n\n  if (dateObj.getUTCFullYear() !== y || (dateObj.getUTCMonth() + 1) !== m || dateObj.getUTCDate() !== d) {\n    return [{ json: { success: false, error_code: 'INVALID_DATE', error_message: 'Date does not exist' } }];\n  }\n\n  const now = Date.now();\n  if (dateObj.getTime() < now) {\n    return [{ json: { success: false, error_code: 'PAST_DATE', error_message: 'Cannot book in the past' } }];\n  }\n\n  const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;\n  if (dateObj.getTime() > (now + ONE_YEAR_MS)) {\n    return [{ json: { success: false, error_code: 'FUTURE_DATE_TOO_EXTREME', error_message: 'Limit: 1 year' } }];\n  }\n\n  // 4. Generar idempotency_key Seguro\n  const idempotencyKey = `booking_${provider_id}_${service_id}_${start_time}_${chat_id || 'anon'}`;\n  const sanitizedKey = idempotencyKey.replace(/[^a-zA-Z0-9_:-]/g, '_').substring(0, 255);\n\n  const ctx = {\n    provider_id,\n    service_id,\n    start_time,\n    user_name,\n    chat_id,\n    idempotency_key: sanitizedKey,\n    _meta: { source: 'WF2_ORCHESTRATOR', version: '2.3.0', timestamp: new Date().toISOString() }\n  };\n\n  return [{ json: { success: true, ctx } }];\n\n} catch (error) {\n  // Global Catch (Option 2) - Prevents 500 errors\n  return [{ json: { success: false, error_code: 'INTERNAL_ERROR', error_message: error.message } }];\n}\n  "
       },
       "name": "Generate Idempotency Key",
       "type": "n8n-nodes-base.code",
@@ -27,7 +28,39 @@
       "position": [
         -500,
         300
-      ]
+      ],
+      "id": "4a36e667-911f-4b87-b544-f93611c79b1f"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "val_ok",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "name": "Validation OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -300,
+        300
+      ],
+      "id": "9c2f2939-8633-4db6-b9c0-6a941f28af22"
     },
     {
       "parameters": {
@@ -44,13 +77,14 @@
         -250,
         300
       ],
+      "alwaysOutputData": true,
       "credentials": {
         "postgres": {
           "id": "5LzvCP9BsQwCi9Z0",
           "name": "Postgres account"
         }
       },
-      "alwaysOutputData": true
+      "id": "09985bd6-f2d0-46f5-b61b-74a2f70d2dae"
     },
     {
       "parameters": {
@@ -79,7 +113,8 @@
       "position": [
         0,
         300
-      ]
+      ],
+      "id": "d8414ece-b15c-49fd-9fd5-857b43cab3d6"
     },
     {
       "parameters": {
@@ -91,11 +126,12 @@
       "position": [
         250,
         400
-      ]
+      ],
+      "id": "aed62918-c59d-4de5-b68d-78b9d4b2e494"
     },
     {
       "parameters": {
-        "jsCode": "// MERGE CONTEXT - After Is Duplicate? (false branch)\n// Get ctx from Generate Idempotency Key node\nconst ctx = $(\"Generate Idempotency Key\").first()?.json?.ctx || {};\nctx._idempotency.is_duplicate = false;\nreturn [{ json: { ctx } }];"
+        "jsCode": "// MERGE CONTEXT - After Is Duplicate? (false branch)\n// Get ctx from Generate Idempotency Key node\nconst ctx = $(\"Generate Idempotency Key\").first()?.json?.ctx || {};\n\n// FIX: Initialize _idempotency if it doesn't exist\nif (!ctx._idempotency) {\n  ctx._idempotency = {};\n}\n\nctx._idempotency.is_duplicate = false;\nreturn [{ json: { ctx } }];"
       },
       "name": "Merge Context",
       "type": "n8n-nodes-base.code",
@@ -103,17 +139,18 @@
       "position": [
         250,
         200
-      ]
+      ],
+      "id": "7a9782c7-3324-46c1-ab95-f900b6f0d40c"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://n8n.stax.ink/webhook/db-get-availability-test",
+        "url": "http://n8n_titanium:5678/webhook/check-availability",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ provider_id: $json.ctx.provider_id, service_id: $json.ctx.service_id, start_time: $json.ctx.start_time }) }}",
+        "jsonBody": "={{ JSON.stringify({ provider_id: $('Generate Idempotency Key').first().json.ctx.provider_id, service_id: $('Generate Idempotency Key').first().json.ctx.service_id, start_time: $('Generate Idempotency Key').first().json.ctx.start_time }) }}",
         "options": {
-          "timeout": 30000
+          "timeout": 15000
         }
       },
       "name": "Check Availability",
@@ -122,7 +159,11 @@
       "position": [
         500,
         200
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "id": "7549de9e-9f91-4ce9-804e-e5d652c2731b"
     },
     {
       "parameters": {
@@ -151,7 +192,8 @@
       "position": [
         750,
         200
-      ]
+      ],
+      "id": "5040125f-721d-4c44-9eaf-ff1aa470e523"
     },
     {
       "parameters": {
@@ -163,7 +205,8 @@
       "position": [
         1000,
         350
-      ]
+      ],
+      "id": "b5069fe3-5505-403c-8d28-5bd239a91fcb"
     },
     {
       "parameters": {
@@ -175,17 +218,18 @@
       "position": [
         1000,
         200
-      ]
+      ],
+      "id": "0a172244-196b-4dda-99b7-545370d475b5"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://n8n.stax.ink/webhook/acquire-lock",
+        "url": "http://n8n_titanium:5678/webhook/acquire-lock",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ provider_id: $json.ctx.provider_id, start_time: $json.ctx.start_time, lock_duration_minutes: 5 }) }}",
+        "jsonBody": "={{ JSON.stringify({ provider_id: $('Generate Idempotency Key').first().json.ctx.provider_id, start_time: $('Generate Idempotency Key').first().json.ctx.start_time, lock_duration_minutes: 1 }) }}",
         "options": {
-          "timeout": 30000
+          "timeout": 15000
         }
       },
       "name": "Acquire Lock",
@@ -194,17 +238,21 @@
       "position": [
         1250,
         200
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "id": "d7be11d0-d9d5-4d63-8619-6ceb79e28927"
     },
     {
       "parameters": {
-        "url": "https://n8n.stax.ink/webhook/circuit-breaker/check",
         "method": "POST",
+        "url": "http://n8n_titanium:5678/webhook/circuit-breaker/check",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ service_id: \"google_calendar\", action: \"check\" }) }}",
         "options": {
-          "timeout": 10000
+          "timeout": 15000
         }
       },
       "name": "Check Circuit Breaker",
@@ -213,7 +261,11 @@
       "position": [
         1500,
         200
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "id": "e5b6f287-e621-4734-9ffb-cd0d01f20bb1"
     },
     {
       "parameters": {
@@ -242,7 +294,8 @@
       "position": [
         1750,
         200
-      ]
+      ],
+      "id": "ce9b1173-baa9-4383-9d45-724037108b05"
     },
     {
       "parameters": {
@@ -254,16 +307,17 @@
       "position": [
         2000,
         350
-      ]
+      ],
+      "id": "402fcf51-8d3f-4808-a618-fa604d49b3de"
     },
     {
       "parameters": {
-        "calendar": {
-          "__rl": true,
-          "value": "dev.n8n.stax@gmail.com",
-          "mode": "list",
-          "cachedResultName": "dev.n8n.stax@gmail.com"
-        }
+        "calendar": "primary",
+        "start": "={{ $(\"Merge Context After Availability\").first().json.ctx.start_time }}",
+        "end": "={{ $(\"Merge Context After Availability\").first().json.ctx.end_time || new Date(new Date($(\"Merge Context After Availability\").first().json.ctx.start_time).getTime() + 60*60000).toISOString() }}",
+        "summary": "={{ `Reserva: Provider ${$(\"Merge Context After Availability\").first().json.ctx.provider_id}, Service ${$(\"Merge Context After Availability\").first().json.ctx.service_id}` }}",
+        "description": "={{ \"Reserva gestionada por Booking Titanium\" }}",
+        "additionalFields": {}
       },
       "name": "Create GCal Event",
       "type": "n8n-nodes-base.googleCalendar",
@@ -272,6 +326,7 @@
         2000,
         200
       ],
+      "id": "c8854fcd-af76-4ceb-9a15-a29ac2e73ebf",
       "credentials": {
         "googleCalendarOAuth2Api": {
           "id": "OsRBfz3Cs7Ph5uV5",
@@ -281,12 +336,14 @@
     },
     {
       "parameters": {
-        "url": "https://n8n.stax.ink/webhook/circuit-breaker/record",
         "method": "POST",
+        "url": "http://n8n_titanium:5678/webhook/circuit-breaker/record",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ service_id: \"google_calendar\", success: true }) }}",
-        "options": {}
+        "options": {
+          "timeout": 15000
+        }
       },
       "name": "Record GCal Success",
       "type": "n8n-nodes-base.httpRequest",
@@ -294,14 +351,18 @@
       "position": [
         2250,
         200
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "id": "d641ca41-eaad-4153-b0bf-84df9d24c096"
     },
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "INSERT INTO bookings (provider_id, service_id, start_time, end_time, idempotency_key, gcal_event_id, user_id, status, created_at) VALUES ($1::int, $2::int, $3::timestamp, ($3::timestamp + INTERVAL '1 hour'), $4::text, $5::text, $6::bigint, 'CONFIRMED', NOW()) RETURNING id;",
+        "query": "INSERT INTO bookings (provider_id, service_id, start_time, end_time, idempotency_key, gcal_event_id, user_id, status, created_at) VALUES ($1::int, $2::int, $3::timestamp, $4::timestamp, $5::text, $6::text, $7::bigint, 'CONFIRMED', NOW()) RETURNING id;",
         "options": {
-          "queryReplacement": "={{ [$json.ctx.provider_id, $json.ctx.service_id, $json.ctx.start_time, $json.ctx.idempotency_key, ($json.id // $json.eventId), ($json.ctx.user_id // $json.ctx.chat_id)] }}"
+          "queryReplacement": "={{ [$('Generate Idempotency Key').first().json.ctx.provider_id, $('Generate Idempotency Key').first().json.ctx.service_id, $('Generate Idempotency Key').first().json.ctx.start_time, $('Generate Idempotency Key').first().json.ctx.end_time || new Date(new Date($('Generate Idempotency Key').first().json.ctx.start_time).getTime() + 60*60000).toISOString(), $('Generate Idempotency Key').first().json.ctx.idempotency_key, $('Create GCal Event').first()?.json?.data?.id || null, $('Generate Idempotency Key').first().json.ctx.user_id || $('Generate Idempotency Key').first().json.ctx.chat_id] }}"
         }
       },
       "name": "Create DB Booking",
@@ -311,12 +372,14 @@
         2500,
         200
       ],
+      "id": "c87c8a63-4999-4686-84a8-835ae62000ef",
       "credentials": {
         "postgres": {
           "id": "5LzvCP9BsQwCi9Z0",
           "name": "Postgres account"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -328,7 +391,22 @@
       "position": [
         2750,
         200
-      ]
+      ],
+      "id": "5221efb0-de8d-4b60-829a-8668f265ae81"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();",
+        "notice": ""
+      },
+      "name": "Validation Error Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -200,
+        500
+      ],
+      "id": "26333b3d-e04c-4d60-9069-8b595f026373"
     }
   ],
   "connections": {
@@ -347,7 +425,25 @@
       "main": [
         [
           {
+            "node": "Validation OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validation OK?": {
+      "main": [
+        [
+          {
             "node": "Check Idempotency DB",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validation Error Output",
             "type": "main",
             "index": 0
           }
@@ -510,9 +606,10 @@
   },
   "settings": {
     "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
     "saveDataErrorExecution": "all",
     "saveDataSuccessExecution": "all",
-    "saveManualExecutions": true,
-    "saveExecutionProgress": true
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true
   }
 }

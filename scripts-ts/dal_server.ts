@@ -22,9 +22,9 @@ app.use((req: express.Request, _res: express.Response, next: express.NextFunctio
 const dbConfig = {
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
-    max: 20,
+    max: 50,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 15000,
+    connectionTimeoutMillis: 5000,
 };
 
 const pool = new Pool(dbConfig);

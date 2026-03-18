@@ -50,6 +50,8 @@ Este directorio contiene la migración completa de los scripts Python originales
 | `n8n_update_deactivate.ts` | Desactiva | `--id ID` |
 | `n8n_delete.ts` | Elimina | `--id ID` |
 | `n8n_push.ts` | Push múltiples | Directorio `workflows/` |
+| `n8n_push_v2.ts` | Push mejorado | `--name NAME --file FILE [--activate]` |
+| `n8n_activate_workflow.ts` | Activa/Desactiva | `--id ID --activate\|--deactivate` |
 
 ## Deployment/Upload
 
@@ -58,6 +60,37 @@ Este directorio contiene la migración completa de los scripts Python originales
 | `upload_all_workflows.ts` | Sube todos | `--activate` |
 | `activate_workflows.ts` | Activa específicos | `--ids "id1,id2"` |
 | `activate_all_workflows.ts` | Activa todos | - |
+
+## Flujo Híbrido MCP + Script (RECOMENDADO 2026-03-18)
+
+**Problema:** El MCP server no puede activar workflows directamente (limitación de n8n v2.x API).
+
+**Solución:** Usar MCP para CRUD (crear/actualizar/borrar) + script solo para activación.
+
+```bash
+# 1. MCP: Crear workflow directamente
+mcp__n8n-workflow-builder__create_workflow --name "My Workflow" --nodes [...] --connections [...]
+
+# 2. MCP: Actualizar workflow directamente
+mcp__n8n-workflow-builder__update_workflow --id <workflow-id> --nodes [...] --connections [...]
+
+# 3. MCP: Verificar cambios
+mcp__n8n-workflow-builder__get_workflow --id <workflow-id>
+
+# 4. SCRIPT: Activar workflow (único caso que requiere script)
+npx tsx scripts-ts/n8n_activate_workflow.ts --id <workflow-id> --activate
+
+# 5. MCP: Confirmar activación
+mcp__n8n-workflow-builder__get_workflow --id <workflow-id>
+```
+
+**Resumen:**
+- ✅ MCP: Crear, leer, actualizar, borrar workflows
+- ✅ MCP: Listar workflows, obtener detalles, listar ejecuciones
+- ❌ MCP: Activar/desactivar → Usar `n8n_activate_workflow.ts`
+
+**Documentación completa:** Ver `README_ACTIVATE.md`
+
 
 ## Validación
 

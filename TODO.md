@@ -1,43 +1,68 @@
-# Plan de Escalamiento: Booking Titanium 🚀
+# Tracking de Mejoras y Resolución de Fallos (Suite de Estrés)
 
-Este documento detalla la hoja de ruta estratégica para escalar la arquitectura del sistema de reservas basado en n8n, basándose en los estándares cloud-native y las directrices del proyecto (GEMINI.md).
+Este documento centraliza el seguimiento de los 5 fallos detectados en la suite de estrés completa (`wf-stress-comprehensive.test.ts`) ejecutada sobre **WF2 v4 Monolítico**. El objetivo es aplicar las mejores prácticas de arquitectura, rendimiento y manejo de estado en n8n.
 
 ---
 
-## 🏗️ Fase 1: Escalamiento de Infraestructura (n8n Queue Mode)
+## 1. STR-06 (Lock TTL Expiration) ✅ RESUELTO
+**Problema:** Falló al no adquirir el segundo lock después de que el tiempo de expiración (TTL) configurado debería haber pasado.
+**Causa Raíz:** Se detectó el parámetro hardcodeado `INTERVAL '5 minutes'` en el nodo `Acquire Lock` de la versión 4, lo que contradecía el tiempo del test (65 segundos) y era inseguro contra inyección SQL.
+**Solución Aplicada:** Refactorizado el nodo para utilizar un **Prepared Statement** con interpolación segura de PostgreSQL (`queryReplacement`), y parametrizado dinámicamente con `lock_duration_minutes`.
 
-**Objetivo:** Separar el procesamiento de webhooks síncronos (rápidos) de la ejecución de flujos pesados (IA, Base de Datos, APIs externas) para evitar timeouts y bloqueos en el hilo principal bajo alta concurrencia.
+**Plan de Acción e Investigación (Extensa):**
+*   [x] **Investigación en n8n Docs & Comunidad:** Documentado en `RESEARCH_LOCK_TTL_STR-06.md`.
+*   [x] **Explorar Alternativas a PostgreSQL para Locks:** Evaluado Advisory Locks y Redis.
+*   [x] **Revisión de Nodos y Código:** Removido anti-patrón de interpolación de string plano.
+*   [x] **Documentar Hallazgos:** `RESEARCH_LOCK_TTL_STR-06.md` generado con jerarquía de fuentes.
+*   [x] **Implementar y Re-testear:** Test `STR-06` ejecutado exitosamente con TTL dinámico.
 
-- [ ] Modificar `docker-compose.yml` para introducir Redis como broker de mensajes.
-- [ ] Configurar un contenedor `n8n-main` dedicado exclusivamente al enrutamiento de UI y webhooks entrantes.
-- [ ] Desplegar contenedores `n8n-worker` (basados en BullMQ) para procesar las ejecuciones de los workflows en background.
-- [ ] Validar que los webhooks (ej. Telegram) sigan respondiendo `200 OK` instantáneamente mientras el procesamiento ocurre asíncronamente.
-- [ ] Revisar y configurar la retención de datos de ejecución en Postgres para prevenir el crecimiento descontrolado de la base de datos bajo alta carga.
+---
 
-## 🧠 Fase 2: Escalamiento Inteligente (Adopción profunda de MCP)
+## 2. LOAD-02 (500 Availability Checks) ✅ RESUELTO
+**Problema:** Falló por timeout de Jest (`Exceeded timeout of 300000 ms`).
+**Diagnóstico Preliminar:** El sistema procesó las peticiones pero tardó más de 5 minutos, revelando un cuello de botella masivo en la lectura concurrente.
+**Causa Raíz:** Estrangulamiento del Connection Pool de Node.js (`pg` max: 20) frente a 500 webhooks simultáneos en n8n, lo que provoca encolamiento y latencia crítica. Además, la prueba de carga estaba escrita de manera secuencial en lugar de paralela.
 
-**Objetivo:** Dotar al Agente de IA (`NN_03_AI_Agent.json`) de mayor autonomía y flexibilidad migrando del enrutamiento tradicional (Condicionales lógicos) a llamadas a herramientas nativas Model Context Protocol (MCP).
+**Plan de Acción:**
+*   [x] **Investigación:** Documentada en `RESEARCH_LOAD_02_TIMEOUT.md`. Identificados límites de Postgres, Node.js y webhooks n8n.
+*   [x] **Ajustar Connection Pool en DAL:** Modificado `scripts-ts/dal_server.ts` a `max: 50`.
+*   [x] **Optimización de Base de Datos:** Añadidos índices compuestos en `provider_services`, `provider_schedules` y `bookings` para acelerar `getSlotsForDay`.
+*   [x] **Revisar Timeouts Express:** Ajustado `connectionTimeoutMillis` a 5000 para que las peticiones fallen rápido.
+*   [x] **Modificar Lógica del Test:** Refactorizado `LOAD-02` a usar `Promise.all` asíncrono para concurrencia real.
+*   [x] **Implementar y Re-testear:** Test completado con éxito en 86 segundos.
 
-- [ ] Habilitar y configurar el servidor MCP nativo de n8n (`n8n-io/mcp`) en Settings → AI → MCP Servers (según `OBLIGATORIO_06`).
-- [ ] Refactorizar flujos de Base de Datos (`DB_Create_Booking.json`, `DB_Find_Next_Available.json`, `DB_Get_Availability.json`, `DB_Reschedule_Booking.json`, `DB_Cancel_Booking.json`) para exponerlos como herramientas (Tools) MCP documentadas.
-- [ ] Refactorizar flujos de servicios externos (`GCAL_Create_Event.json`, `GCAL_Delete_Event.json`, `GMAIL_Send_Confirmation.json`) para exposición MCP.
-- [ ] Actualizar el prompt y la configuración del Agente (`NN_03_AI_Agent.json`) para que utilice estas herramientas de forma autónoma en lugar de depender de branches (switch/if) rígidos.
-- [ ] Realizar pruebas (testing E2E) para garantizar que el LLM comprende los esquemas de entrada/salida (*Standard Contracts*) de las nuevas herramientas.
+---
 
-## 🌐 Fase 3: Escalamiento de Negocio (Arquitectura Omnicanal)
+## 3. EDGE-DATA-04 (Emojis in data) ✅ RESUELTO
+**Problema:** Falló por error de conexión en Node (`fetch failed / AggregateError`).
+**Diagnóstico Preliminar:** No es un fallo por el contenido (Emojis), sino un error de red puro.
+**Causa Raíz:** Saturación de sockets (Resource Exhaustion) y timeout del algoritmo "Happy Eyeballs" de `undici` (cliente HTTP nativo de Node.js 18+ usado por Jest) durante las pruebas concurrentes. Cuando Jest hace cientos de peticiones rápidas, agota los file descriptors y falla la resolución IPv4/IPv6 devolviendo un `AggregateError`.
 
-**Objetivo:** Desacoplar el sistema de mensajería (actualmente altamente dependiente de Telegram) para soportar múltiples interfaces (WhatsApp, Webchat, Voice) sin alterar la lógica de negocio subyacente.
+**Plan de Acción:**
+*   [x] **Investigación:** Confirmado que es un error del runner (Jest/Node.js) bajo estrés, no de n8n.
+*   [x] **Ajustar Test Runner:** Añadida configuración condicional `NODE_OPTIONS="--network-family-autoselection-attempt-timeout=5000"` o ejecución aislada.
+*   [x] **Controlar Concurrencia de Jest:** Confirmado que aislando la prueba del bloque de carga principal (LOAD/STR), el test enruta correctamente los emojis y pasa consistentemente.
 
-- [ ] Diseñar un **Adapter Pattern** creando un workflow enrutador agnóstico `NN_04_Omnichannel_Router.json`.
-- [ ] Refactorizar `NN_01_Booking_Gateway.json` para normalizar las cargas útiles entrantes (payloads) de diferentes canales a un formato de mensaje único interno.
-- [ ] Crear el canal de salida de WhatsApp (ej. `NN_04_WhatsApp_Sender.json`) y asegurar que cumple con los *Standard Contracts*.
-- [ ] Actualizar `NN_00_Global_Error_Handler.json` para que pueda notificar errores de forma inteligente al canal de origen correspondiente.
+---
 
-## 🛡️ Fase 4: Rendimiento y Resiliencia (Circuit Breakers / Rate Limits)
+## 4. DBL-01 (Rapid double-booking same slot) ❌
+**Problema:** Sigue dando `0 éxitos` en lugar de `1` bajo alta velocidad.
+**Causa Raíz:** Bajo 10 peticiones síncronas simultáneas, la latencia inducida por el motor de n8n y la base de datos ocasiona que el timeout del test (o el timeout interno HTTP) aborte antes de que se confirme la primera transacción, marcando falsamente todas como fallidas.
 
-**Objetivo:** Proteger el sistema contra ataques repetitivos, abusos de uso (que consumen créditos LLM) y caídas de APIs de terceros (como Google Calendar).
+**Plan de Acción:**
+*   [x] **Evaluación:** Verificada la correcta implementación del Lock y FK Constraint. El error es de latencia, no de lógica.
+*   [ ] **Desacoplar Lógica:** Depende directamente del plan de acción 5 (Sistema Asíncrono).
 
-- [ ] Implementar un manejador de caché (ej. nodo Redis) delante de `DB_Get_Availability.json` para evitar sobrecargar la base de datos PostgreSQL con peticiones repetitivas de solo lectura.
-- [ ] Aplicar **Rate Limiting** (límites de tasa) a nivel de API Gateway / Nginx o dentro del propio nodo de entrada `NN_01_Booking_Gateway.json` para mitigar SPAM / abusos persistentes.
-- [ ] Implementar patrones **Watchdog** (Timeout y Retry logic con *backoff exponencial*) en todos los nodos `HTTP Request` que interactúen con APIs externas (cumplimiento estricto de `OBLIGATORIO_05`).
-- [ ] Auditar e instalar *Circuit Breakers* para pausar gracefully los workflows de sincronización externa si se detecta una caída continua de Google Calendar o Gmail.
+---
+
+## 5. DBL-02 (Concurrent double-booking different slots) ❌
+**Problema:** Falló por `Webhook timeout after 60000ms`.
+**Causa Raíz:** El motor síncrono de n8n no está diseñado para procesar 10 transacciones pesadas (que incluyen consultas DB y llamadas API a Google Calendar) en paralelo exacto sin encolamiento. Esto estrangula los webhooks.
+
+**Plan de Acción:**
+*   [x] **Investigación:** Confirmado el "Bug Queue Mode" en versiones modernas de n8n que impide la anidación asíncrona de workflows (`runData null`).
+*   [ ] **Arquitectura Asíncrona (Worker):** Implementar la arquitectura aprobada: Gateway (`WF1`) guarda en BD de "Intenciones de Reserva" y retorna `HTTP 200 INMEDIATO`.
+*   [ ] **Configurar Polling/Trigger:** El Worker (`WF8`) lee la BD cada minuto o recibe un webhook desacoplado y ejecuta GCal/Confirmación en segundo plano.
+
+---
+*Documento generado para seguimiento estructurado de estabilización.*
