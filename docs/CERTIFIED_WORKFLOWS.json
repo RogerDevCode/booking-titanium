@@ -59,8 +59,8 @@
     "node_count": 9,
     "tests_passed": "1/1",
     "certified_at": "2026-03-20",
-    "git_tag": null,
-    "status": "ACTIVE"
+    "git_tag": "WF1_Booking_API_Gateway-v2.0.0-certified",
+    "status": "FROZEN"
   },
   {
     "name": "WF2_Booking_Orchestrator",
