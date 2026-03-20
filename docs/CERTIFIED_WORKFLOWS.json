@@ -1,0 +1,20 @@
+[
+  {
+    "name": "RAG_01_Document_Ingestion",
+    "version": "1.7.0",
+    "node_count": 22,
+    "tests_passed": "3/3",
+    "certified_at": "2026-03-20",
+    "git_tag": null,
+    "status": "ACTIVE"
+  },
+  {
+    "name": "RAG_02_Document_Retrieval",
+    "version": "1.4.0",
+    "node_count": 18,
+    "tests_passed": "3/3",
+    "certified_at": "2026-03-20",
+    "git_tag": null,
+    "status": "ACTIVE"
+  }
+]
