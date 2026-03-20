@@ -23,8 +23,8 @@
     "node_count": 12,
     "tests_passed": "2/2",
     "certified_at": "2026-03-20",
-    "git_tag": null,
-    "status": "ACTIVE"
+    "git_tag": "WF7_Distributed_Lock_System-v1.0.0-certified",
+    "status": "FROZEN"
   },
   {
     "name": "WF6_Rollback_Workflow",
