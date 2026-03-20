@@ -50,8 +50,8 @@
     "node_count": 13,
     "tests_passed": "1/1",
     "certified_at": "2026-03-20",
-    "git_tag": null,
-    "status": "ACTIVE"
+    "git_tag": "WF3_Availability_Service-v1.0.0-certified",
+    "status": "FROZEN"
   },
   {
     "name": "WF1_Booking_API_Gateway",
