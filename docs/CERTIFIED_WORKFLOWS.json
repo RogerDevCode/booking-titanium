@@ -5,8 +5,8 @@
     "node_count": 22,
     "tests_passed": "3/3",
     "certified_at": "2026-03-20",
-    "git_tag": null,
-    "status": "ACTIVE"
+    "git_tag": "RAG_01_Document_Ingestion-v1.7.0-certified",
+    "status": "FROZEN"
   },
   {
     "name": "RAG_02_Document_Retrieval",
