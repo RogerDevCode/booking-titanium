@@ -104,8 +104,8 @@
     "node_count": 6,
     "tests_passed": "8/8",
     "certified_at": "2026-03-20",
-    "git_tag": null,
-    "status": "ACTIVE"
+    "git_tag": "DLQ_01_Add_Entry-v1.0.0-certified",
+    "status": "FROZEN"
   },
   {
     "name": "DLQ_02_Get_Status",
