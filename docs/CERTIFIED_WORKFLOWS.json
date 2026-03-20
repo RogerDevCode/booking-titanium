@@ -97,5 +97,23 @@
     "certified_at": "2026-03-20",
     "git_tag": "BB_00_Config-v1.0.0-certified",
     "status": "FROZEN"
+  },
+  {
+    "name": "DLQ_01_Add_Entry",
+    "version": "1.0.0",
+    "node_count": 6,
+    "tests_passed": "8/8",
+    "certified_at": "2026-03-20",
+    "git_tag": null,
+    "status": "ACTIVE"
+  },
+  {
+    "name": "DLQ_02_Get_Status",
+    "version": "1.0.0",
+    "node_count": 3,
+    "tests_passed": "2/2",
+    "certified_at": "2026-03-20",
+    "git_tag": null,
+    "status": "ACTIVE"
   }
 ]
