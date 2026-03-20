@@ -86,8 +86,8 @@
     "node_count": 6,
     "tests_passed": "4/4",
     "certified_at": "2026-03-20",
-    "git_tag": null,
-    "status": "ACTIVE"
+    "git_tag": "CB_02_Record_Result-v1.0.0-certified",
+    "status": "FROZEN"
   },
   {
     "name": "BB_00_Config",
