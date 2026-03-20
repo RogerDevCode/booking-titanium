@@ -113,7 +113,7 @@
     "node_count": 3,
     "tests_passed": "2/2",
     "certified_at": "2026-03-20",
-    "git_tag": null,
-    "status": "ACTIVE"
+    "git_tag": "DLQ_02_Get_Status-v1.0.0-certified",
+    "status": "FROZEN"
   }
 ]
