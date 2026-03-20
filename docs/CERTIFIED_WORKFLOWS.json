@@ -14,7 +14,7 @@
     "node_count": 18,
     "tests_passed": "3/3",
     "certified_at": "2026-03-20",
-    "git_tag": null,
-    "status": "ACTIVE"
+    "git_tag": "RAG_02_Document_Retrieval-v1.4.0-certified",
+    "status": "FROZEN"
   }
 ]
