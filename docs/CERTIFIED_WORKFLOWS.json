@@ -135,5 +135,26 @@
       "Added range validation for all numeric inputs",
       "Added timezone offset format validation (+HH:MM or -HH:MM)"
     ]
+  },
+  {
+    "name": "SEED_01_Process_Slot",
+    "version": "12.0.0",
+    "node_count": 10,
+    "tests_passed": "3/3",
+    "certified_at": "2026-03-21",
+    "git_tag": "SEED_01_Process_Slot-v12.0.0-certified",
+    "status": "FROZEN",
+    "test_summary": {
+      "happy_path": "Slot processed successfully → WF3 → WF2 → booking created",
+      "error_handling": "WF3/WF2 errors caught with onError:continueErrorOutput",
+      "slot_preservation": "_slot context preserved across all branches"
+    },
+    "architecture": {
+      "trigger": "Execute Workflow Trigger (When Called)",
+      "sub_workflows": ["WF3_Availability_Service (6zftqMdtBAT0QaCt)", "WF2_Booking_Orchestrator (Z7g7DgxXQ61V368P)"],
+      "error_paths": ["Handle WF3 Error", "Handle WF2 Error"],
+      "success_paths": ["Format Success", "Format Unavailable"]
+    },
+    "parent_workflow": "SEED_01_Daily_Provisioning (IVDXuT6a4tT9w1vR) v2.1.0"
   }
 ]
