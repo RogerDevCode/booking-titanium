@@ -3,22 +3,21 @@
   "nodes": [
     {
       "parameters": {
-        "inputSource": "jsonExample",
-        "jsonExample": "{\"start_time\": \"2026-03-15T10:30:00\", \"provider_id\": 1, \"service_id\": 1, \"user_name\": \"María González\", \"user_email\": \"maria@ejemplo.com\", \"chat_id\": 12345}"
+        "inputSource": "passthrough"
       },
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
       "position": [
         0,
-        432
+        208
       ],
-      "id": "trigger"
+      "id": "cd253673-4fc0-4455-990c-5f04d0f10c7c"
     },
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "db-create-booking-test",
+        "path": "db-create-booking",
         "responseMode": "lastNode",
         "options": {}
       },
@@ -27,10 +26,10 @@
       "typeVersion": 2.1,
       "position": [
         0,
-        600
+        400
       ],
-      "webhookId": "db-create-booking-test",
-      "id": "webhook_trigger"
+      "webhookId": "db-create-booking",
+      "id": "0cc16492-b03c-44a0-86d3-eb40a8da5cc7"
     },
     {
       "parameters": {},
@@ -39,125 +38,190 @@
       "typeVersion": 1,
       "position": [
         0,
-        232
+        0
       ],
-      "id": "manual"
+      "id": "0e4c67a8-dc40-429b-a480-198d35c7ec88"
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first().json.body || $input.first().json;\n\n// VRF — GUARD + VALIDATE\nconst chat_id = parseInt(input.chat_id);\nconst provider_id = parseInt(input.provider_id);\nconst service_id = parseInt(input.service_id);\nconst start_time = input.start_time;\nconst user_email = input.user_email || '';\nconst user_name = input.user_name || 'Paciente';\n\nlet isValid = true;\nlet error_message = null;\n\nif (!chat_id || !provider_id || !service_id || !start_time) {\n  isValid = false;\n  error_message = 'Missing required fields: chat_id, provider_id, service_id, start_time';\n}\n\nreturn [{\n  json: {\n    isValid,\n    error_message,\n    chat_id,\n    provider_id,\n    service_id,\n    start_time,\n    user_email,\n    user_name\n  }\n}];"
+        "jsCode": "// LAYER 1+2: Extract & Validate (§4.1 PRE-validate)\n// Zero-throw: returns Standard Contract error, never throws\n\nconst raw = $input.first().json;\nconst input = (raw.body && typeof raw.body === 'object') ? raw.body : raw;\n\nconst INT_RE = /^\\d+$/;\nconst ISO_RE = /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,3})?(Z|[+-]\\d{2}:\\d{2})?$/;\nconst SAFE_STR_RE = /^[^'\";\\\\]{1,255}$/;\n\nfunction ve(code, msg) {\n  return [{ json: {\n    success: false, error_code: code, error_message: msg, data: null,\n    _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id },\n    _exit_early: true\n  }}];\n}\n\nconst idempotency_key = String(input.idempotency_key || '').trim();\nif (!idempotency_key) return ve('MISSING_FIELD', 'idempotency_key is required');\nif (!SAFE_STR_RE.test(idempotency_key)) return ve('INVALID_INPUT', 'idempotency_key contains invalid characters or exceeds 255 chars');\n\nconst pidStr = String(input.provider_id ?? '').trim();\nif (!pidStr || !INT_RE.test(pidStr)) return ve('INVALID_TYPE', 'provider_id must be a positive integer');\nconst provider_id = parseInt(pidStr);\nif (provider_id < 1) return ve('INVALID_TYPE', 'provider_id must be >= 1');\n\nconst sidStr = String(input.service_id ?? '').trim();\nif (!sidStr || !INT_RE.test(sidStr)) return ve('INVALID_TYPE', 'service_id must be a positive integer');\nconst service_id = parseInt(sidStr);\nif (service_id < 1) return ve('INVALID_TYPE', 'service_id must be >= 1');\n\nconst start_time = String(input.start_time || '').trim();\nif (!start_time) return ve('MISSING_FIELD', 'start_time is required');\nif (!ISO_RE.test(start_time)) return ve('INVALID_TYPE', 'start_time must be ISO 8601 (e.g. 2026-04-15T09:00:00-03:00)');\nconst startDate = new Date(start_time);\nif (isNaN(startDate.getTime())) return ve('INVALID_DATE', 'start_time is not a valid date');\n\nlet end_time = start_time;\nif (input.end_time !== undefined && input.end_time !== null) {\n  end_time = String(input.end_time).trim();\n  if (!ISO_RE.test(end_time)) return ve('INVALID_TYPE', 'end_time must be ISO 8601');\n  const endDate = new Date(end_time);\n  if (isNaN(endDate.getTime())) return ve('INVALID_DATE', 'end_time is not a valid date');\n  if (endDate <= startDate) return ve('INVALID_RANGE', 'end_time must be after start_time');\n}\n\nlet chat_id = null;\nif (input.chat_id !== undefined && input.chat_id !== null) {\n  const cidStr = String(input.chat_id).trim();\n  if (!INT_RE.test(cidStr)) return ve('INVALID_TYPE', 'chat_id must be a non-negative integer');\n  chat_id = parseInt(cidStr);\n}\n\nlet gcal_event_id = null;\nif (input.gcal_event_id !== undefined && input.gcal_event_id !== null) {\n  gcal_event_id = String(input.gcal_event_id).trim();\n  if (!SAFE_STR_RE.test(gcal_event_id)) return ve('INVALID_INPUT', 'gcal_event_id contains invalid chars or exceeds 255 chars');\n}\n\nlet status = 'CONFIRMED';\nif (input.status !== undefined && input.status !== null) {\n  status = String(input.status).toUpperCase().trim();\n  const VALID = ['CONFIRMED', 'CANCELLED', 'RESCHEDULED', 'COMPLETED', 'NO_SHOW'];\n  if (!VALID.includes(status)) return ve('INVALID_TYPE', 'status must be one of: ' + VALID.join(', '));\n}\n\nreturn [{ json: {\n  success: true, idempotency_key, provider_id, service_id,\n  start_time, end_time, chat_id, gcal_event_id, status, _validated: true\n}}];",
+        "mode": "runOnceForAllItems"
       },
-      "name": "Build Secure JSON",
+      "name": "Validate Input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        250,
-        432
+        256,
+        304
       ],
-      "id": "build_json"
+      "id": "1d8dd331-b8a4-40ae-86be-ee876958ca07"
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "http://dal-service:3000/create-booking",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $json }}",
-        "options": {
-          "neverError": true,
-          "timeout": 5000,
-          "maxRetries": 3,
-          "retryWait": {
-            "type": "exponentialBackoff",
-            "base": 1000
-          }
+        "jsCode": "// Gate: _exit_early items get harmless query\n// Valid items: build idempotency check (§3.3 Layer 3)\nconst input = $input.first().json;\n\nif (input._exit_early) {\n  return [{ json: { ...input, idempotency_check_query: \"SELECT NULL AS id, NULL AS status WHERE FALSE;\" } }];\n}\n\nconst esc = (v) => v.replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 255);\nconst check_query = `SELECT id, status FROM bookings WHERE idempotency_key = '${esc(input.idempotency_key)}'::text LIMIT 1;`;\n\nreturn [{ json: { ...input, idempotency_check_query: check_query } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Build Idempotency Check Query",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        304
+      ],
+      "id": "5336c94b-7b9c-41dd-aedd-0b5ea97acb6f"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.idempotency_check_query }}",
+        "options": {}
+      },
+      "name": "Check Idempotency",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        672,
+        304
+      ],
+      "alwaysOutputData": true,
+      "id": "21432342-fff0-4b49-930d-b3f491a8ec4b",
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
         }
       },
-      "name": "Call DAL Create",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        600,
-        432
-      ],
-      "id": "call_dal_create"
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
-        "jsCode": "// Format DAL response con message legible para el LLM\nconst dalResponse = $input.first()?.json || {};\nconst isSuccess = dalResponse.success === true;\nconst bookingId   = dalResponse.data?.booking_id   || dalResponse.data?.id   || null;\nconst bookingCode = dalResponse.data?.booking_code || dalResponse.data?.code || null;\nconst startTime   = dalResponse.data?.start_time   || null;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message: isSuccess\n      ? `Reserva confirmada${bookingCode ? ' ' + bookingCode : ''}${startTime ? ' para el ' + startTime : ''}`\n      : (dalResponse.error_message || dalResponse.message || 'No se pudo crear la reserva.'),\n    error_code:    isSuccess ? null : (dalResponse.error_code || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || 'Booking creation failed'),\n    data: isSuccess ? (dalResponse.data || dalResponse) : null,\n    _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), version: '3.0.0' }\n  }\n}];"
+        "jsCode": "// Handle DB error during idempotency check\nconst e = $input.first().json;\nlet error_code = 'IDEMPOTENCY_CHECK_FAILED';\nlet error_message = e.message || e.error?.message || 'Failed to check idempotency';\n\nif (error_message.includes('connection') || error_message.includes('ECONNREFUSED')) {\n  error_code = 'DB_CONNECTION_ERROR';\n  error_message = 'Database connection failed during idempotency check';\n} else if (error_message.includes('timeout') || error_message.includes('ETIMEDOUT')) {\n  error_code = 'DB_TIMEOUT';\n  error_message = 'Database timeout during idempotency check';\n} else if (error_message.includes('authentication')) {\n  error_code = 'DB_AUTH_ERROR';\n}\n\nreturn [{ json: {\n  success: false, error_code, error_message, data: null,\n  _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];",
+        "mode": "runOnceForAllItems"
       },
-      "name": "Format Output",
+      "name": "Handle Idempotency Error",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        850,
-        432
+        880,
+        520
       ],
-      "id": "format_out"
+      "id": "09a0a253-2c85-494c-b261-f63dc02086a8"
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "valid_cond",
-              "leftValue": "={{ $json.isValid === true }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
+        "jsCode": "// DECISION NODE — replaces broken IF v2.3 (§5.1)\n// Inspects Postgres result + original validated data\n// Decides: existing → Standard Contract duplicate | new → pass to insert | error → pass through\n//\n// SINGLE OUTPUT — downstream nodes gate by _route flag\n\nconst pgResult = $input.first().json;\n\n// CRITICAL FIX: Postgres replaces entire json with query result\n// For _exit_early items, original data is lost. Retrieve from Build Idempotency Check Query.\nconst upstreamData = $('Build Idempotency Check Query').isExecuted\n  ? $('Build Idempotency Check Query').first().json\n  : null;\n\n// Check if this is a validation error (upstream has _exit_early)\nif (upstreamData && upstreamData._exit_early) {\n  return [{ json: { ...upstreamData, _route: 'error' } }];\n}\n\n// Retrieve original validated data for new bookings (§5.3 guard)\nconst originalData = upstreamData && upstreamData._validated ? upstreamData : null;\n\nif (!originalData) {\n  return [{ json: {\n    success: false, error_code: 'PIPELINE_ERROR',\n    error_message: 'Validated data lost in Route By Idempotency',\n    data: null, _route: 'error',\n    _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }}];\n}\n\n// Check Postgres result for existing booking\nconst hasExisting = pgResult && pgResult.id !== undefined && pgResult.id !== null;\n\nif (hasExisting) {\n  // DUPLICATE — emit final Standard Contract\n  return [{ json: {\n    success: true, error_code: null, error_message: null,\n    data: { booking_id: pgResult.id, status: pgResult.status || 'CONFIRMED', is_duplicate: true },\n    _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id },\n    _route: 'existing'\n  }}];\n}\n\n// NEW — pass validated data for insert\nreturn [{ json: { ...originalData, _route: 'new' } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Route By Idempotency",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        304
+      ],
+      "id": "e35f96a6-faa1-47ce-932d-00f5691c5789"
+    },
+    {
+      "parameters": {
+        "jsCode": "// GATE: Only build query for _route === 'new'\n// All other items pass through unchanged to Merge node\nconst input = $input.first().json;\n\nif (input._route !== 'new') {\n  // Not for insert — skip to Merge\n  // Return empty array so this item does NOT flow to Execute Insert\n  return [];\n}\n\n// LAYER 3: Build INSERT with explicit casts (§3.3)\nconst { provider_id, service_id, start_time, end_time, idempotency_key, gcal_event_id, chat_id, status } = input;\nconst esc = (v) => v.replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 255);\n\nconst insert_query = `INSERT INTO bookings (\n  provider_id, service_id, start_time, end_time,\n  idempotency_key, gcal_event_id, user_id, status, created_at\n) VALUES (\n  ${Number(provider_id)}::int,\n  ${Number(service_id)}::int,\n  '${esc(start_time)}'::timestamptz,\n  '${esc(end_time)}'::timestamptz,\n  '${esc(idempotency_key)}'::text,\n  ${gcal_event_id ? `'${esc(gcal_event_id)}'::text` : 'NULL'},\n  ${chat_id !== null ? `${Number(chat_id)}::bigint` : 'NULL'},\n  '${esc(status)}'::text,\n  NOW()\n) RETURNING id, status;`;\n\nreturn [{ json: { ...input, insert_query } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Build Insert Query",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        304
+      ],
+      "id": "30969936-524a-4a18-9347-a3dad60c4685"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Pass-through for items with _route !== 'new'\n// These are 'existing' duplicates or 'error' validation failures\nconst input = $input.first().json;\n\nif (input._route === 'new') {\n  // This item goes through Build Insert Query path — skip here\n  return [];\n}\n\n// Pass through to Format Response\nreturn [{ json: input }];"
+      },
+      "name": "Pass Through Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        520
+      ],
+      "id": "pt-error-01"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.insert_query }}",
+        "options": {}
+      },
+      "name": "Execute Insert",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1320,
+        304
+      ],
+      "alwaysOutputData": true,
+      "id": "edb9432c-f2b8-44b1-a4da-32cf01dcd7f4",
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
         }
       },
-      "id": "if_valid_create",
-      "name": "Is Valid?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        400,
-        432
-      ]
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: \"VALIDATION_ERROR\",\n    error_message: $json.error_message,\n    data: null,\n    _meta: { source: \"DB_Create_Booking\", timestamp: new Date().toISOString(), version: \"1.1.0\" }\n  }\n}];"
+        "jsCode": "// Format success — new booking created\nconst result = $input.first().json;\nconst booking_id = result.id || null;\n\nif (!booking_id) {\n  return [{ json: {\n    success: false, error_code: 'DB_ERROR',\n    error_message: 'INSERT succeeded but no booking_id returned',\n    data: null,\n    _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }}];\n}\n\nreturn [{ json: {\n  success: true, error_code: null, error_message: null,\n  data: { booking_id, status: result.status || 'CONFIRMED', is_duplicate: false },\n  _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];",
+        "mode": "runOnceForAllItems"
       },
-      "id": "format_invalid_create",
-      "name": "Format Invalid",
+      "name": "Format Success Output",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        600,
-        600
-      ]
+        1540,
+        208
+      ],
+      "id": "1e560418-a7aa-45d5-9487-d8f26b23f566"
     },
     {
       "parameters": {
-        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT — Tool-compatible (v3.0.0)\n// El AI Agent lee \"message\" como respuesta legible y \"data\" para detalles.\nconst result = $input.first()?.json || {};\nconst isSuccess = result.success !== false;\n\n// Construir mensaje legible para el LLM\nlet message = result.message || result.data?.message || null;\nif (!message) {\n  message = isSuccess\n    ? 'Operación completada con éxito.'\n    : (result.error_message || result.error_code || 'Error desconocido.');\n}\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message,\n    error_code:    isSuccess ? null : (result.error_code    || 'UNKNOWN_ERROR'),\n    error_message: isSuccess ? null : (result.error_message || message),\n    data:          result.data || null,\n    _meta: {\n      source:    'DB_CREATE_BOOKING',\n      timestamp: new Date().toISOString(),\n      version:   '3.0.0'\n    }\n  }\n}];"
+        "jsCode": "// Handle INSERT error — categorize\nconst e = $input.first().json;\nlet error_code = 'DB_INSERT_ERROR';\nlet error_message = e.message || e.error?.message || 'Failed to create booking';\n\nif (error_message.includes('violates foreign key')) {\n  error_code = 'FK_VIOLATION';\n  if (error_message.includes('provider')) error_message = 'Invalid provider_id: provider does not exist';\n  else if (error_message.includes('service')) error_message = 'Invalid service_id: service does not exist';\n  else error_message = 'Foreign key constraint violation';\n} else if (error_message.includes('idempotency_key') && (error_message.includes('already exists') || error_message.includes('duplicate key'))) {\n  error_code = 'DUPLICATE_IDEMPOTENCY_KEY';\n  error_message = 'Booking with this idempotency_key already exists (race condition)';\n} else if (error_message.includes('connection') || error_message.includes('ECONNREFUSED')) {\n  error_code = 'DB_CONNECTION_ERROR';\n} else if (error_message.includes('timeout') || error_message.includes('ETIMEDOUT')) {\n  error_code = 'DB_TIMEOUT';\n}\n\nreturn [{ json: {\n  success: false, error_code, error_message, data: null,\n  _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];",
+        "mode": "runOnceForAllItems"
       },
-      "id": "standard_contract_1772984456914",
-      "name": "📤 Standard Contract Output",
+      "name": "Handle Insert Error",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        5000,
-        500
-      ]
+        1540,
+        520
+      ],
+      "id": "8a9ab693-9ac4-406b-a78d-5431addcd76f"
+    },
+    {
+      "parameters": {
+        "jsCode": "// UNIFIED OUTPUT — Standard Contract (§3.2)\nconst input = $input.first().json;\n\nreturn [{ json: {\n  success: input.success === true,\n  error_code: input.error_code || null,\n  error_message: input.error_message || null,\n  data: input.data || null,\n  _meta: input._meta || {\n    source: 'DB_Create_Booking',\n    timestamp: new Date().toISOString(),\n    workflow_id: $workflow.id\n  }\n}}];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        400
+      ],
+      "id": "12a977b4-172d-4756-b945-04878ff369e4"
     }
   ],
+  "pinData": {},
   "connections": {
     "Execute Workflow Trigger": {
       "main": [
         [
           {
-            "node": "Build Secure JSON",
+            "node": "Validate Input",
             "type": "main",
             "index": 0
           }
@@ -168,7 +232,7 @@
       "main": [
         [
           {
-            "node": "Build Secure JSON",
+            "node": "Validate Input",
             "type": "main",
             "index": 0
           }
@@ -179,69 +243,136 @@
       "main": [
         [
           {
-            "node": "Build Secure JSON",
+            "node": "Validate Input",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Build Secure JSON": {
+    "Validate Input": {
       "main": [
         [
           {
-            "node": "Is Valid?",
+            "node": "Build Idempotency Check Query",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Call DAL Create": {
+    "Build Idempotency Check Query": {
       "main": [
         [
           {
-            "node": "Format Output",
+            "node": "Check Idempotency",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Is Valid?": {
+    "Check Idempotency": {
       "main": [
         [
           {
-            "node": "Call DAL Create",
+            "node": "Route By Idempotency",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Format Invalid",
+            "node": "Handle Idempotency Error",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Format Invalid": {
+    "Handle Idempotency Error": {
       "main": [
         [
           {
-            "node": "Format Output",
+            "node": "Format Response",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Format Output": {
+    "Route By Idempotency": {
       "main": [
         [
           {
-            "node": "📤 Standard Contract Output",
+            "node": "Build Insert Query",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Pass Through Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pass Through Error": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Insert Query": {
+      "main": [
+        [
+          {
+            "node": "Execute Insert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Insert": {
+      "main": [
+        [
+          {
+            "node": "Format Success Output",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle Insert Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Success Output": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Insert Error": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
             "type": "main",
             "index": 0
           }
@@ -249,8 +380,10 @@
       ]
     }
   },
+  "active": true,
   "settings": {
-    "executionOrder": "v1"
-  },
-  "id": "ilA6a6sM5CvDsSBi"
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  }
 }
