@@ -26,7 +26,7 @@
     },
     {
       "parameters": {
-        "jsCode": "\n// Idempotency Check v2.3.1 - Enhanced ISO Sanitization\ntry {\n  const input = $input.first().json;\n  const body = input.body || input;\n\n  const sanitizeInt = (val) => {\n    if (Array.isArray(val)) val = val[0];\n    const parsed = parseInt(val, 10);\n    return isNaN(parsed) ? null : parsed;\n  };\n\n  const sanitizeStr = (val, maxLen = 255) => {\n    if (Array.isArray(val)) val = val[0];\n    if (typeof val !== 'string') val = String(val || '');\n    return val.replace(/[^\\w\\s@.-]/gi, '_').substring(0, maxLen);\n  };\n\n  // Sanitización especial para FECHA (permitir Z, :, +)\n  const sanitizeDateStr = (val) => {\n    if (Array.isArray(val)) val = val[0];\n    if (typeof val !== 'string') val = String(val || '');\n    return val.replace(/[^\\d-T:Z.+-]/gi, '').substring(0, 50);\n  };\n\n  const provider_id = sanitizeInt(body.provider_id);\n  const service_id = sanitizeInt(body.service_id);\n  const start_time = sanitizeDateStr(body.start_time); \n  const user_name = sanitizeStr(body.user_name || body.name, 100);\n  const chat_id = sanitizeStr(body.chat_id || body.customer_id, 50);\n\n  if (!provider_id || !service_id || !start_time) {\n    return [{ json: { success: false, error_code: 'INVALID_INPUT', error_message: 'Missing or invalid fields' } }];\n  }\n\n  const parts = start_time.match(/^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})/);\n  if (!parts) {\n    return [{ json: { success: false, error_code: 'INVALID_DATE_FORMAT', error_message: 'Format must be ISO 8601' } }];\n  }\n\n  const [full, y, m, d] = parts.slice(1, 5).map(p => parseInt(p, 10));\n  const dateObj = new Date(start_time);\n\n  // Verificación de Fecha Real\n  if (isNaN(dateObj.getTime()) || dateObj.getUTCFullYear() !== y || (dateObj.getUTCMonth() + 1) !== m || dateObj.getUTCDate() !== d) {\n    // Tolerancia para offsets: si el UTC no coincide, probamos con la fecha local del objeto\n    if (isNaN(dateObj.getTime())) {\n       return [{ json: { success: false, error_code: 'INVALID_DATE', error_message: 'Date does not exist' } }];\n    }\n  }\n\n  const now = Date.now();\n  if (dateObj.getTime() < (now - 3600000)) { // 1h de gracia\n    return [{ json: { success: false, error_code: 'PAST_DATE', error_message: 'Cannot book in the past' } }];\n  }\n\n  if (dateObj.getTime() > (now + (365 * 24 * 60 * 60 * 1000))) {\n    return [{ json: { success: false, error_code: 'FUTURE_DATE_TOO_EXTREME', error_message: 'Limit: 1 year' } }];\n  }\n\n  const idempotencyKey = `booking_${provider_id}_${service_id}_${start_time}_${chat_id || 'anon'}`;\n  const sanitizedKey = idempotencyKey.replace(/[^a-zA-Z0-9_:-]/g, '_').substring(0, 255);\n\n  const ctx = {\n    provider_id,\n    service_id,\n    start_time,\n    user_name,\n    chat_id,\n    idempotency_key: sanitizedKey,\n    _meta: { source: 'WF2_ORCHESTRATOR', version: '2.3.1', timestamp: new Date().toISOString() }\n  };\n\n  return [{ json: { success: true, ctx } }];\n\n} catch (error) {\n  return [{ json: { success: false, error_code: 'INTERNAL_ERROR', error_message: error.message } }];\n}\n  "
+        "jsCode": "\n// Idempotency Check v2.3.1 - Enhanced ISO Sanitization\ntry {\n  const input = $input.first().json;\n  const body = input.body || input;\n\n  const sanitizeInt = (val) => {\n    if (Array.isArray(val)) val = val[0];\n    const parsed = parseInt(val, 10);\n    return isNaN(parsed) ? null : parsed;\n  };\n\n  const sanitizeStr = (val, maxLen = 255) => {\n    if (Array.isArray(val)) val = val[0];\n    if (typeof val !== 'string') val = String(val || '');\n    return val.replace(/[^\\w\\s@.-]/gi, '_').substring(0, maxLen);\n  };\n\n  // Sanitización especial para FECHA (permitir Z, :, +)\n  const sanitizeDateStr = (val) => {\n    if (Array.isArray(val)) val = val[0];\n    if (typeof val !== 'string') val = String(val || '');\n    return val.replace(/[^\\d-T:Z.+-]/gi, '').substring(0, 50);\n  };\n\n  const provider_id = sanitizeInt(body.provider_id);\n  const service_id = sanitizeInt(body.service_id);\n  const start_time = sanitizeDateStr(body.start_time); \n  const user_name = sanitizeStr(body.user_name || body.name, 100);\n  const chat_id = sanitizeStr(body.chat_id || body.customer_id, 50);\n\n  if (!provider_id || !service_id || !start_time) {\n    return [{ json: { success: false, error_code: 'INVALID_INPUT', error_message:'Missing or invalid fields' , data: null, _meta: { source: 'WF2_BOOKING_ORCHESTRATOR', timestamp: new Date().toISOString() } } }];\n  }\n\n  const parts = start_time.match(/^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})/);\n  if (!parts) {\n    return [{ json: { success: false, error_code: 'INVALID_DATE_FORMAT', error_message:'Format must be ISO 8601' , data: null, _meta: { source: 'WF2_BOOKING_ORCHESTRATOR', timestamp: new Date().toISOString() } } }];\n  }\n\n  const [full, y, m, d] = parts.slice(1, 5).map(p => parseInt(p, 10));\n  const dateObj = new Date(start_time);\n\n  // Verificación de Fecha Real\n  if (isNaN(dateObj.getTime()) || dateObj.getUTCFullYear() !== y || (dateObj.getUTCMonth() + 1) !== m || dateObj.getUTCDate() !== d) {\n    // Tolerancia para offsets: si el UTC no coincide, probamos con la fecha local del objeto\n    if (isNaN(dateObj.getTime())) {\n       return [{ json: { success: false, error_code: 'INVALID_DATE', error_message:'Date does not exist' , data: null, _meta: { source: 'WF2_BOOKING_ORCHESTRATOR', timestamp: new Date().toISOString() } } }];\n    }\n  }\n\n  const now = Date.now();\n  if (dateObj.getTime() < (now - 3600000)) { // 1h de gracia\n    return [{ json: { success: false, error_code: 'PAST_DATE', error_message:'Cannot book in the past' , data: null, _meta: { source: 'WF2_BOOKING_ORCHESTRATOR', timestamp: new Date().toISOString() } } }];\n  }\n\n  if (dateObj.getTime() > (now + (365 * 24 * 60 * 60 * 1000))) {\n    return [{ json: { success: false, error_code: 'FUTURE_DATE_TOO_EXTREME', error_message:'Limit: 1 year' , data: null, _meta: { source: 'WF2_BOOKING_ORCHESTRATOR', timestamp: new Date().toISOString() } } }];\n  }\n\n  const idempotencyKey = `booking_${provider_id}_${service_id}_${start_time}_${chat_id || 'anon'}`;\n  const sanitizedKey = idempotencyKey.replace(/[^a-zA-Z0-9_:-]/g, '_').substring(0, 255);\n\n  const ctx = {\n    provider_id,\n    service_id,\n    start_time,\n    user_name,\n    chat_id,\n    idempotency_key: sanitizedKey,\n    _meta: { source: 'WF2_ORCHESTRATOR', version: '2.3.1', timestamp: new Date().toISOString() }\n  };\n\n  return [{ json: { success: true, ctx } }];\n\n} catch (error) {\n  return [{ json: { success: false, error_code: 'INTERNAL_ERROR', error_message:error.message , data: null, _meta: { source: 'WF2_BOOKING_ORCHESTRATOR', timestamp: new Date().toISOString() } } }];\n}\n  "
       },
       "name": "Generate Idempotency Key",
       "type": "n8n-nodes-base.code",
@@ -124,7 +124,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// DUPLICATE BRANCH - Return existing booking\nconst existing = $input.first().json[0] || $input.first().json;\nconst ctx = $input.first().json.ctx || {};\n\nctx._idempotency.is_duplicate = true;\nctx._idempotency.existing_booking_id = existing.id;\n\nreturn [{\n  json: {\n    ctx,\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      booking_id: existing.id,\n      status: existing.status,\n      gcal_event_id: existing.gcal_event_id,\n      is_duplicate: true,\n      message: 'Booking already exists (idempotent retry)'\n    },\n    _meta: {\n      source: 'WF2_BOOKING_ORCHESTRATOR',\n      timestamp: new Date().toISOString(),\n      version: '2.0.0',\n      idempotency: 'duplicate'\n    }\n  }\n}];"
+        "jsCode": "// DUPLICATE BRANCH - Return existing booking\nconst existing = $input.first().json[0] || $input.first().json;\nconst ctx = $input.first().json.ctx || {};\n\nctx._idempotency.is_duplicate = true;\nctx._idempotency.existing_booking_id = existing.id;\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      ctx,\n      booking_id: existing.id,\n      status: existing.status,\n      gcal_event_id: existing.gcal_event_id,\n      is_duplicate: true,\n      message: 'Booking already exists (idempotent retry)'\n    },\n    _meta: {\n      source: 'WF2_BOOKING_ORCHESTRATOR',\n      timestamp: new Date().toISOString(),\n      version: '2.0.0',\n      idempotency: 'duplicate'\n    }\n  }\n}];"
       },
       "name": "Return Duplicate",
       "type": "n8n-nodes-base.code",
@@ -200,7 +200,7 @@
     },
     {
       "parameters": {
-        "jsCode": "\n// NOT AVAILABLE BRANCH\n// Intentamos recuperar ctx del input o del nodo inicial Generate Idempotency Key\nconst ctx = $input.first().json.ctx || $(\"Generate Idempotency Key\").first().json.ctx;\nctx._meta.failed_at = 'Check Availability';\n\nreturn [{\n  json: {\n    ctx,\n    success: false,\n    error_code: 'NO_AVAILABILITY',\n    error_message: 'No availability found for requested time slot',\n    data: $input.first().json.data || null, // Incluimos la razón (p.ej. mode fail-safe)\n    _meta: {\n      source: 'WF2_BOOKING_ORCHESTRATOR',\n      timestamp: new Date().toISOString(),\n      version: '2.3.2'\n    }\n  }\n}];"
+        "jsCode": "\n// NOT AVAILABLE BRANCH\n// Intentamos recuperar ctx del input o del nodo inicial Generate Idempotency Key\nconst ctx = $input.first().json.ctx || $(\"Generate Idempotency Key\").first().json.ctx;\nctx._meta.failed_at = 'Check Availability';\n\nreturn [{\n  json: {\n    success: false,\n    error_code: 'NO_AVAILABILITY',\n    error_message: 'No availability found for requested time slot',\n    data: { ctx, rawData: $input.first().json.data || null }, // Modified to wrap context inside data\n    _meta: {\n      source: 'WF2_BOOKING_ORCHESTRATOR',\n      timestamp: new Date().toISOString(),\n      version: '2.3.2'\n    }\n  }\n}];"
       },
       "name": "Error - No Availability",
       "type": "n8n-nodes-base.code",
@@ -449,6 +449,32 @@
         500
       ],
       "id": "9bb01cef-2485-47b8-88ca-e6a829994dbd"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -750,
+        100
+      ],
+      "id": "trigger-internal-wf2"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "name": "Final Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3400,
+        200
+      ],
+      "id": "final-response-node-wf2"
     }
   ],
   "connections": {
@@ -668,6 +694,61 @@
         [
           {
             "node": "Standard Contract Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Generate Idempotency Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Return Duplicate": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error - No Availability": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Standard Contract Output": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validation Error Output": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
             "type": "main",
             "index": 0
           }

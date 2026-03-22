@@ -6,7 +6,10 @@
       "name": "Manual Trigger",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [200, 100],
+      "position": [
+        200,
+        100
+      ],
       "id": "2ef24783-0bd3-45b0-9606-6e73ccd3c610"
     },
     {
@@ -19,7 +22,10 @@
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [200, 300],
+      "position": [
+        200,
+        300
+      ],
       "webhookId": "bac07b58-a1c1-4494-bfbc-5a5255f7d871",
       "id": "86bf51e8-3c2a-4b71-b1ac-864de6d58099"
     },
@@ -30,7 +36,10 @@
       "name": "When Called",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
-      "position": [200, 500],
+      "position": [
+        200,
+        500
+      ],
       "id": "3a6ce2f6-620e-44dc-b2b9-8c2d45caf432"
     },
     {
@@ -40,7 +49,10 @@
       "name": "Validate Input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [420, 300],
+      "position": [
+        420,
+        300
+      ],
       "id": "val-input-seed-01"
     },
     {
@@ -50,7 +62,10 @@
       "name": "Generate Slots",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [660, 300],
+      "position": [
+        660,
+        300
+      ],
       "id": "44658718-d0c0-4323-90e3-7ce94406b1cd"
     },
     {
@@ -80,56 +95,125 @@
       "name": "Process Slot",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
-      "position": [900, 300],
+      "position": [
+        900,
+        300
+      ],
       "id": "f8e8a4dd-01b0-4f61-984f-35ef2c40dbc9",
       "onError": "continueErrorOutput"
     },
     {
       "parameters": {
-        "jsCode": "// FIX #8: only onError:continueErrorOutput — no continueOnFail\nconst err = $input.first().json;\nreturn [{\n  json: {\n    success: false,\n    slot: 'unknown',\n    error_code: 'PROCESS_SLOT_CRASH',\n    error_message: err.message || err.error?.message || 'SEED_01_Process_Slot crashed',\n    idempotency_key: null,\n    source: 'SEED_01',\n    _meta: { source: 'SEED_01_Daily_Provisioning', timestamp: new Date().toISOString() }\n  }\n}];"
+        "jsCode": "// FIX #8: only onError:continueErrorOutput — no continueOnFail\nconst err = $input.first().json;\nreturn [{\n  json: {\n    success: false,\n    error_code: 'PROCESS_SLOT_CRASH',\n    error_message: err.message || err.error?.message || 'SEED_01_Process_Slot crashed',\n    data: { slot: 'unknown', idempotency_key: null, source: 'SEED_01' },\n    _meta: { source: 'SEED_01_Daily_Provisioning', timestamp: new Date().toISOString() }\n  }\n}];"
       },
       "name": "Handle Slot Error",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [900, 520],
+      "position": [
+        900,
+        520
+      ],
       "id": "134e891c-9010-4c66-9a65-049bdc962bd4"
     },
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "// P0-FIX: Integrity check — detect silent data loss\nconst results = $input.all().map(i => i.json);\n\nconst expectedStr = $execution.customData.get('seed_slot_count');\nconst expected = parseInt(expectedStr || '0');\nconst booked = results.filter(r => r.success === true);\nconst failed = results.filter(r => r.success === false);\nconst total = results.length;\n\nlet integrity_status = 'OK';\nlet integrity_warning = null;\nif (expected > 0 && total !== expected) {\n  integrity_status = 'SLOT_COUNT_MISMATCH';\n  integrity_warning = `Expected ${expected} slots but processed ${total}. Possible silent data loss.`;\n}\n\n$execution.customData.set('seed_booked', String(booked.length));\n$execution.customData.set('seed_failed', String(failed.length));\n$execution.customData.set('seed_integrity', integrity_status);\n\nresults.sort((a, b) => (a.slot || '').localeCompare(b.slot || ''));\n\nreturn [{\n  json: {\n    success: integrity_status === 'OK' && failed.length === 0,\n    message: `Seeding completed: ${booked.length} booked, ${failed.length} failed` +\n      (integrity_warning ? ` | WARNING: ${integrity_warning}` : ''),\n    data: {\n      total_slots: total,\n      expected_slots: expected,\n      booked: booked.length,\n      failed: failed.length,\n      integrity_status,\n      integrity_warning,\n      details: results\n    },\n    _meta: { source: 'SEED_01_Daily_Provisioning', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }\n}];"
+        "jsCode": "// P0-FIX: Integrity check — detect silent data loss\nconst results = $input.all().map(i => i.json);\n\nconst expectedStr = $execution.customData.get('seed_slot_count');\nconst expected = parseInt(expectedStr || '0');\nconst booked = results.filter(r => r.success === true);\nconst failed = results.filter(r => r.success === false);\nconst total = results.length;\n\nlet integrity_status = 'OK';\nlet integrity_warning = null;\nif (expected > 0 && total !== expected) {\n  integrity_status = 'SLOT_COUNT_MISMATCH';\n  integrity_warning = `Expected ${expected} slots but processed ${total}. Possible silent data loss.`;\n}\n\n$execution.customData.set('seed_booked', String(booked.length));\n$execution.customData.set('seed_failed', String(failed.length));\n$execution.customData.set('seed_integrity', integrity_status);\n\nresults.sort((a, b) => (a.slot || '').localeCompare(b.slot || ''));\n\nreturn [{\n  json: {\n    success: integrity_status === 'OK' && failed.length === 0,\n    error_code: (integrity_status === 'OK' && failed.length === 0) ? null : 'PROVISIONING_ERROR',\n    error_message: (integrity_status === 'OK' && failed.length === 0) ? null : 'Some slots failed to provision or integrity warning',\n    message: `Seeding completed: ${booked.length} booked, ${failed.length} failed` +\n      (integrity_warning ? ` | WARNING: ${integrity_warning}` : ''),\n    data: {\n      total_slots: total,\n      expected_slots: expected,\n      booked: booked.length,\n      failed: failed.length,\n      integrity_status,\n      integrity_warning,\n      details: results\n    },\n    _meta: { source: 'SEED_01_Daily_Provisioning', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }\n}];"
       },
       "name": "Report Summary",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1140, 300],
+      "position": [
+        1140,
+        300
+      ],
       "id": "8ebe37d5-0906-4f75-ba1c-69428f19721f"
     }
   ],
   "connections": {
     "Manual Trigger": {
-      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Webhook": {
-      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "When Called": {
-      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Validate Input": {
-      "main": [[{ "node": "Generate Slots", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Generate Slots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Generate Slots": {
-      "main": [[{ "node": "Process Slot", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Process Slot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Process Slot": {
       "main": [
-        [{ "node": "Report Summary", "type": "main", "index": 0 }],
-        [{ "node": "Handle Slot Error", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Report Summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle Slot Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Handle Slot Error": {
-      "main": [[{ "node": "Report Summary", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Report Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {

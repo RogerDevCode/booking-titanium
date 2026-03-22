@@ -64,11 +64,11 @@
   },
   {
     "name": "WF2_Booking_Orchestrator",
-    "version": "4.0.0",
+    "version": "4.0.1",
     "node_count": 21,
-    "tests_passed": "15/15",
-    "certified_at": "2026-03-20",
-    "git_tag": "WF2_Booking_Orchestrator-v4.0.0-certified",
+    "tests_passed": "19/19",
+    "certified_at": "2026-03-22",
+    "git_tag": "WF2_Booking_Orchestrator-v4.0.1-certified",
     "status": "FROZEN"
   },
   {
@@ -118,11 +118,11 @@
   },
   {
     "name": "SEED_01_Daily_Provisioning",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "node_count": 8,
-    "tests_passed": "7/7",
-    "certified_at": "2026-03-21",
-    "git_tag": "SEED_01_Daily_Provisioning-v2.1.0-certified",
+    "tests_passed": "10/10",
+    "certified_at": "2026-03-22",
+    "git_tag": "SEED_01_Daily_Provisioning-v2.1.1-certified",
     "status": "FROZEN",
     "test_summary": {
       "happy_path": "8/8 slots booked with valid chat_id",
@@ -151,9 +151,18 @@
     },
     "architecture": {
       "trigger": "Execute Workflow Trigger (When Called)",
-      "sub_workflows": ["WF3_Availability_Service (6zftqMdtBAT0QaCt)", "WF2_Booking_Orchestrator (Z7g7DgxXQ61V368P)"],
-      "error_paths": ["Handle WF3 Error", "Handle WF2 Error"],
-      "success_paths": ["Format Success", "Format Unavailable"]
+      "sub_workflows": [
+        "WF3_Availability_Service (6zftqMdtBAT0QaCt)",
+        "WF2_Booking_Orchestrator (Z7g7DgxXQ61V368P)"
+      ],
+      "error_paths": [
+        "Handle WF3 Error",
+        "Handle WF2 Error"
+      ],
+      "success_paths": [
+        "Format Success",
+        "Format Unavailable"
+      ]
     },
     "parent_workflow": "SEED_01_Daily_Provisioning (IVDXuT6a4tT9w1vR) v2.1.0"
   }
