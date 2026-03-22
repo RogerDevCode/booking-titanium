@@ -3,17 +3,13 @@
   "nodes": [
     {
       "parameters": {
-        "inputSource": "jsonExample",
-        "jsonExample": "{\"booking_id\": \"BKG-X7K9P2\", \"new_start_time\": \"2026-03-20T14:00:00\", \"chat_id\": 12345}"
+        "inputSource": "passthrough"
       },
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
-      "position": [
-        -200,
-        432
-      ],
-      "id": "trigger"
+      "position": [0, 208],
+      "id": "reschedule-trigger-01"
     },
     {
       "parameters": {
@@ -25,281 +21,212 @@
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [
-        -200,
-        632
-      ],
+      "position": [0, 400],
       "webhookId": "db-reschedule-booking",
-      "id": "webhook_trigger"
+      "id": "reschedule-webhook-01"
     },
     {
       "parameters": {},
       "name": "Manual Trigger",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [
-        -200,
-        232
-      ],
-      "id": "manual_trigger"
+      "position": [0, 0],
+      "id": "reschedule-manual-01"
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first().json.body || $input.first().json;\n\n// VRF — GUARD + VALIDATE\nconst isValidUUID = (v) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);\nconst bookingId = input.old_booking_id || input.booking_id;\n\nlet isValid = true;\nlet error_message = null;\n\nif (!bookingId || !isValidUUID(bookingId)) {\n  isValid = false;\n  error_message = 'Invalid or missing booking_id (UUID required)';\n}\nif (isValid && !input.new_start_time) {\n  isValid = false;\n  error_message = 'Missing required field: new_start_time';\n}\n\nconst chatId = parseInt(input.chat_id);\n\nreturn [{\n  json: {\n    isValid,\n    error_message,\n    chat_id: isNaN(chatId) ? null : chatId,\n    booking_id: bookingId,\n    old_booking_id: bookingId,\n    start_time: input.new_start_time,\n    provider_id: parseInt(input.provider_id) || 1,\n    service_id: parseInt(input.service_id) || 1,\n    user_email: input.user_email || '',\n    user_name: input.user_name || 'Paciente'\n  }\n}];"
+        "jsCode": "// LAYER 1+2: Extract & Validate for reschedule\n// Zero-throw: returns Standard Contract error, never throws\n\nconst raw = $input.first().json;\nconst input = (raw.body && typeof raw.body === 'object') ? raw.body : raw;\n\n// UUID regex pattern\nconst UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\n// ISO 8601 with timezone\nfunction isIsoDate(str) {\n  if (!str || !str.includes('T')) return false;\n  const tzMatch = str.match(/(Z|[+-]\\d{2}:\\d{2})$/);\n  if (!tzMatch) return false;\n  const d = new Date(str);\n  if (isNaN(d.getTime())) return false;\n  const parts = str.match(/^(\\d{4})-(\\d{2})-(\\d{2})T/);\n  if (!parts) return false;\n  const [_, year, month, day] = parts;\n  if (parseInt(month) !== d.getUTCMonth() + 1) return false;\n  if (parseInt(day) !== d.getUTCDate()) return false;\n  return true;\n}\n\nfunction ve(code, msg) {\n  return [{ json: {\n    success: false, error_code: code, error_message: msg, data: null,\n    _meta: { source: 'DB_Reschedule_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id },\n    _exit_early: true\n  }}];\n}\n\n// === BOOKING_ID VALIDATION ===\nconst booking_id = String(input.booking_id || '').trim();\nif (!booking_id) return ve('MISSING_FIELD', 'booking_id is required');\nif (!UUID_RE.test(booking_id)) return ve('INVALID_TYPE', 'booking_id must be a valid UUID');\n\n// === NEW_START_TIME VALIDATION ===\nconst new_start_time = String(input.new_start_time || '').trim();\nif (!new_start_time) return ve('MISSING_FIELD', 'new_start_time is required');\nif (!isIsoDate(new_start_time)) return ve('INVALID_TYPE', 'new_start_time must be ISO 8601 with timezone');\n\nconst newDate = new Date(new_start_time);\nconst now = Date.now();\nif (newDate.getTime() < now) return ve('PAST_DATE', 'Cannot reschedule to the past');\nconst ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;\nif (newDate.getTime() > (now + ONE_YEAR_MS)) return ve('FUTURE_DATE_TOO_EXTREME', 'Rescheduling limited to 1 year in advance');\n\n// === PROVIDER_ID / SERVICE_ID (optional, default to existing) ===\nlet provider_id = null;\nif (input.provider_id !== undefined && input.provider_id !== null) {\n  const pidStr = String(input.provider_id).trim();\n  const INT_RE = /^\\d+$/;\n  if (!pidStr || !INT_RE.test(pidStr)) return ve('INVALID_TYPE', 'provider_id must be a positive integer');\n  provider_id = parseInt(pidStr);\n}\n\nlet service_id = null;\nif (input.service_id !== undefined && input.service_id !== null) {\n  const sidStr = String(input.service_id).trim();\n  const INT_RE = /^\\d+$/;\n  if (!sidStr || !INT_RE.test(sidStr)) return ve('INVALID_TYPE', 'service_id must be a positive integer');\n  service_id = parseInt(sidStr);\n}\n\n// === CHAT_ID (optional) ===\nlet chat_id = null;\nif (input.chat_id !== undefined && input.chat_id !== null) {\n  const cidStr = String(input.chat_id).trim();\n  const INT_RE = /^\\d+$/;\n  if (!cidStr || !INT_RE.test(cidStr)) return ve('INVALID_TYPE', 'chat_id must be a non-negative integer');\n  chat_id = parseInt(cidStr);\n}\n\n// === RESCHEDULE_REASON (optional) ===\nlet reschedule_reason = null;\nif (input.reschedule_reason !== undefined && input.reschedule_reason !== null) {\n  reschedule_reason = String(input.reschedule_reason).trim();\n  if (reschedule_reason.length > 500) return ve('INVALID_INPUT', 'reschedule_reason must be <= 500 chars');\n}\n\nreturn [{ json: {\n  success: true,\n  booking_id,\n  new_start_time,\n  provider_id,\n  service_id,\n  chat_id,\n  reschedule_reason,\n  _validated: true\n}}];",
+        "mode": "runOnceForAllItems"
       },
-      "name": "Build Secure JSON",
+      "name": "Validate Input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        50,
-        432
-      ],
-      "id": "build_json"
+      "position": [256, 304],
+      "id": "reschedule-validate-01"
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "mf4qnUG7UlrAKpQU",
-          "mode": "id"
-        },
-        "mode": "wait",
-        "inputData": "={{ $json }}",
-        "options": {}
+        "jsCode": "// Gate: _exit_early items skip\n// Valid items: build check booking exists query\nconst input = $input.first().json;\n\nif (input._exit_early) {\n  return [{ json: { ...input, check_query: \"SELECT NULL WHERE FALSE;\" } }];\n}\n\nconst { booking_id } = input;\nconst safeId = booking_id.replace(/'/g, \"''\");\n\n// Check if booking exists and get current details\nconst check_query = `SELECT id, status, provider_id, service_id, start_time FROM bookings WHERE id = '${safeId}'::uuid LIMIT 1;`;\n\nreturn [{ json: { ...input, check_query } }];",
+        "mode": "runOnceForAllItems"
       },
-      "name": "Step 1: Cancel Old",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        400,
-        432
-      ],
-      "id": "cancel_old"
-    },
-    {
-      "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "ilA6a6sM5CvDsSBi",
-          "mode": "id"
-        },
-        "mode": "wait",
-        "inputData": "={{ $json }}",
-        "options": {}
-      },
-      "name": "Step 2: Create New",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        750,
-        432
-      ],
-      "id": "create_new"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Format reschedule response con message legible para el LLM\nconst cancelResult = $node[\"Step 1: Cancel Old\"]?.json  || {};\nconst createResult = $node[\"Step 2: Create New\"]?.json  || {};\nconst isSuccess    = createResult.success === true;\nconst newCode      = createResult.data?.booking_code || createResult.data?.new_booking_code || null;\nconst newTime      = createResult.data?.start_time   || null;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message: isSuccess\n      ? `Tu cita fue reprogramada correctamente${newCode ? ' (' + newCode + ')' : ''}${newTime ? ' para el ' + newTime : ''}`\n      : (createResult.error_message || 'No se pudo reprogramar la cita.'),\n    error_code:    isSuccess ? null : (createResult.error_code    || 'RESCHEDULE_ERROR'),\n    error_message: isSuccess ? null : (createResult.error_message || 'Reschedule failed'),\n    data: {\n      old_booking_id:   cancelResult.data?.booking_id   || null,\n      old_booking_code: cancelResult.data?.booking_code || null,\n      new_booking_id:   createResult.data?.booking_id   || null,\n      new_booking_code: newCode,\n      status: isSuccess ? 'CONFIRMED' : 'FAILED'\n    },\n    _meta: { source: 'DB_Reschedule_Booking', timestamp: new Date().toISOString(), version: '3.0.0' }\n  }\n}];"
-      },
-      "name": "Final Response",
+      "name": "Build Check Query",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        1000,
-        432
-      ],
-      "id": "final_res"
+      "position": [464, 304],
+      "id": "reschedule-build-check-01"
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "valid_cond",
-              "leftValue": "={{ $json.isValid === true }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
+        "operation": "executeQuery",
+        "query": "={{ $json.check_query }}",
+        "options": {}
+      },
+      "name": "Check Booking Exists",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [672, 304],
+      "alwaysOutputData": true,
+      "id": "reschedule-check-pg-01",
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
         }
       },
-      "id": "if_valid_reschedule",
-      "name": "Is Valid?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        200,
-        432
-      ]
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: \"VALIDATION_ERROR\",\n    error_message: $json.error_message,\n    data: null,\n    _meta: { source: \"DB_Reschedule_Booking\", timestamp: new Date().toISOString(), version: \"1.0.0\" }\n  }\n}];"
+        "jsCode": "// Handle DB error during check\nconst e = $input.first().json;\nconst upstreamData = $('Build Check Query').isExecuted ? $('Build Check Query').first().json : {};\nlet error_code = 'CHECK_FAILED';\nlet error_message = e.message || e.error?.message || 'Failed to check booking';\n\nif (error_message.includes('invalid input syntax for type uuid')) {\n  error_code = 'INVALID_UUID';\n  error_message = 'booking_id is not a valid UUID format';\n} else if (error_message.includes('connection') || error_message.includes('ECONNREFUSED')) {\n  error_code = 'DB_CONNECTION_ERROR';\n  error_message = 'Database connection failed';\n} else if (error_message.includes('timeout')) {\n  error_code = 'DB_TIMEOUT';\n  error_message = 'Database query timeout';\n}\n\nreturn [{ json: {\n  ...upstreamData,\n  success: false, error_code, error_message, data: null,\n  _meta: { source: 'DB_Reschedule_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];",
+        "mode": "runOnceForAllItems"
       },
-      "id": "format_invalid_reschedule",
-      "name": "Format Invalid",
+      "name": "Handle Check Error",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        300,
-        600
-      ]
+      "position": [672, 520],
+      "id": "reschedule-handle-check-err-01"
     },
     {
       "parameters": {
-        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT — Tool-compatible (v3.0.0)\n// El AI Agent lee \"message\" como respuesta legible y \"data\" para detalles.\nconst result = $input.first()?.json || {};\nconst isSuccess = result.success !== false;\n\n// Construir mensaje legible para el LLM\nlet message = result.message || result.data?.message || null;\nif (!message) {\n  message = isSuccess\n    ? 'Operación completada con éxito.'\n    : (result.error_message || result.error_code || 'Error desconocido.');\n}\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message,\n    error_code:    isSuccess ? null : (result.error_code    || 'UNKNOWN_ERROR'),\n    error_message: isSuccess ? null : (result.error_message || message),\n    data:          result.data || null,\n    _meta: {\n      source:    'DB_RESCHEDULE_BOOKING',\n      timestamp: new Date().toISOString(),\n      version:   '3.0.0'\n    }\n  }\n}];"
+        "jsCode": "// DECISION NODE — Check booking exists and can be rescheduled\nconst pgResult = $input.first().json;\nconst upstreamData = $('Build Check Query').isExecuted ? $('Build Check Query').first().json : null;\n\n// Pass-through validation errors\nif (upstreamData && upstreamData._exit_early) {\n  return [{ json: { ...upstreamData, _route: 'error' } }];\n}\n\nif (!upstreamData || !upstreamData._validated) {\n  return [{ json: {\n    success: false, error_code: 'PIPELINE_ERROR',\n    error_message: 'Validated data lost in Route By Exists',\n    data: null, _route: 'error',\n    _meta: { source: 'DB_Reschedule_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }}];\n}\n\n// Check if booking was found\nconst bookingFound = pgResult && pgResult.id !== undefined && pgResult.id !== null;\n\nif (!bookingFound) {\n  return [{ json: {\n    success: false, error_code: 'NOT_FOUND',\n    error_message: 'Booking not found',\n    data: null,\n    _meta: { source: 'DB_Reschedule_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id },\n    _route: 'not_found'\n  }}];\n}\n\n// Check if already cancelled\nconst status = pgResult.status || '';\nif (status === 'CANCELLED') {\n  return [{ json: {\n    success: false, error_code: 'ALREADY_CANCELLED',\n    error_message: 'Cannot reschedule a cancelled booking',\n    data: { booking_id: upstreamData.booking_id, status: 'CANCELLED' },\n    _meta: { source: 'DB_Reschedule_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id },\n    _route: 'already_cancelled'\n  }}];\n}\n\n// Get existing provider_id and service_id if not provided\nconst existing_provider_id = pgResult.provider_id || upstreamData.provider_id;\nconst existing_service_id = pgResult.service_id || upstreamData.service_id;\n\n// Booking exists and can be rescheduled — proceed\nreturn [{ json: {\n  ...upstreamData,\n  existing_status: status,\n  existing_provider_id: upstreamData.provider_id || existing_provider_id,\n  existing_service_id: upstreamData.service_id || existing_service_id,\n  existing_start_time: pgResult.start_time,\n  _route: 'reschedule'\n}}];",
+        "mode": "runOnceForAllItems"
       },
-      "id": "standard_contract_1772984456916",
-      "name": "📤 Standard Contract Output",
+      "name": "Route By Exists",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        5000,
-        500
-      ]
+      "position": [880, 304],
+      "id": "reschedule-route-exists-01"
     },
     {
       "parameters": {
-        "jsCode": "const buildData = $('Build Secure JSON').first().json;\nreturn [{\n  json: {\n    chat_id: buildData.chat_id,\n    start_time: buildData.start_time,\n    provider_id: buildData.provider_id,\n    service_id: buildData.service_id,\n    user_name: buildData.user_name,\n    user_email: buildData.user_email\n  }\n}];"
+        "jsCode": "// GATE: Only process items with _route === 'reschedule'\nconst input = $input.first().json;\n\nif (input._route !== 'reschedule') {\n  return [];\n}\n\nconst { booking_id, new_start_time, reschedule_reason, existing_provider_id, existing_service_id } = input;\nconst safeId = booking_id.replace(/'/g, \"''\");\nconst safeReason = reschedule_reason ? reschedule_reason.replace(/'/g, \"''\") : null;\nconst safeNewTime = new_start_time.replace(/'/g, \"''\");\n\n// UPDATE booking start_time (and optionally provider_id, service_id)\nconst provider_id = input.provider_id || existing_provider_id;\nconst service_id = input.service_id || existing_service_id;\n\nconst reschedule_query = `UPDATE bookings SET start_time = '${safeNewTime}'::timestamptz, provider_id = ${provider_id}::int, service_id = ${service_id}::int, updated_at = NOW() WHERE id = '${safeId}'::uuid RETURNING id, status, start_time;`;\n\nreturn [{ json: { ...input, reschedule_query } }];",
+        "mode": "runOnceForAllItems"
       },
-      "id": "prepare-create-input",
-      "name": "Prepare Create Input",
+      "name": "Build Reschedule Query",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        550,
-        432
-      ]
+      "position": [1100, 304],
+      "id": "reschedule-build-reschedule-01"
+    },
+    {
+      "parameters": {
+        "jsCode": "// GATE: Pass through non-reschedule routes to Format Response\nconst input = $input.first().json;\n\nif (input._route === 'reschedule') {\n  return [];\n}\n\n// Pass through error/not_found/already_cancelled responses\nreturn [{ json: input }];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Pass Through Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 520],
+      "id": "reschedule-pass-through-01"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.reschedule_query }}",
+        "options": {}
+      },
+      "name": "Execute Reschedule",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [1320, 304],
+      "alwaysOutputData": true,
+      "id": "reschedule-execute-pg-01",
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format success — booking rescheduled\nconst result = $input.first().json;\nconst upstreamData = $('Build Reschedule Query').isExecuted ? $('Build Reschedule Query').first().json : {};\nconst booking_id = result.id || upstreamData.booking_id;\n\nif (!booking_id) {\n  return [{ json: {\n    success: false, error_code: 'DB_ERROR',\n    error_message: 'Reschedule succeeded but no booking_id returned',\n    data: null,\n    _meta: { source: 'DB_Reschedule_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }}];\n}\n\nreturn [{ json: {\n  success: true, error_code: null, error_message: null,\n  data: { \n    booking_id, \n    status: result.status || 'CONFIRMED', \n    rescheduled: true,\n    new_start_time: result.start_time || upstreamData.new_start_time\n  },\n  _meta: { source: 'DB_Reschedule_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Format Success Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 304],
+      "id": "reschedule-format-success-01"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle Reschedule error\nconst e = $input.first().json;\nconst upstreamData = $('Build Reschedule Query').isExecuted ? $('Build Reschedule Query').first().json : {};\nlet error_code = 'DB_RESCHEDULE_ERROR';\nlet error_message = e.message || e.error?.message || 'Failed to reschedule booking';\n\nif (error_message.includes('violates foreign key')) {\n  error_code = 'FK_VIOLATION';\n  error_message = 'Foreign key constraint violation';\n} else if (error_message.includes('connection') || error_message.includes('ECONNREFUSED')) {\n  error_code = 'DB_CONNECTION_ERROR';\n  error_message = 'Database connection failed during reschedule';\n} else if (error_message.includes('timeout')) {\n  error_code = 'DB_TIMEOUT';\n  error_message = 'Database reschedule timeout';\n}\n\nreturn [{ json: {\n  ...upstreamData,\n  success: false, error_code, error_message, data: null,\n  _meta: { source: 'DB_Reschedule_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Handle Reschedule Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 520],
+      "id": "reschedule-handle-reschedule-err-01"
+    },
+    {
+      "parameters": {
+        "jsCode": "// UNIFIED OUTPUT — Standard Contract (§3.2)\nconst input = $input.first().json;\n\n// Process items that have data OR error_code set\nif (input.data !== undefined || input.error_code !== undefined) {\n  return [{ json: {\n    success: input.success === true,\n    error_code: input.error_code || null,\n    error_message: input.error_message || null,\n    data: input.data || null,\n    _meta: input._meta || {\n      source: 'DB_Reschedule_Booking',\n      timestamp: new Date().toISOString(),\n      workflow_id: $workflow.id\n    }\n  }}];\n}\n\n// Otherwise, pass-through item — skip it\nreturn [];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1760, 400],
+      "id": "reschedule-format-response-01"
     }
   ],
   "connections": {
     "Execute Workflow Trigger": {
-      "main": [
-        [
-          {
-            "node": "Build Secure JSON",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
     },
     "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Build Secure JSON",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
     },
     "Manual Trigger": {
+      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
+    },
+    "Validate Input": {
+      "main": [[{ "node": "Build Check Query", "type": "main", "index": 0 }]]
+    },
+    "Build Check Query": {
+      "main": [[{ "node": "Check Booking Exists", "type": "main", "index": 0 }]]
+    },
+    "Check Booking Exists": {
       "main": [
-        [
-          {
-            "node": "Build Secure JSON",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{ "node": "Route By Exists", "type": "main", "index": 0 }],
+        [{ "node": "Handle Check Error", "type": "main", "index": 0 }]
       ]
     },
-    "Build Secure JSON": {
+    "Handle Check Error": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
+    },
+    "Route By Exists": {
+      "main": [[
+        { "node": "Build Reschedule Query", "type": "main", "index": 0 },
+        { "node": "Pass Through Error", "type": "main", "index": 0 }
+      ]]
+    },
+    "Pass Through Error": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
+    },
+    "Build Reschedule Query": {
+      "main": [[{ "node": "Execute Reschedule", "type": "main", "index": 0 }]]
+    },
+    "Execute Reschedule": {
       "main": [
-        [
-          {
-            "node": "Is Valid?",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{ "node": "Format Success Output", "type": "main", "index": 0 }],
+        [{ "node": "Handle Reschedule Error", "type": "main", "index": 0 }]
       ]
     },
-    "Step 1: Cancel Old": {
-      "main": [
-        [
-          {
-            "node": "Prepare Create Input",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Format Success Output": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
     },
-    "Step 2: Create New": {
-      "main": [
-        [
-          {
-            "node": "Final Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Is Valid?": {
-      "main": [
-        [
-          {
-            "node": "Step 1: Cancel Old",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Format Invalid",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Format Invalid": {
-      "main": [
-        [
-          {
-            "node": "Final Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Prepare Create Input": {
-      "main": [
-        [
-          {
-            "node": "Step 2: Create New",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Final Response": {
-      "main": [
-        [
-          {
-            "node": "📤 Standard Contract Output",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Handle Reschedule Error": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
-  "id": "F2F5oQ7okPDKwg9E"
+  "active": true
 }
