@@ -1,386 +1,195 @@
 [
   {
-    "name": "NN_00_Global_Error_Handler",
-    "id": "B1VnkirO5dF20MHg",
-    "order": 1,
-    "webhook_path": "nn-00-global-error",
-    "description": "Centralized error handler - receives errors from all workflows"
-  },
-  {
     "name": "NN_02_Message_Parser",
     "id": "f80XLogu45Zg1TSM",
-    "order": 2,
+    "order": 1,
     "webhook_path": "nn-02-booking-parser-test",
     "description": "Parses incoming Telegram messages, validates and sanitizes input"
   },
   {
     "name": "NN_03_AI_Agent",
     "id": "PTJmDjgXfi14rdRW",
-    "order": 3,
+    "order": 2,
     "webhook_path": "nn-03-ai-agent",
     "description": "AI Agent with Groq (llama-3.3-70b-versatile) for booking responses"
   },
   {
     "name": "NN_04_Telegram_Sender",
     "id": "WE7DxLKAECtsA8Up",
-    "order": 4,
+    "order": 3,
     "webhook_path": "nn-04-telegram-sender-v2",
     "description": "Sends booking confirmations and responses via Telegram"
   },
   {
     "name": "DB_Get_Availability",
     "id": "zdUslfT9C0sTI83H",
-    "order": 5,
+    "order": 4,
     "webhook_path": "db-get-availability-test"
   },
   {
     "name": "DB_Cancel_Booking",
     "id": "mf4qnUG7UlrAKpQU",
-    "order": 7,
+    "order": 5,
     "webhook_path": "db-cancel-booking-test"
-  },
-  {
-    "name": "DB_Reschedule_Booking",
-    "id": "F2F5oQ7okPDKwg9E",
-    "order": 8,
-    "webhook_path": "db-reschedule-booking"
   },
   {
     "name": "DB_Find_Next_Available",
     "id": "oi5AiSoJRbzDf2A8",
-    "order": 9,
+    "order": 6,
     "webhook_path": "db-find-next-available"
   },
   {
     "name": "GCAL_Delete_Event",
     "id": "a2biGljAt5Cqig1C",
-    "order": 11,
+    "order": 7,
     "webhook_path": "gcal-delete-event"
   },
   {
     "name": "GMAIL_Send_Confirmation",
     "id": "uHSnVdLiMkEmpJZE",
-    "order": 12,
+    "order": 8,
     "webhook_path": "gmail-send-confirmation"
   },
   {
     "name": "NN_01_Booking_Gateway",
     "id": "MZfYRe4ZDgUeWW64",
-    "order": 13,
+    "order": 9,
     "webhook_path": "nn-01-booking-gateway",
     "description": "Main entry point - orchestrates NN_02 → NN_03 → NN_04 flow"
   },
   {
     "name": "NN_05_Reminder_Cron",
     "id": "trmFIo0zClyF38L8",
-    "order": 14
+    "order": 10
   },
   {
     "name": "BB_00_Config",
     "id": "9aK8rsjujaBEDmDp",
-    "order": 15,
+    "order": 11,
     "webhook_path": "bb-00-config"
   },
   {
     "name": "FRONTEND_Landing_Page",
-    "id": "EfQxqiSRjdJapQIY",
-    "order": 16,
-    "webhook_path": "titanium-landing",
-    "production_url": "https://n8n.stax.ink/webhook/EfQxqiSRjdJapQIY/webhook/titanium-landing"
+    "id": "rykhyxrMQUdrnE6C",
+    "order": 12,
+    "webhook_path": "titanium-landing"
   },
   {
     "name": "DB_Get_Providers",
     "id": "cNC4U2Bg6HoX09YP",
-    "order": 17
+    "order": 13
   },
   {
     "name": "DB_Get_Services",
     "id": "N2mFFyKLf7365OB9",
-    "order": 18
+    "order": 14
   },
   {
     "name": "DB_Get_Providers_By_Service",
     "id": "koGljfSXUzYESNoh",
-    "order": 19
+    "order": 15
   },
   {
     "name": "NN_03-B_Pipeline_Agent",
     "id": "X3D2dWkBu8QLlNSm",
-    "order": 20,
+    "order": 16,
     "webhook_path": "nn-03-b-pipeline"
   },
   {
     "name": "RAG_01_Document_Ingestion",
-    "id": "RAG_01_Document_Ingestion_ID",
-    "order": 21,
+    "id": "y5wGA3AEpaI95b3f",
+    "order": 17,
     "webhook_path": "rag-ingest-document",
     "description": "RAG document ingestion - converts documents to embeddings"
   },
   {
     "name": "RAG_02_Document_Retrieval",
-    "id": "RAG_02_Document_Retrieval_ID",
-    "order": 22,
+    "id": "WJTbYPafFOY4yFiS",
+    "order": 18,
     "webhook_path": "rag-search",
     "description": "RAG document retrieval - searches embeddings and returns context"
   },
   {
-    "name": "DB_Inspector",
-    "id": "CnV39YbNpAqyZr1P",
-    "order": 23,
-    "webhook_path": "db-inspector-last"
-  },
-  {
-    "name": "DB_Debug",
-    "id": "1ACCUSFG0eB9dEi6",
-    "order": 24,
-    "webhook_path": "rag-search"
-  },
-  {
-    "name": "DB_Resolve_Service_ID",
-    "id": "YVrtyqLVCuykAKgB",
-    "order": 25
-  },
-  {
-    "name": "DB_Get_User_Bookings",
-    "id": "rQKcHRQristrgJed",
-    "order": 26
-  },
-  {
-    "name": "DB_Get_User_Profile",
-    "id": "mJMUeVZSi55z8Bu9",
-    "order": 27
-  },
-  {
-    "name": "DB_Update_User_Profile",
-    "id": "wcsRgox02YnwDuGG",
-    "order": 28
-  },
-  {
-    "name": "DB_Update_Reminders",
-    "id": "xm6as11jRYblmgEJ",
-    "order": 29
-  },
-  {
-    "name": "DB_Join_Waitlist",
-    "id": "FH8hRUv3dVgo8FB6",
-    "order": 30
-  },
-  {
-    "name": "NN_03-C_Agent_V3",
-    "id": "OnHBt710KnrC9DE8",
-    "order": 31,
-    "webhook_path": "nn-03-c-agent"
-  },
-  {
-    "name": "SEED_Book_Tomorrow",
-    "id": "LIPSYlD7LHfFnAHW",
-    "order": 32,
-    "webhook_path": "seed-tomorrow",
-    "version": "2.0.0"
-  },
-  {
-    "name": "DB_Update_Gcal_Event_ID",
-    "id": "DB_Update_Gcal_Event_ID",
-    "order": 33
-  },
-  {
-    "name": "GCAL_Delete_Events_For_Tomorrow",
-    "id": "vvatFsBtr87mHdMX",
-    "order": 34,
-    "webhook_path": "gcal-delete-events-for-tomorrow"
-  },
-  {
-    "name": "TEMP_List_Gcal_Tomorrow",
-    "id": "sySggLPit1dmlaIy",
-    "order": 35,
-    "webhook_path": "list-gcal-tomorrow"
-  },
-  {
-    "name": "SUB_Seed_Single_Booking",
-    "id": "8h2HMDoNQTJEkiZL",
-    "order": 36,
-    "version": "2.0.0"
-  },
-  {
-    "name": "TEMP_Get_Gcal_Event",
-    "id": "50qjJMExc4LGPdbL",
-    "order": 37,
-    "webhook_path": "get-gcal-event"
-  },
-  {
     "name": "WF3_Availability_Service",
     "id": "6zftqMdtBAT0QaCt",
-    "order": 38,
+    "order": 19,
     "webhook_path": "check-availability"
-  },
-  {
-    "name": "WF4_Sync_Engine",
-    "id": "vsnXdMVEOJf1thmj",
-    "order": 40,
-    "webhook_path": "sync-repair-manual"
-  },
-  {
-    "name": "WF6_Rollback_Workflow",
-    "id": "hJtyeGLsMtOxLbAd",
-    "order": 41,
-    "webhook_path": "rollback-booking"
   },
   {
     "name": "WF7_Distributed_Lock_System",
     "id": "fhjJXp5DWLjbsem1",
-    "order": 43,
+    "order": 20,
     "webhook_path": "acquire-lock"
   },
   {
     "name": "WF5_GCal_Collision_Check",
     "id": "mSDwCAcyfLzJwvrb",
-    "order": 44,
+    "order": 21,
     "webhook_path": "gcal-collision-check"
   },
   {
-    "name": "WF2_Booking_Orchestrator_Error_Handler",
-    "id": "DW3wMB9KP5BR4JoM",
-    "order": 45
-  },
-  {
-    "name": "CB_GCal_Circuit_Breaker",
-    "id": "G15qrYLDth6n5WR7",
-    "order": 46,
-    "webhook_path": "circuit-breaker/check"
-  },
-  {
-    "name": "WF4_Sync_Engine_Event_Driven",
-    "id": "mEe6l6iIoXzIABJW",
-    "order": 47,
-    "webhook_path": "gcal-sync-trigger"
-  },
-  {
-    "name": "DLQ_Retry",
-    "id": "Ns2XLxQCaVsVTpSC",
-    "order": 49
-  },
-  {
-    "name": "CB_GCal_Circuit_Breaker",
-    "id": "G15qrYLDth6n5WR7",
-    "order": 50,
-    "webhook_path": "circuit-breaker/check"
-  },
-  {
-    "name": "DLQ_Retry",
-    "id": "Ns2XLxQCaVsVTpSC",
-    "order": 52
-  },
-  {
-    "name": "WF2_Booking_Orchestrator_Error_Handler",
-    "id": "DW3wMB9KP5BR4JoM",
-    "order": 54
-  },
-  {
-    "name": "WF4_Sync_Engine_Event_Driven",
-    "id": "mEe6l6iIoXzIABJW",
-    "order": 55,
-    "webhook_path": "gcal-sync-trigger"
-  },
-  {
-    "name": "My workflow",
-    "id": "WIHlHlgqRAWEFuWv",
-    "order": 56,
-    "webhook_path": "booking-ai-agent"
-  },
-  {
-    "name": "Diagnostic Test",
-    "id": "3qjxakUfnVlfvlwj",
-    "order": 56,
-    "webhook_path": "test-diagnostic"
-  },
-  {
-    "name": "DLQ_Manager",
-    "id": "DI8ybMP3MF0UldhT",
-    "order": 57,
-    "webhook_path": "dlq/add"
-  },
-  {
-    "name": "WF5_GCal_Collision_Check",
-    "id": "mSDwCAcyfLzJwvrb",
-    "order": 57,
-    "webhook_path": "gcal-collision-check"
-  },
-  {
-    "name": "WF2_Booking_Orchestrator",
-    "id": "Z7g7DgxXQ61V368P",
-    "order": 57,
-    "webhook_path": "booking-orchestrator"
-  },
-  {
-    "name": "WF5_GCal_Collision_Check",
-    "id": "mSDwCAcyfLzJwvrb",
-    "order": 58,
-    "webhook_path": "gcal-collision-check"
-  },
-  {
-    "name": "CB_01_Check_State",
-    "id": "6RDslq06ZS78Zph1",
-    "order": 59,
-    "webhook_path": "circuit-breaker/check"
+    "name": "WF6_Rollback_Workflow",
+    "id": "hJtyeGLsMtOxLbAd",
+    "order": 22,
+    "webhook_path": "rollback-booking"
   },
   {
     "name": "DLQ_01_Add_Entry",
     "id": "XRMU2cqA3fxU9e2I",
-    "order": 60,
+    "order": 23,
     "webhook_path": "dlq/add"
-  },
-  {
-    "name": "CB_02_Record_Result",
-    "id": "bT0r2EmUqGjc6Ioz",
-    "order": 61,
-    "webhook_path": "circuit-breaker/record"
   },
   {
     "name": "DLQ_02_Get_Status",
     "id": "85HqM7BIAApvfKbm",
-    "order": 62,
+    "order": 24,
     "webhook_path": "dlq/status"
   },
   {
-    "name": "TEST_GCal_Connection",
-    "id": "OK1i9Rpk3T3o30jS",
-    "order": 62,
-    "webhook_path": "test-gcal"
+    "name": "CB_01_Check_State",
+    "id": "6RDslq06ZS78Zph1",
+    "order": 25,
+    "webhook_path": "circuit-breaker/check"
+  },
+  {
+    "name": "CB_02_Record_Result",
+    "id": "bT0r2EmUqGjc6Ioz",
+    "order": 26,
+    "webhook_path": "circuit-breaker/record"
+  },
+  {
+    "name": "WF2_Booking_Orchestrator",
+    "id": "Z7g7DgxXQ61V368P",
+    "order": 27,
+    "webhook_path": "booking-orchestrator"
   },
   {
     "name": "WF1_Booking_API_Gateway",
     "id": "2G9ffjvKyF5bqDT5",
-    "order": 63,
+    "order": 28,
     "webhook_path": "book-appointment"
   },
   {
-    "name": "TEST_GCal_Minimal",
-    "id": "74zsMccewOLqJ8lD",
-    "order": 63,
-    "webhook_path": "test-gcal-minimal"
+    "name": "DB_Reschedule_Booking",
+    "id": "0gIIs3YgDNKHebkk",
+    "order": 29,
+    "webhook_path": "db-reschedule-booking"
   },
   {
-    "name": "SEED_Book_Tomorrow",
-    "id": "LIPSYlD7LHfFnAHW",
-    "order": 64,
-    "webhook_path": "seed-tomorrow"
+    "name": "DB_Create_Booking",
+    "id": "0pqnF4CQSGJMp7br",
+    "order": 30,
+    "webhook_path": "db-create-booking"
   },
   {
-    "name": "WF8_Booking_Queue_Worker",
-    "id": "GaVFL3VwVy5qUrqf",
-    "order": 65,
-    "webhook_path": "wf8-worker-trigger"
+    "name": "SEED_01_Daily_Provisioning",
+    "id": "IVDXuT6a4tT9w1vR",
+    "order": 31,
+    "webhook_path": "seed-daily-prod-v1"
   },
   {
-    "name": "WF1_Booking_API_Gateway_Async",
-    "id": "T3peNeEvQz2HFtxr",
-    "order": 66,
-    "webhook_path": "book-appointment-async"
-  },
-  {
-    "name": "WF9_Booking_Intent_Status",
-    "id": "3wWhCGCVrjFtcLfP",
-    "order": 67,
-    "webhook_path": "booking-intents/:intent_id"
+    "name": "SEED_01_Process_Slot",
+    "id": "jalLaIR09MPpZGcl",
+    "order": 32
   }
 ]
