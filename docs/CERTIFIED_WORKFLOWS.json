@@ -115,5 +115,25 @@
     "certified_at": "2026-03-20",
     "git_tag": "DLQ_02_Get_Status-v1.0.0-certified",
     "status": "FROZEN"
+  },
+  {
+    "name": "SEED_01_Daily_Provisioning",
+    "version": "2.1.0",
+    "node_count": 8,
+    "tests_passed": "7/7",
+    "certified_at": "2026-03-21",
+    "git_tag": "SEED_01_Daily_Provisioning-v2.1.0-certified",
+    "status": "FROZEN",
+    "test_summary": {
+      "happy_path": "8/8 slots booked with valid chat_id",
+      "red_team": "5/5 invalid inputs rejected (Feb 30, negative ID, invalid hours, invalid TZ, invalid duration)",
+      "integrity_check": "OK - slot count matches expected"
+    },
+    "security_fixes": [
+      "Replaced all regex validation with native JS (Date constructor, Number.isInteger)",
+      "Added real date existence validation (rejects Feb 30, Apr 31, etc.)",
+      "Added range validation for all numeric inputs",
+      "Added timezone offset format validation (+HH:MM or -HH:MM)"
+    ]
   }
 ]
