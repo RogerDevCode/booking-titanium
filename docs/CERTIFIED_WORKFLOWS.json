@@ -165,5 +165,63 @@
       ]
     },
     "parent_workflow": "SEED_01_Daily_Provisioning (IVDXuT6a4tT9w1vR) v2.1.0"
+  },
+  {
+    "name": "DB_Create_Booking",
+    "version": "4.2.0",
+    "node_count": 14,
+    "tests_passed": "15/15",
+    "certified_at": "2026-03-23",
+    "git_tag": "DB_Create_Booking-v4.2.0-certified",
+    "status": "FROZEN",
+    "test_summary": {
+      "happy_path": "Successful booking creation with booking_id return",
+      "idempotency": "Silent success for duplicate idempotency_key with is_duplicate: true",
+      "validation": "15/15 tests passed - MISSING_FIELD, INVALID_TYPE, INVALID_RANGE, SQL injection blocked, date validation (Feb 30, Feb 29, no timezone)"
+    },
+    "security_fixes": [
+      "Mandatory 4-Layer Postgres Pattern (§3.3) implemented",
+      "Gate + Skip pattern (no IF nodes v2.3 bug)",
+      "ISO 8601 with timezone validation",
+      "Date existence validation (catches Feb 30, Apr 31, etc.)",
+      "SQL injection blocked with SAFE_STR_RE regex",
+      "Zero-throw pattern with Standard Contract"
+    ]
+  },
+  {
+    "name": "DB_Cancel_Booking",
+    "version": "1.0.0",
+    "node_count": 14,
+    "tests_passed": "6/6",
+    "certified_at": "2026-03-23",
+    "git_tag": "DB_Cancel_Booking-v1.0.0-certified",
+    "status": "FROZEN",
+    "test_summary": {
+      "happy_path": "Successful booking cancellation with booking_id return",
+      "validation": "Negative tests passed for MISSING_FIELD, INVALID_TYPE (invalid UUID format), NOT_FOUND, ALREADY_CANCELLED"
+    },
+    "architecture": {
+      "pattern": "Gate + Skip (no IF nodes)",
+      "validation": "UUID regex + existence check",
+      "error_handling": "Zero-throw pattern with Standard Contract"
+    }
+  },
+  {
+    "name": "DB_Reschedule_Booking",
+    "version": "1.0.0",
+    "node_count": 14,
+    "tests_passed": "6/6",
+    "certified_at": "2026-03-23",
+    "git_tag": "DB_Reschedule_Booking-v1.0.0-certified",
+    "status": "FROZEN",
+    "test_summary": {
+      "happy_path": "Successful booking reschedule with new_start_time update",
+      "validation": "Negative tests passed for MISSING_FIELD, INVALID_TYPE (invalid UUID/date), PAST_DATE, NOT_FOUND, ALREADY_CANCELLED"
+    },
+    "architecture": {
+      "pattern": "Gate + Skip (no IF nodes)",
+      "validation": "UUID regex + ISO 8601 with timezone + date existence check",
+      "error_handling": "Zero-throw pattern with Standard Contract"
+    }
   }
 ]
