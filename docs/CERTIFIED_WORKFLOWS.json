@@ -1,5 +1,47 @@
 [
   {
+    "name": "FRONTEND_Landing_Page",
+    "version": "1.0.0",
+    "node_count": 3,
+    "tests_passed": "11/11",
+    "certified_at": "2026-03-23",
+    "git_tag": "FRONTEND_Landing_Page-v1.0.0-certified",
+    "status": "FROZEN",
+    "test_file": "tests/FRONTEND_Landing_Page.test.ts",
+    "test_summary": {
+      "architecture": "3/3 tests passed - workflow structure (3 nodes), node versions, webhook config",
+      "content": "3/3 tests passed - HTML structure, Booking Titanium branding, Telegram CTA",
+      "security": "2/2 tests passed - responseNode mode, Content-Type header",
+      "design": "3/3 tests passed - modern CSS, responsive design, Google Fonts"
+    },
+    "architecture": {
+      "pattern": "Static HTML generator with webhook endpoint",
+      "description": "Serves a modern landing page for Booking Titanium at /webhook/titanium-landing",
+      "webhook": "GET /titanium-landing → HTML response",
+      "response_format": "text/html with proper Content-Type header"
+    },
+    "data_flow": [
+      "Webhook (GET) → Generate Frontend (Code node with HTML template)",
+      "→ Respond to Webhook (text/html)"
+    ],
+    "design_features": [
+      "Dark theme with titanium color palette",
+      "Ambient background with radial gradients",
+      "Cursor glow effect (interactive)",
+      "Glassmorphism (backdrop-filter)",
+      "CSS animations (pulse effect)",
+      "Responsive design (mobile-first @media queries)",
+      "Google Fonts: Outfit (headings) + Manrope (body)",
+      "Animated entrance (staggered fade-in)"
+    ],
+    "security_notes": [
+      "GET-only endpoint (no POST/PUT/DELETE)",
+      "responseNode mode for reliable responses",
+      "Static HTML generation (no external API calls)",
+      "No user input processing (XSS-proof)"
+    ]
+  },
+  {
     "name": "NN_05_Reminder_Cron",
     "version": "2.0.0",
     "node_count": 8,

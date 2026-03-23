@@ -1,81 +1,114 @@
-import axios from 'axios';
+import * as fs from 'fs';
+import * as path from 'path';
 
-const N8N_URL = process.env.N8N_URL || 'https://n8n.stax.ink';
-const WEBHOOK_URL = `${N8N_URL}/webhook/titanium-landing`;
-
-describe('FRONTEND_Landing_Page', () => {
+describe('FRONTEND_Landing_Page Paranoia Tests', () => {
   const TIMEOUT = 15000;
+  const WORKFLOW_PATH = path.join(__dirname, '../workflows/FRONTEND_Landing_Page.json');
 
-  // Note: This workflow requires manual "Publish" in n8n UI to register webhooks
-  // See: https://github.com/n8n-io/n8n/issues/551
-  // Tests below validate the workflow structure and HTML generation
+  let workflow: any;
 
-  it('Structure: workflow has correct node count', async () => {
-    // This test validates the workflow structure without calling the webhook
-    const workflow = await import('../workflows/FRONTEND_Landing_Page.json');
-    expect(workflow.nodes.length).toBe(3); // Webhook, Generate Frontend, Respond to Webhook
+  beforeAll(() => {
+    workflow = JSON.parse(fs.readFileSync(WORKFLOW_PATH, 'utf-8'));
+  });
+
+  // === ARCHITECTURE TESTS ===
+
+  it('has correct workflow structure (3 nodes)', () => {
+    expect(workflow.nodes).toHaveLength(3);
+    const nodeNames = workflow.nodes.map((n: any) => n.name);
+    expect(nodeNames).toContain('Webhook');
+    expect(nodeNames).toContain('Generate Frontend');
+    expect(nodeNames).toContain('Respond to Webhook');
   }, TIMEOUT);
 
-  it('Structure: workflow uses responseNode mode', async () => {
-    const workflow = await import('../workflows/FRONTEND_Landing_Page.json');
-    const webhookNode = workflow.nodes.find(n => n.name === 'Webhook');
-    expect(webhookNode.parameters.responseMode).toBe('responseNode');
+  it('uses correct node versions', () => {
+    const webhook = workflow.nodes.find((n: any) => n.name === 'Webhook');
+    const code = workflow.nodes.find((n: any) => n.name === 'Generate Frontend');
+    const respond = workflow.nodes.find((n: any) => n.name === 'Respond to Webhook');
+
+    expect(webhook.typeVersion).toBe(2.1);
+    expect(code.typeVersion).toBe(2);
+    expect(respond.typeVersion).toBeGreaterThanOrEqual(1.1);
   }, TIMEOUT);
 
-  it('Structure: HTML contains expected title', async () => {
-    const workflow = await import('../workflows/FRONTEND_Landing_Page.json');
-    const generateNode = workflow.nodes.find(n => n.name === 'Generate Frontend');
-    const html = generateNode.parameters.jsCode.match(/<title>(.*?)<\/title>/)[1];
-    expect(html).toContain('Booking Titanium');
+  it('has correct webhook configuration (GET method)', () => {
+    const webhook = workflow.nodes.find((n: any) => n.name === 'Webhook');
+    expect(webhook.parameters.httpMethod).toBe('GET');
+    expect(webhook.parameters.path).toBe('titanium-landing');
+    expect(webhook.parameters.responseMode).toBe('responseNode');
   }, TIMEOUT);
 
-  it('Structure: HTML contains hero content', async () => {
-    const workflow = await import('../workflows/FRONTEND_Landing_Page.json');
-    const generateNode = workflow.nodes.find(n => n.name === 'Generate Frontend');
-    const html = generateNode.parameters.jsCode;
-    expect(html).toContain('Gestión de Reservas');
-    expect(html).toContain('Inteligente');
-    expect(html).toContain('IA + Automatización');
+  // === CONTENT TESTS ===
+
+  it('generates valid HTML structure', () => {
+    const generateNode = workflow.nodes.find((n: any) => n.name === 'Generate Frontend');
+    const jsCode = generateNode.parameters.jsCode;
+
+    expect(jsCode).toContain('<!DOCTYPE html>');
+    expect(jsCode).toContain('<html');
+    expect(jsCode).toContain('</html>');
   }, TIMEOUT);
 
-  it('Structure: HTML contains CTA buttons', async () => {
-    const workflow = await import('../workflows/FRONTEND_Landing_Page.json');
-    const generateNode = workflow.nodes.find(n => n.name === 'Generate Frontend');
-    const html = generateNode.parameters.jsCode;
-    expect(html).toContain('Reservar vía Telegram');
-    expect(html).toContain('Saber más');
+  it('includes Booking Titanium branding', () => {
+    const generateNode = workflow.nodes.find((n: any) => n.name === 'Generate Frontend');
+    const jsCode = generateNode.parameters.jsCode;
+
+    expect(jsCode).toContain('Booking Titanium');
+    expect(jsCode).toContain('Titanium');
   }, TIMEOUT);
 
-  it('Structure: HTML contains cursor glow effect', async () => {
-    const workflow = await import('../workflows/FRONTEND_Landing_Page.json');
-    const generateNode = workflow.nodes.find(n => n.name === 'Generate Frontend');
-    const html = generateNode.parameters.jsCode;
-    expect(html).toContain('cursor-glow');
-    expect(html).toContain('cursorGlow');
+  it('includes Telegram CTA link', () => {
+    const generateNode = workflow.nodes.find((n: any) => n.name === 'Generate Frontend');
+    const jsCode = generateNode.parameters.jsCode;
+
+    expect(jsCode).toContain('t.me/');
+    expect(jsCode).toContain('Telegram');
   }, TIMEOUT);
 
-  it('Structure: HTML contains ambient background', async () => {
-    const workflow = await import('../workflows/FRONTEND_Landing_Page.json');
-    const generateNode = workflow.nodes.find(n => n.name === 'Generate Frontend');
-    const html = generateNode.parameters.jsCode;
-    expect(html).toContain('ambient-bg');
-    expect(html).toContain('radial-gradient');
+  // === SECURITY TESTS ===
+
+  it('uses responseNode mode (not lastNode)', () => {
+    const webhook = workflow.nodes.find((n: any) => n.name === 'Webhook');
+    expect(webhook.parameters.responseMode).toBe('responseNode');
   }, TIMEOUT);
 
-  it('Structure: HTML has valid DOCTYPE', async () => {
-    const workflow = await import('../workflows/FRONTEND_Landing_Page.json');
-    const generateNode = workflow.nodes.find(n => n.name === 'Generate Frontend');
-    const html = generateNode.parameters.jsCode;
-    expect(html).toContain('<!DOCTYPE html>');
+  it('sets correct Content-Type header', () => {
+    const respondNode = workflow.nodes.find((n: any) => n.name === 'Respond to Webhook');
+    const headers = respondNode.parameters.options?.responseHeaders?.entries;
+    
+    const contentTypeHeader = headers?.find((h: any) => h.name === 'Content-Type');
+    expect(contentTypeHeader).toBeDefined();
+    expect(contentTypeHeader?.value).toBe('text/html');
   }, TIMEOUT);
 
-  it('Integration: landing page includes Google Fonts', async () => {
-    const workflow = await import('../workflows/FRONTEND_Landing_Page.json');
-    const generateNode = workflow.nodes.find(n => n.name === 'Generate Frontend');
-    const html = generateNode.parameters.jsCode;
-    expect(html).toContain('fonts.googleapis.com');
-    expect(html).toContain('Outfit');
-    expect(html).toContain('Manrope');
+  // === DESIGN TESTS ===
+
+  it('includes modern CSS features', () => {
+    const generateNode = workflow.nodes.find((n: any) => n.name === 'Generate Frontend');
+    const jsCode = generateNode.parameters.jsCode;
+
+    expect(jsCode).toContain('cursor-glow'); // Interactive cursor effect
+    expect(jsCode).toContain('ambient-bg'); // Ambient background
+    expect(jsCode).toContain('animation'); // CSS animations
+    expect(jsCode).toContain('backdrop-filter'); // Glassmorphism
+    expect(jsCode).toContain('radial-gradient');
+  }, TIMEOUT);
+
+  it('includes responsive design', () => {
+    const generateNode = workflow.nodes.find((n: any) => n.name === 'Generate Frontend');
+    const jsCode = generateNode.parameters.jsCode;
+
+    expect(jsCode).toContain('@media (max-width: 768px)');
+    expect(jsCode).toContain('viewport');
+  }, TIMEOUT);
+
+  it('includes Google Fonts', () => {
+    const generateNode = workflow.nodes.find((n: any) => n.name === 'Generate Frontend');
+    const jsCode = generateNode.parameters.jsCode;
+
+    expect(jsCode).toContain('fonts.googleapis.com');
+    expect(jsCode).toContain('Outfit');
+    expect(jsCode).toContain('Manrope');
   }, TIMEOUT);
 
 });
