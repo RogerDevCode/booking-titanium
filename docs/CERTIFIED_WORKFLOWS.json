@@ -313,5 +313,25 @@
       "validation": "Optional boolean type casting + validation",
       "error_handling": "Zero-throw pattern with Standard Contract, responseNode mode"
     }
+  },
+  {
+    "name": "DB_Get_Providers_By_Service",
+    "version": "1.0.0",
+    "node_count": 12,
+    "tests_passed": "12/12",
+    "certified_at": "2026-03-23",
+    "git_tag": "DB_Get_Providers_By_Service-v1.0.0-certified",
+    "status": "FROZEN",
+    "test_file": "tests/DB_Get_Providers_By_Service.test.ts",
+    "test_summary": {
+      "happy_path": "4/4 tests passed - fetch providers by service_id (int, string, non-existent service)",
+      "validation": "6/6 tests passed - MISSING_FIELD, INVALID_TYPE (boolean, string, float, zero, negative)",
+      "standard_contract": "2/2 tests passed - success and error responses include all required fields"
+    },
+    "architecture": {
+      "pattern": "Gate + Skip (no IF nodes)",
+      "validation": "Positive integer regex + validation for service_id",
+      "error_handling": "Zero-throw pattern with Standard Contract, responseNode mode"
+    }
   }
 ]

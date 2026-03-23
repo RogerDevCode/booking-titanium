@@ -23,7 +23,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "db-get-providers-by-service",
-        "responseMode": "lastNode",
+        "responseMode": "responseNode",
         "options": {}
       },
       "name": "Webhook",
@@ -46,7 +46,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Gate: _exit_early items skip to Format Response\n// Valid items: build providers-by-service query\nconst input = $input.first().json;\n\nif (input._exit_early) {\n  return [{ json: { ...input, providers: [] } }];\n}\n\nconst { service_id } = input;\n\n// Build query to get providers for a specific service\n// JOIN providers with provider_services to get only providers offering this service\nconst providers_query = `\n  SELECT DISTINCT p.id, p.name, p.email, p.active, p.created_at\n  FROM providers p\n  INNER JOIN provider_services ps ON p.id = ps.provider_id\n  WHERE ps.service_id = ${service_id}::int\n  ORDER BY p.name;\n`;\n\nreturn [{ json: {\n  ...input,\n  providers_query,\n  service_id\n}}];",
+        "jsCode": "// Gate: _exit_early items skip to Format Response\n// Valid items: build providers-by-service query\nconst input = $input.first().json;\n\nif (input._exit_early) {\n  return [{ json: { ...input, providers: [] } }];\n}\n\nconst { service_id } = input;\n\n// Build query to get providers for a specific service\n// JOIN providers with provider_services to get only providers offering this service\n// Note: providers table has: id, name, email, gcal_calendar_id, is_active, google_calendar_id\nconst providers_query = `\n  SELECT DISTINCT p.id, p.name, p.email, p.is_active as active\n  FROM providers p\n  INNER JOIN provider_services ps ON p.id = ps.provider_id\n  WHERE ps.service_id = ${service_id}::int\n  ORDER BY p.name;\n`;\n\nreturn [{ json: {\n  ...input,\n  providers_query,\n  service_id\n}}];",
         "mode": "runOnceForAllItems"
       },
       "name": "Build Providers Query",
@@ -57,14 +57,25 @@
     },
     {
       "parameters": {
-        "jsCode": "// GATE: Only process items with _validated === true\nconst input = $input.first().json;\n\nif (input._exit_early) {\n  return [];\n}\n\nreturn [{ json: input }];",
+        "jsCode": "// Gate: only pass valid items to Build Query\nconst input = $input.first().json;\nif (input._exit_early) return [];\nreturn [{ json: input }];",
         "mode": "runOnceForAllItems"
       },
-      "name": "Pass Through Error",
+      "name": "Gate Execute",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [568, 300],
-      "id": "pbs-pass-through-01"
+      "position": [568, 200],
+      "id": "pbs-gate-execute-01"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Gate: only pass validation errors to skip query\nconst input = $input.first().json;\nif (!input._exit_early) return [];\nreturn [{ json: input }];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Gate Skip",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [568, 400],
+      "id": "pbs-gate-skip-01"
     },
     {
       "parameters": {
@@ -99,7 +110,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Format providers response\nconst items = $input.all();\nconst upstreamData = $('Build Providers Query').isExecuted ? $('Build Providers Query').first().json : {};\n\n// Map all provider rows\nconst providers = items.map(item => ({\n  id: item.json.id,\n  name: item.json.name,\n  email: item.json.email,\n  active: item.json.active,\n  created_at: item.json.created_at\n}));\n\nreturn [{ json: {\n  success: true,\n  error_code: null,\n  error_message: null,\n  data: {\n    providers,\n    total: providers.length,\n    service_id: upstreamData.service_id\n  },\n  _meta: {\n    source: 'DB_Get_Providers_By_Service',\n    timestamp: new Date().toISOString(),\n    workflow_id: $workflow.id\n  }\n}}];",
+        "jsCode": "// Format providers response\nconst items = $input.all();\nconst upstreamData = $('Build Providers Query').isExecuted ? $('Build Providers Query').first().json : {};\n\nlet providers = [];\n// Postgres alwaysOutputData=true returns [{json: {}}] when 0 rows\nif (items.length > 0 && Object.keys(items[0].json).length > 0 && items[0].json.id !== undefined) {\n  providers = items.map(item => ({\n    id: item.json.id,\n    name: item.json.name,\n    email: item.json.email,\n    active: item.json.active\n  }));\n}\n\nreturn [{ json: {\n  success: true,\n  error_code: null,\n  error_message: null,\n  data: {\n    providers,\n    total: providers.length,\n    service_id: upstreamData.service_id\n  },\n  _meta: {\n    source: 'DB_Get_Providers_By_Service',\n    timestamp: new Date().toISOString(),\n    workflow_id: $workflow.id\n  }\n}}];",
         "mode": "runOnceForAllItems"
       },
       "name": "Format Providers",
@@ -110,7 +121,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// UNIFIED OUTPUT — Standard Contract (§3.2)\nconst input = $input.first().json;\n\n// Process items that have data OR error_code set\nif (input.data !== undefined || input.error_code !== undefined) {\n  return [{ json: {\n    success: input.success === true,\n    error_code: input.error_code || null,\n    error_message: input.error_message || null,\n    data: input.data || null,\n    _meta: input._meta || {\n      source: 'DB_Get_Providers_By_Service',\n      timestamp: new Date().toISOString(),\n      workflow_id: $workflow.id\n    }\n  }}];\n}\n\n// Otherwise, pass-through item — skip it\nreturn [];",
+        "jsCode": "// UNIFIED OUTPUT — Standard Contract (§3.2)\nconst items = $input.all();\nlet finalItem = items.find(i => i.json.data !== undefined || i.json.error_code !== undefined);\nif (!finalItem) finalItem = items.find(i => i.json._exit_early);\nif (!finalItem) { \n  return [{ json: { success: false, error_code: 'PIPELINE_ERROR', error_message: 'No valid output found', data: null, _meta: { source: 'DB_Get_Providers_By_Service', timestamp: new Date().toISOString(), workflow_id: $workflow.id } } }]; \n}\nconst input = finalItem.json;\nreturn [{ json: {\n  success: input.success === true,\n  error_code: input.error_code || null,\n  error_message: input.error_message || null,\n  data: input.data || null,\n  _meta: input._meta || {\n    source: 'DB_Get_Providers_By_Service',\n    timestamp: new Date().toISOString(),\n    workflow_id: $workflow.id\n  }\n}}];",
         "mode": "runOnceForAllItems"
       },
       "name": "Format Response",
@@ -118,6 +129,17 @@
       "typeVersion": 2,
       "position": [1088, 300],
       "id": "pbs-format-response-01"
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {}
+      },
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1300, 300],
+      "id": "pbs-respond-01"
     }
   ],
   "connections": {
@@ -131,15 +153,18 @@
       "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
     },
     "Validate Input": {
-      "main": [[{ "node": "Build Providers Query", "type": "main", "index": 0 }]]
-    },
-    "Build Providers Query": {
       "main": [[
-        { "node": "Pass Through Error", "type": "main", "index": 0 },
-        { "node": "Format Response", "type": "main", "index": 0 }
+        { "node": "Gate Execute", "type": "main", "index": 0 },
+        { "node": "Gate Skip", "type": "main", "index": 0 }
       ]]
     },
-    "Pass Through Error": {
+    "Gate Execute": {
+      "main": [[{ "node": "Build Providers Query", "type": "main", "index": 0 }]]
+    },
+    "Gate Skip": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
+    },
+    "Build Providers Query": {
       "main": [[{ "node": "Execute Providers Query", "type": "main", "index": 0 }]]
     },
     "Execute Providers Query": {
@@ -153,6 +178,9 @@
     },
     "Format Providers": {
       "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
+    },
+    "Format Response": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
     }
   },
   "settings": {
