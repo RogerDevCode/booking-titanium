@@ -3,100 +3,68 @@
   "nodes": [
     {
       "parameters": {},
-      "id": "trigger_manual",
-      "name": "When clicking ‘Test workflow’",
+      "name": "Manual Trigger",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [
-        200,
-        220
-      ]
+      "position": [0, 0],
+      "id": "tg-manual-01"
     },
     {
       "parameters": {
         "inputSource": "passthrough"
       },
-      "id": "trigger_execwf",
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
-      "position": [
-        200,
-        420
-      ]
+      "position": [0, 200],
+      "id": "tg-trigger-01"
     },
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "nn-04-telegram-sender-v2",
+        "path": "nn-04-telegram-sender",
         "responseMode": "lastNode",
         "options": {}
       },
-      "id": "trigger_webhook",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [
-        380,
-        650
-      ],
-      "webhookId": "nn-04-telegram-sender-v2"
+      "position": [0, 400],
+      "webhookId": "nn-04-telegram-sender",
+      "id": "tg-webhook-01"
     },
     {
       "parameters": {
-        "jsCode": "const item = $input.first()?.json || {};\nconst data = item.data || item.body?.data || item.body || item;\n\n// Support both 'text' and 'ai_response' fields\nconst chat_id = data.chat_id;\nconst text = data.text || data.ai_response;\n\n// Validation Sandwich PRE: Check required fields\nconst isValid = !!(chat_id && text);\n\nreturn [{\n  json: {\n    isValid,\n    chat_id: chat_id,\n    text: text,\n    ai_response: text,\n    original_data: data\n  }\n}];"
+        "jsCode": "// LAYER 1+2: Extract & Validate (§4.1 PRE-validate)\n// Zero-throw: returns Standard Contract error, never throws\n\nconst raw = $input.first().json;\nconst input = (raw.body && typeof raw.body === 'object') ? raw.body : raw;\n\nfunction ve(code, msg) {\n  return [{ json: {\n    success: false, error_code: code, error_message: msg, data: null,\n    _meta: { source: 'NN_04_Telegram_Sender', timestamp: new Date().toISOString(), workflow_id: $workflow.id },\n    _exit_early: true\n  }}];\n}\n\n// === CHAT_ID VALIDATION ===\nlet chat_id;\nif (input.chat_id === undefined || input.chat_id === null) {\n  return ve('MISSING_FIELD', 'chat_id is required');\n}\nif (typeof input.chat_id === 'string') {\n  const trimmed = input.chat_id.trim();\n  const INT_RE = /^\\d+$/;\n  if (!INT_RE.test(trimmed)) return ve('INVALID_TYPE', 'chat_id must be a positive integer');\n  chat_id = parseInt(trimmed);\n} else if (typeof input.chat_id === 'number') {\n  chat_id = input.chat_id;\n  if (!Number.isInteger(chat_id) || chat_id < 1) return ve('INVALID_TYPE', 'chat_id must be a positive integer');\n} else {\n  return ve('INVALID_TYPE', 'chat_id must be a number or numeric string');\n}\n\n// === TEXT VALIDATION ===\nlet text = null;\nif (input.text !== undefined && input.text !== null) {\n  text = String(input.text).trim();\n} else if (input.ai_response !== undefined && input.ai_response !== null) {\n  text = String(input.ai_response).trim();\n}\nif (!text || text.length === 0) return ve('MISSING_FIELD', 'text or ai_response is required');\nif (text.length > 4096) return ve('INVALID_INPUT', 'text must be <= 4096 characters (Telegram limit)');\n\nreturn [{ json: {\n  success: true,\n  chat_id,\n  text,\n  _validated: true\n}}];",
+        "mode": "runOnceForAllItems"
       },
-      "id": "extract_validate",
-      "name": "Extract & Validate (PRE)",
+      "name": "Validate Input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        480,
-        420
-      ]
+      "position": [256, 200],
+      "id": "tg-validate-01"
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "cond_valid_tg",
-              "leftValue": "={{ $json.isValid }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        }
+        "jsCode": "// Sanitize text for Telegram MarkdownV2 [SEC_02]\nconst input = $input.first().json;\n\n// Pass-through validation errors\nif (input._exit_early) {\n  return [{ json: { ...input, sanitized_text: '' } }];\n}\n\nconst text = input.text || '';\nconst sanitized = text.replace(/([_*\\[\\]()~`>#+\\-=|{}.!])/g, '\\\\$1');\n\nreturn [{ json: {\n  ...input,\n  sanitized_text: sanitized\n}}];",
+        "mode": "runOnceForAllItems"
       },
-      "id": "verify_nn04",
-      "name": "Is Valid?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        700,
-        420
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "// Sanitize text for Telegram MarkdownV2 [SEC_02]\nconst text = $input.first()?.json?.text || $input.first()?.json?.ai_response || '';\n\nif (!text) {\n  return [{ json: { ...$input.first().json, sanitized_text: '' } }];\n}\n\n// Official Telegram MarkdownV2 escape list\nconst sanitized = text.replace(/([_*\\[\\]()~`>#+\\-=|{}.!])/g, '\\\\$1');\n\nreturn [{ json: { ...$input.first().json, sanitized_text: sanitized } }];"
-      },
-      "id": "sanitize_telegram",
       "name": "Sanitize for Telegram",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        825,
-        300
-      ]
+      "position": [464, 200],
+      "id": "tg-sanitize-01"
+    },
+    {
+      "parameters": {
+        "jsCode": "// GATE: Only process items with _validated === true\nconst input = $input.first().json;\n\nif (input._exit_early) {\n  return [];\n}\n\nreturn [{ json: input }];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Pass Through Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [568, 300],
+      "id": "tg-pass-through-01"
     },
     {
       "parameters": {
@@ -106,219 +74,92 @@
           "parse_mode": "MarkdownV2"
         }
       },
-      "id": "telegram_node",
       "name": "Telegram",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [
-        950,
-        300
-      ],
+      "position": [672, 200],
       "credentials": {
         "telegramApi": {
-          "id": "ewRLYYWW68aJpgIC",
-          "name": "Telegram Booking"
+          "id": "WR4umwQYS9Gx0cTO",
+          "name": "Telegram account"
         }
       },
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "id": "tg-send-01"
     },
     {
       "parameters": {
-        "jsCode": "const telegramResult = $input.first()?.json || {};\nconst originalData = $node[\"Extract & Validate (PRE)\"].json;\nconst chat_id = telegramResult.result?.chat?.id || telegramResult.chat?.id || originalData.chat_id || \"unknown\";\n\nif (telegramResult.error_code === \"VALIDATION_ERROR\") {\n  return [{ json: telegramResult }];\n}\n\n/* n8n Telegram node v1.2 returns: { ok: true, result: { message_id, chat, ... } } */\nconst msgId = telegramResult.result?.message_id || telegramResult.message_id || null;\nconst isSuccess = !!(msgId || telegramResult.ok === true) && !telegramResult.error;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    error_code: isSuccess ? null : \"TELEGRAM_API_ERROR\",\n    error_message: isSuccess ? null : (telegramResult.error || \"Telegram failed to send message\"),\n    data: {\n      delivery_status: isSuccess ? \"SENT\" : \"FAILED\",\n      chat_id: chat_id,\n      message_id: msgId\n    },\n    _meta: {\n      source: \"NN_04_Telegram_Sender\",\n      timestamp: new Date().toISOString(),\n      workflow_id: \"NN_04\",\n      version: \"1.1.0\"\n    }\n  }\n}];"
+        "jsCode": "// Handle Telegram API error\nconst e = $input.first().json;\nconst upstreamData = $('Pass Through Error').isExecuted ? $('Pass Through Error').first().json : {};\nlet error_code = 'TELEGRAM_API_ERROR';\nlet error_message = e.message || e.error?.message || 'Telegram API error';\n\nif (error_message.includes('chat not found') || error_message.includes('400')) {\n  error_code = 'TELEGRAM_CHAT_NOT_FOUND';\n  error_message = 'Telegram chat not found or bot blocked';\n} else if (error_message.includes('unauthorized') || error_message.includes('401')) {\n  error_code = 'TELEGRAM_AUTH_ERROR';\n  error_message = 'Telegram bot token invalid or revoked';\n} else if (error_message.includes('rate limit') || error_message.includes('429')) {\n  error_code = 'TELEGRAM_RATE_LIMIT';\n  error_message = 'Telegram rate limit exceeded';\n}\n\nreturn [{ json: {\n  ...upstreamData,\n  success: false, error_code, error_message, data: null,\n  _meta: { source: 'NN_04_Telegram_Sender', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];",
+        "mode": "runOnceForAllItems"
       },
-      "id": "format_success",
-      "name": "Format Success (POST)",
+      "name": "Handle Telegram Error",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        1200,
-        300
-      ]
+      "position": [672, 420],
+      "id": "tg-handle-error-01"
     },
     {
       "parameters": {
-        "jsCode": "return {\n    success: false,\n    error_code: \"VALIDATION_ERROR\",\n    error_message: \"Payload missing required fields for Telegram\",\n    data: null,\n    _meta: {\n      source: \"NN_04_Telegram_Sender\",\n      timestamp: new Date().toISOString(),\n      workflow_id: \"NN_04\",\n      version: \"1.0.0\"\n    }\n};"
+        "jsCode": "// Format success — message sent\nconst result = $input.first().json;\nconst upstreamData = $('Pass Through Error').isExecuted ? $('Pass Through Error').first().json : {};\n\nconst msgId = result.result?.message_id || result.message_id || null;\nconst chatId = result.result?.chat?.id || result.chat?.id || upstreamData.chat_id || null;\nconst isSuccess = !!(msgId || result.ok === true) && !result.error;\n\nif (!isSuccess) {\n  return [{ json: {\n    success: false, error_code: 'TELEGRAM_SEND_ERROR',\n    error_message: 'Telegram returned success but no message_id',\n    data: null,\n    _meta: { source: 'NN_04_Telegram_Sender', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }}];\n}\n\nreturn [{ json: {\n  success: true, error_code: null, error_message: null,\n  data: {\n    message_id: msgId,\n    chat_id: chatId,\n    delivery_status: 'SENT',\n    text_length: upstreamData.sanitized_text?.length || 0\n  },\n  _meta: {\n    source: 'NN_04_Telegram_Sender',\n    timestamp: new Date().toISOString(),\n    workflow_id: $workflow.id\n  }\n}}];",
+        "mode": "runOnceForAllItems"
       },
-      "id": "format_rejection",
-      "name": "Format Rejection",
+      "name": "Format Success Output",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        950,
-        550
-      ]
-    },
-    {
-      "parameters": {},
-      "id": "trigger_error",
-      "name": "Error Trigger",
-      "type": "n8n-nodes-base.errorTrigger",
-      "typeVersion": 1,
-      "position": [
-        200,
-        850
-      ]
+      "position": [880, 200],
+      "id": "tg-format-success-01"
     },
     {
       "parameters": {
-        "jsCode": "return {\n  success: false,\n  error_code: \"TELEGRAM_SYSTEM_ERROR\",\n  error_message: $input.first()?.json?.execution?.error?.message || \"Fatal error in Telegram Sender workflow\",\n  data: null,\n  _meta: {\n    source: \"NN_04_Telegram_Sender\",\n    timestamp: new Date().toISOString(),\n    workflow_id: \"NN_04\",\n    version: \"1.0.0\"\n  }\n};"
+        "jsCode": "// UNIFIED OUTPUT — Standard Contract (§3.2)\nconst input = $input.first().json;\n\nif (input.data !== undefined || input.error_code !== undefined) {\n  return [{ json: {\n    success: input.success === true,\n    error_code: input.error_code || null,\n    error_message: input.error_message || null,\n    data: input.data || null,\n    _meta: input._meta || {\n      source: 'NN_04_Telegram_Sender',\n      timestamp: new Date().toISOString(),\n      workflow_id: $workflow.id\n    }\n  }}];\n}\n\nreturn [];",
+        "mode": "runOnceForAllItems"
       },
-      "id": "format_error",
-      "name": "Format Global Error",
+      "name": "Format Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        480,
-        850
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\n// Retorna esquema unificado para todos los workflows\n\nconst result = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'NN_04_TELEGRAM_SENDER',\n      workflow_id: 'NN_04_TELEGRAM_SENDER',\n      timestamp: new Date().toISOString(),\n      version: '4.3.1'\n    }\n  }\n}];"
-      },
-      "id": "standard_contract_1772984456924",
-      "name": "📤 Standard Contract Output",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        5000,
-        500
-      ]
+      "position": [1088, 300],
+      "id": "tg-format-response-01"
     }
   ],
   "connections": {
-    "When clicking ‘Test workflow’": {
-      "main": [
-        [
-          {
-            "node": "Extract & Validate (PRE)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Manual Trigger": {
+      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
     },
     "Execute Workflow Trigger": {
-      "main": [
-        [
-          {
-            "node": "Extract & Validate (PRE)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
     },
     "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Extract & Validate (PRE)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
     },
-    "Extract & Validate (PRE)": {
-      "main": [
-        [
-          {
-            "node": "Is Valid?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Is Valid?": {
-      "main": [
-        [
-          {
-            "node": "Sanitize for Telegram",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Format Rejection",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Validate Input": {
+      "main": [[{ "node": "Sanitize for Telegram", "type": "main", "index": 0 }]]
     },
     "Sanitize for Telegram": {
-      "main": [
-        [
-          {
-            "node": "Telegram",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[
+        { "node": "Pass Through Error", "type": "main", "index": 0 },
+        { "node": "Format Response", "type": "main", "index": 0 }
+      ]]
+    },
+    "Pass Through Error": {
+      "main": [[{ "node": "Telegram", "type": "main", "index": 0 }]]
     },
     "Telegram": {
       "main": [
-        [
-          {
-            "node": "Format Success (POST)",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Format Success (POST)",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{ "node": "Format Success Output", "type": "main", "index": 0 }],
+        [{ "node": "Handle Telegram Error", "type": "main", "index": 0 }]
       ]
     },
-    "Error Trigger": {
-      "main": [
-        [
-          {
-            "node": "Format Global Error",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Handle Telegram Error": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
     },
-    "Format Global Error": {
-      "main": [
-        [
-          {
-            "node": "Format Success (POST)",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "📤 Standard Contract Output",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Format Rejection": {
-      "main": [
-        [
-          {
-            "node": "Format Success (POST)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Format Success Output": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
-  "id": "WE7DxLKAECtsA8Up"
+  "active": true
 }
