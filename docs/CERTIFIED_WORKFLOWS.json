@@ -606,5 +606,23 @@
         "get_providers_by_service"
       ]
     }
+  },
+  {
+    "name": "FRONTEND_Landing_Page",
+    "version": "1.0.0",
+    "node_count": 3,
+    "tests_passed": "9/9",
+    "certified_at": "2026-03-23",
+    "git_tag": "FRONTEND_Landing_Page-v1.0.0-certified",
+    "status": "FROZEN",
+    "test_file": "tests/FRONTEND_Landing_Page.test.ts",
+    "test_summary": {
+      "structure": "9/9 tests passed - node count, responseNode mode, HTML content (title, hero, CTA, effects, fonts)"
+    },
+    "architecture": {
+      "pattern": "Simple GET webhook → HTML generator → Respond to Webhook",
+      "features": "Modern dark theme, cursor glow effect, ambient background, animated elements",
+      "note": "Requires manual Publish in n8n UI to register webhooks (Issue #551)"
+    }
   }
 ]
