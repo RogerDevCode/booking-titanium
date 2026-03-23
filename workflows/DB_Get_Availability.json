@@ -23,7 +23,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "db-get-availability",
-        "responseMode": "lastNode",
+        "responseMode": "responseNode",
         "options": {}
       },
       "name": "Webhook",
@@ -46,13 +46,35 @@
     },
     {
       "parameters": {
-        "jsCode": "// Gate: _exit_early items skip to Format Response\n// Valid items: build availability query\nconst input = $input.first().json;\n\nif (input._exit_early) {\n  return [{ json: { ...input, slots: [] } }];\n}\n\nconst { provider_id, service_id, date } = input;\n\n// Calculate start and end times for the date (UTC)\n// Using date at midnight UTC to avoid timezone issues\nconst start_time = date + 'T00:00:00Z';\nconst end_time = date + 'T23:59:59Z';\n\n// Build query to get available slots\n// Generates 20-minute slots for the entire day (72 slots = 24h * 3 slots/hour)\nconst availability_query = `\n  WITH time_slots AS (\n    SELECT generate_series(\n      '${start_time}'::timestamptz,\n      '${end_time}'::timestamptz,\n      '20 minutes'::interval\n    ) AS slot_start\n  )\n  SELECT \n    ts.slot_start AT TIME ZONE 'UTC' AS slot_start,\n    TO_CHAR(ts.slot_start AT TIME ZONE 'UTC', 'HH24:MI') AS display_time,\n    CASE \n      WHEN b.id IS NULL THEN true \n      ELSE false \n    END AS is_available\n  FROM time_slots ts\n  LEFT JOIN bookings b ON \n    b.provider_id = ${provider_id}::int AND\n    b.service_id = ${service_id}::int AND\n    b.status != 'CANCELLED' AND\n    b.start_time <= ts.slot_start + interval '20 minutes' AND\n    b.start_time >= ts.slot_start - interval '20 minutes'\n  ORDER BY ts.slot_start;\n`;\n\nreturn [{ json: {\n  ...input,\n  availability_query,\n  start_time,\n  end_time\n}}];",
+        "jsCode": "// Gate: only pass valid items to Build Query\nconst input = $input.first().json;\nif (input._exit_early) return [];\nreturn [{ json: input }];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Gate Execute",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [464, 150],
+      "id": "avail-gate-execute-01"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Gate: only pass validation errors to skip query\nconst input = $input.first().json;\nif (!input._exit_early) return [];\nreturn [{ json: input }];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Gate Skip",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [464, 450],
+      "id": "avail-gate-skip-01"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build query to get available slots\nconst { provider_id, service_id, date } = $input.first().json;\n\n// Calculate start and end times for the date (UTC)\n// Using date at midnight UTC to avoid timezone issues\nconst start_time = date + 'T00:00:00Z';\nconst end_time = date + 'T23:59:59Z';\n\n// Generates 20-minute slots for the entire day (72 slots = 24h * 3 slots/hour)\nconst availability_query = `\n  WITH time_slots AS (\n    SELECT generate_series(\n      '${start_time}'::timestamptz,\n      '${end_time}'::timestamptz,\n      '20 minutes'::interval\n    ) AS slot_start\n  )\n  SELECT \n    ts.slot_start AT TIME ZONE 'UTC' AS slot_start,\n    TO_CHAR(ts.slot_start AT TIME ZONE 'UTC', 'HH24:MI') AS display_time,\n    CASE \n      WHEN b.id IS NULL THEN true \n      ELSE false \n    END AS is_available\n  FROM time_slots ts\n  LEFT JOIN bookings b ON \n    b.provider_id = ${provider_id}::int AND\n    b.service_id = ${service_id}::int AND\n    b.status != 'CANCELLED' AND\n    b.start_time <= ts.slot_start + interval '20 minutes' AND\n    b.start_time >= ts.slot_start - interval '20 minutes'\n  ORDER BY ts.slot_start;\n`;\n\nreturn [{ json: {\n  ...$input.first().json,\n  availability_query,\n  start_time,\n  end_time\n}}];",
         "mode": "runOnceForAllItems"
       },
       "name": "Build Availability Query",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [464, 200],
+      "position": [672, 150],
       "id": "avail-build-query-01"
     },
     {
@@ -64,7 +86,7 @@
       "name": "Execute Availability Query",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
-      "position": [672, 200],
+      "position": [880, 150],
       "alwaysOutputData": true,
       "id": "avail-execute-pg-01",
       "credentials": {
@@ -83,7 +105,7 @@
       "name": "Handle DB Error",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [672, 420],
+      "position": [1088, 300],
       "id": "avail-handle-error-01"
     },
     {
@@ -94,19 +116,30 @@
       "name": "Format Availability",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [880, 200],
+      "position": [1088, 150],
       "id": "avail-format-01"
     },
     {
       "parameters": {
-        "jsCode": "// UNIFIED OUTPUT — Standard Contract (§3.2)\nconst input = $input.first().json;\n\n// Process items that have data OR error_code set\nif (input.data !== undefined || input.error_code !== undefined) {\n  return [{ json: {\n    success: input.success === true,\n    error_code: input.error_code || null,\n    error_message: input.error_message || null,\n    data: input.data || null,\n    _meta: input._meta || {\n      source: 'DB_Get_Availability',\n      timestamp: new Date().toISOString(),\n      workflow_id: $workflow.id\n    }\n  }}];\n}\n\n// Otherwise, pass-through item — skip it\nreturn [];",
+        "jsCode": "// UNIFIED OUTPUT — Standard Contract (§3.2)\nconst items = $input.all();\nlet finalItem = items.find(i => i.json.data !== undefined || i.json.error_code !== undefined);\nif (!finalItem) finalItem = items.find(i => i.json._exit_early);\nif (!finalItem) { \n  return [{ json: { success: false, error_code: 'PIPELINE_ERROR', error_message: 'No valid output found', data: null, _meta: { source: 'DB_Get_Availability', timestamp: new Date().toISOString(), workflow_id: $workflow.id } } }]; \n}\nconst input = finalItem.json;\nreturn [{ json: {\n  success: input.success === true,\n  error_code: input.error_code || null,\n  error_message: input.error_message || null,\n  data: input.data || null,\n  _meta: input._meta || {\n    source: 'DB_Get_Availability',\n    timestamp: new Date().toISOString(),\n    workflow_id: $workflow.id\n  }\n}}];",
         "mode": "runOnceForAllItems"
       },
       "name": "Format Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1088, 300],
+      "position": [1300, 300],
       "id": "avail-format-response-01"
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {}
+      },
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1500, 300],
+      "id": "avail-respond-01"
     }
   ],
   "connections": {
@@ -120,7 +153,16 @@
       "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
     },
     "Validate Input": {
+      "main": [[
+        { "node": "Gate Execute", "type": "main", "index": 0 },
+        { "node": "Gate Skip", "type": "main", "index": 0 }
+      ]]
+    },
+    "Gate Execute": {
       "main": [[{ "node": "Build Availability Query", "type": "main", "index": 0 }]]
+    },
+    "Gate Skip": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
     },
     "Build Availability Query": {
       "main": [[{ "node": "Execute Availability Query", "type": "main", "index": 0 }]]
@@ -136,6 +178,9 @@
     },
     "Format Availability": {
       "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
+    },
+    "Format Response": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
     }
   },
   "settings": {

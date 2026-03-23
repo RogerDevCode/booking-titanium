@@ -243,5 +243,25 @@
       "validation": "chat_id integer regex + text length 4096 limit",
       "error_handling": "Zero-throw pattern with Standard Contract, responseNode mode"
     }
+  },
+  {
+    "name": "DB_Get_Availability",
+    "version": "2.0.0",
+    "node_count": 13,
+    "tests_passed": "8/8",
+    "certified_at": "2026-03-22",
+    "git_tag": "DB_Get_Availability-v2.0.0-certified",
+    "status": "FROZEN",
+    "test_file": "tests/DB_Get_Availability.test.ts",
+    "changes_from_v1": {
+      "added": ["Gate Execute", "Gate Skip", "Respond to Webhook"],
+      "removed": [],
+      "fixed": ["Hanging webhook requests due to missing Respond to Webhook and unmatched routing paths", "responseMode changed to responseNode for reliable HTTP responses"]
+    },
+    "architecture": {
+      "pattern": "Gate + Skip (no IF nodes)",
+      "validation": "Positive integer regex + date existence check",
+      "error_handling": "Zero-throw pattern with Standard Contract, responseNode mode"
+    }
   }
 ]
