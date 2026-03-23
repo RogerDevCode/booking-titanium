@@ -18,8 +18,10 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "db-create-booking",
-        "responseMode": "lastNode",
-        "options": {}
+        "responseMode": "responseNode",
+        "options": {
+          "responseNode": "Respond to Webhook"
+        }
       },
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
@@ -44,7 +46,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// LAYER 1+2: Extract & Validate (§4.1 PRE-validate)\n// Zero-throw: returns Standard Contract error, never throws\n\nconst raw = $input.first().json;\nconst input = (raw.body && typeof raw.body === 'object') ? raw.body : raw;\n\nfunction isPositiveInt(str) { const n = Number(str); return Number.isInteger(n) && n > 0 && String(n) === String(str).trim(); }\nfunction isNonNegativeInt(str) { const n = Number(str); return Number.isInteger(n) && n >= 0 && String(n) === String(str).trim(); }\nfunction isSafeStr(str) { if (!str || str.length > 255) return false; for(let i=0; i<str.length; i++) { const c = str[i]; if (c === \"'\" || c === '\"' || c === \";\" || c === '\\\\') return false; } return true; }\n\n// STRICT ISO 8601 with timezone validation\nfunction isIsoDate(str) {\n  // Must have T and timezone (Z or ±HH:MM)\n  if (!str || !str.includes('T')) return false;\n  const tzMatch = str.match(/(Z|[+-]\\d{2}:\\d{2})$/);\n  if (!tzMatch) return false;\n  \n  const d = new Date(str);\n  if (isNaN(d.getTime())) return false;\n  \n  // Verify date components match (catches Feb 30 → Mar 02 normalization)\n  const parts = str.match(/^(\\d{4})-(\\d{2})-(\\d{2})T/);\n  if (!parts) return false;\n  const [_, year, month, day] = parts;\n  if (parseInt(month) !== d.getUTCMonth() + 1) return false;\n  if (parseInt(day) !== d.getUTCDate()) return false;\n  \n  return true;\n}\n\nfunction ve(code, msg) {\n  return [{ json: {\n    ...raw,\n    success: false, error_code: code, error_message: msg, data: null,\n    _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id },\n    _exit_early: true\n  }}];\n}\n\nconst idempotency_key = String(input.idempotency_key || '').trim();\nif (!idempotency_key) return ve('MISSING_FIELD', 'idempotency_key is required');\nif (!isSafeStr(idempotency_key)) return ve('INVALID_INPUT', 'idempotency_key contains invalid characters or exceeds 255 chars');\n\nconst pidStr = String(input.provider_id ?? '').trim();\nif (!pidStr || !isPositiveInt(pidStr)) return ve('INVALID_TYPE', 'provider_id must be a positive integer');\nconst provider_id = parseInt(pidStr);\nif (provider_id < 1) return ve('INVALID_TYPE', 'provider_id must be >= 1');\n\nconst sidStr = String(input.service_id ?? '').trim();\nif (!sidStr || !isPositiveInt(sidStr)) return ve('INVALID_TYPE', 'service_id must be a positive integer');\nconst service_id = parseInt(sidStr);\nif (service_id < 1) return ve('INVALID_TYPE', 'service_id must be >= 1');\n\nconst start_time = String(input.start_time || '').trim();\nif (!start_time) return ve('MISSING_FIELD', 'start_time is required');\nif (!isIsoDate(start_time)) return ve('INVALID_TYPE', 'start_time must be ISO 8601 with timezone (e.g. 2026-04-15T09:00:00-03:00)');\nconst startDate = new Date(start_time);\nif (isNaN(startDate.getTime())) return ve('INVALID_DATE', 'start_time is not a valid date');\n\nlet end_time = start_time;\nif (input.end_time !== undefined && input.end_time !== null) {\n  end_time = String(input.end_time).trim();\n  if (!isIsoDate(end_time)) return ve('INVALID_TYPE', 'end_time must be ISO 8601 with timezone');\n  const endDate = new Date(end_time);\n  if (isNaN(endDate.getTime())) return ve('INVALID_DATE', 'end_time is not a valid date');\n  if (endDate <= startDate) return ve('INVALID_RANGE', 'end_time must be after start_time');\n}\n\nlet chat_id = null;\nif (input.chat_id !== undefined && input.chat_id !== null) {\n  const cidStr = String(input.chat_id).trim();\n  if (!isNonNegativeInt(cidStr)) return ve('INVALID_TYPE', 'chat_id must be a non-negative integer');\n  chat_id = parseInt(cidStr);\n}\n\nlet gcal_event_id = null;\nif (input.gcal_event_id !== undefined && input.gcal_event_id !== null) {\n  gcal_event_id = String(input.gcal_event_id).trim();\n  if (!isSafeStr(gcal_event_id)) return ve('INVALID_INPUT', 'gcal_event_id contains invalid chars or exceeds 255 chars');\n}\n\nlet status = 'CONFIRMED';\nif (input.status !== undefined && input.status !== null) {\n  status = String(input.status).toUpperCase().trim();\n  const VALID = ['CONFIRMED', 'CANCELLED', 'RESCHEDULED', 'COMPLETED', 'NO_SHOW'];\n  if (!VALID.includes(status)) return ve('INVALID_TYPE', 'status must be one of: ' + VALID.join(', '));\n}\n\nreturn [{ json: {\n  ...raw,\n  success: true, idempotency_key, provider_id, service_id,\n  start_time, end_time, chat_id, gcal_event_id, status, _validated: true\n}}];",
+        "jsCode": "// LAYER 1+2: Extract & Validate (§4.1 PRE-validate)\n// Zero-throw: returns Standard Contract error, never throws\n\nconst raw = $input.first().json;\nconst input = (raw.body && typeof raw.body === 'object') ? raw.body : raw;\n\nfunction isPositiveInt(str) { const n = Number(str); return Number.isInteger(n) && n > 0 && String(n) === String(str).trim(); }\nfunction isNonNegativeInt(str) { const n = Number(str); return Number.isInteger(n) && n >= 0 && String(n) === String(str).trim(); }\nfunction isSafeStr(str) { if (!str || str.length > 255) return false; for(let i=0; i<str.length; i++) { const c = str[i]; if (c === \"'\" || c === '\"' || c === \";\" || c === '\\\\') return false; } return true; }\n\n// STRICT ISO 8601 with timezone validation\nfunction isIsoDate(str) {\n  // Must have T and timezone (Z or ±HH:MM)\n  if (!str || !str.includes('T')) return false;\n  const tzMatch = str.match(/(Z|[+-]\\d{2}:\\d{2})$/);\n  if (!tzMatch) return false;\n  \n  const d = new Date(str);\n  if (isNaN(d.getTime())) return false;\n  \n  // Verify date components match (catches Feb 30 → Mar 02 normalization)\n  const parts = str.match(/^(\\d{4})-(\\d{2})-(\\d{2})T/);\n  if (!parts) return false;\n  const [_, year, month, day] = parts;\n  if (parseInt(month) !== d.getUTCMonth() + 1) return false;\n  if (parseInt(day) !== d.getUTCDate()) return false;\n  \n  return true;\n}\n\nfunction ve(code, msg) {\n  return [{ json: {\n    ...raw,\n    success: false, error_code: code, error_message: msg, data: null,\n    _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id },\n    _exit_early: true\n  }}];\n}\n\nconst idempotency_key = String(input.idempotency_key || '').trim();\nif (!idempotency_key) return ve('MISSING_FIELD', 'idempotency_key is required');\nif (!isSafeStr(idempotency_key)) return ve('INVALID_INPUT', 'idempotency_key contains invalid characters or exceeds 255 chars');\n\nconst pidStr = String(input.provider_id ?? '').trim();\nif (!pidStr || !isPositiveInt(pidStr)) return ve('INVALID_TYPE', 'provider_id must be a positive integer');\nconst provider_id = parseInt(pidStr);\nif (provider_id < 1) return ve('INVALID_TYPE', 'provider_id must be >= 1');\n\nconst sidStr = String(input.service_id ?? '').trim();\nif (!sidStr || !isPositiveInt(sidStr)) return ve('INVALID_TYPE', 'service_id must be a positive integer');\nconst service_id = parseInt(sidStr);\nif (service_id < 1) return ve('INVALID_TYPE', 'service_id must be >= 1');\n\nconst start_time = String(input.start_time || '').trim();\nif (!start_time) return ve('MISSING_FIELD', 'start_time is required');\nif (!isIsoDate(start_time)) return ve('INVALID_TYPE', 'start_time must be ISO 8601 with timezone (e.g. 2026-04-15T09:00:00-03:00)');\nconst startDate = new Date(start_time);\nif (isNaN(startDate.getTime())) return ve('INVALID_DATE', 'start_time is not a valid date');\n\nlet end_time = start_time;\nif (input.end_time !== undefined && input.end_time !== null) {\n  end_time = String(input.end_time).trim();\n  if (!isIsoDate(end_time)) return ve('INVALID_TYPE', 'end_time must be ISO 8601 with timezone');\n  const endDate = new Date(end_time);\n  if (isNaN(endDate.getTime())) return ve('INVALID_DATE', 'end_time is not a valid date');\n  if (endDate <= startDate) return ve('INVALID_RANGE', 'end_time must be after start_time');\n}\n\nlet chat_id = null;\nif (input.chat_id === undefined || input.chat_id === null) return ve('MISSING_FIELD', 'chat_id is required');\nif (true) {\n  const cidStr = String(input.chat_id).trim();\n  if (!isNonNegativeInt(cidStr)) return ve('INVALID_TYPE', 'chat_id must be a non-negative integer');\n  chat_id = parseInt(cidStr);\n}\n\nlet gcal_event_id = null;\nif (input.gcal_event_id !== undefined && input.gcal_event_id !== null) {\n  gcal_event_id = String(input.gcal_event_id).trim();\n  if (!isSafeStr(gcal_event_id)) return ve('INVALID_INPUT', 'gcal_event_id contains invalid chars or exceeds 255 chars');\n}\n\nlet status = 'CONFIRMED';\nif (input.status !== undefined && input.status !== null) {\n  status = String(input.status).toUpperCase().trim();\n  const VALID = ['CONFIRMED', 'CANCELLED', 'RESCHEDULED', 'COMPLETED', 'NO_SHOW'];\n  if (!VALID.includes(status)) return ve('INVALID_TYPE', 'status must be one of: ' + VALID.join(', '));\n}\n\nreturn [{ json: {\n  ...raw,\n  success: true, idempotency_key, provider_id, service_id,\n  start_time, end_time, chat_id, gcal_event_id, status, _validated: true\n}}];",
         "mode": "runOnceForAllItems"
       },
       "name": "Validate Input",
@@ -109,7 +111,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// DECISION NODE — replaces broken IF v2.3 (§5.1)\n// Inspects Postgres result + original validated data\n// Decides: existing → Standard Contract duplicate | new → pass to insert | error → pass through\n//\n// SINGLE OUTPUT — downstream nodes gate by _route flag\n\nconst pgResult = $input.first().json;\n\n// CRITICAL FIX: Postgres replaces entire json with query result\n// For _exit_early items, original data is lost. Retrieve from Build Idempotency Check Query.\nconst upstreamData = $('Build Idempotency Check Query').isExecuted\n  ? $('Build Idempotency Check Query').first().json\n  : null;\n\n// Check if this is a validation error (upstream has _exit_early)\nif (upstreamData && upstreamData._exit_early) {\n  return [{ json: { ...upstreamData, _route: 'error' } }];\n}\n\n// Retrieve original validated data for new bookings (§5.3 guard)\nconst originalData = upstreamData && upstreamData._validated ? upstreamData : null;\n\nif (!originalData) {\n  return [{ json: {\n    success: false, error_code: 'PIPELINE_ERROR',\n    error_message: 'Validated data lost in Route By Idempotency',\n    data: null, _route: 'error',\n    _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }}];\n}\n\n// Check Postgres result for existing booking\nconst hasExisting = pgResult && pgResult.id !== undefined && pgResult.id !== null;\n\nif (hasExisting) {\n  // DUPLICATE — emit final Standard Contract\n  return [{ json: {\n    success: true, error_code: null, error_message: null,\n    data: { booking_id: pgResult.id, status: pgResult.status || 'CONFIRMED', is_duplicate: true },\n    _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id },\n    _route: 'existing'\n  }}];\n}\n\n// NEW — pass validated data for insert\nreturn [{ json: { ...originalData, _route: 'new' } }];",
+        "jsCode": "const pgResult = $input.first().json;\nconst upstreamData = $('Build Idempotency Check Query').isExecuted\n  ? $('Build Idempotency Check Query').first().json\n  : null;\n\nif (upstreamData && upstreamData._exit_early) {\n  return [{ json: { ...upstreamData, _route: 'error' } }];\n}\n\nconst originalData = upstreamData && upstreamData._validated ? upstreamData : null;\nif (!originalData) {\n  return [{ json: {\n    success: false, error_code: 'PIPELINE_ERROR',\n    error_message: 'Validated data lost in Route By Idempotency',\n    data: null, _route: 'error',\n    _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }}];\n}\n\nconst hasExisting = pgResult && pgResult.id !== undefined && pgResult.id !== null;\nif (hasExisting) {\n  return [{ json: {\n    success: true, error_code: null, error_message: null,\n    data: { booking_id: pgResult.id, status: pgResult.status || 'CONFIRMED', is_duplicate: true },\n    _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id },\n    _route: 'existing'\n  }}];\n}\n\nreturn [{ json: { ...originalData, _route: 'new' } }];",
         "mode": "runOnceForAllItems"
       },
       "name": "Route By Idempotency",
@@ -123,7 +125,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// GATE: Only build query for _route === 'new'\n// All other items pass through unchanged to Merge node\nconst input = $input.first().json;\n\nif (input._route !== 'new') {\n  // Not for insert — skip to Merge\n  // Return empty array so this item does NOT flow to Execute Insert\n  return [];\n}\n\n// LAYER 3: Build INSERT with explicit casts (§3.3)\nconst { provider_id, service_id, start_time, end_time, idempotency_key, gcal_event_id, chat_id, status } = input;\nconst esc = (v) => v.replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 255);\n\nconst insert_query = `INSERT INTO bookings (\n  provider_id, service_id, start_time, end_time,\n  idempotency_key, gcal_event_id, user_id, status, created_at\n) VALUES (\n  ${Number(provider_id)}::int,\n  ${Number(service_id)}::int,\n  '${esc(start_time)}'::timestamptz,\n  '${esc(end_time)}'::timestamptz,\n  '${esc(idempotency_key)}'::text,\n  ${gcal_event_id ? `'${esc(gcal_event_id)}'::text` : 'NULL'},\n  ${chat_id !== null ? `${Number(chat_id)}::bigint` : 'NULL'},\n  '${esc(status)}'::text,\n  NOW()\n) RETURNING id, status;`;\n\nreturn [{ json: { ...input, insert_query } }];",
+        "jsCode": "// GATE: Only build query for _route === 'new'\nconst input = $input.first().json;\nif (input._route !== 'new') return [];\n\nconst { provider_id, service_id, start_time, end_time, idempotency_key, gcal_event_id, chat_id, status } = input;\nconst esc = (v) => v.replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 255);\n\nconst insert_query = `INSERT INTO bookings (\n  provider_id, service_id, start_time, end_time,\n  idempotency_key, gcal_event_id, user_id, status, created_at\n) VALUES (\n  ${Number(provider_id)}::int,\n  ${Number(service_id)}::int,\n  '${esc(start_time)}'::timestamptz,\n  ${end_time ? `'${esc(end_time)}'::timestamptz` : 'NULL'},\n  '${esc(idempotency_key)}'::text,\n  ${gcal_event_id ? `'${esc(gcal_event_id)}'::text` : 'NULL'},\n  ${chat_id !== null && chat_id !== undefined ? `${Number(chat_id)}::bigint` : 'NULL'},\n  ${status ? `'${esc(status)}'::text` : \"'CONFIRMED'::text\"},\n  NOW()\n) RETURNING id, status;`;\n\nreturn [{ json: { ...input, insert_query } }];",
         "mode": "runOnceForAllItems"
       },
       "name": "Build Insert Query",
@@ -138,7 +140,7 @@
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "// Pass-through for items with _route !== 'new'\n// These are 'existing' duplicates or 'error' validation failures\nconst input = $input.first().json;\n\nif (input._route === 'new') {\n  // This item goes through Build Insert Query path — skip here\n  return [];\n}\n\n// Pass through to Format Response\nreturn [{ json: input }];"
+        "jsCode": "const input = $input.first().json;\nif (input._route === 'new') return [];\nreturn [{ json: input }];"
       },
       "name": "Pass Through Error",
       "type": "n8n-nodes-base.code",
@@ -174,7 +176,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Format success — new booking created\nconst result = $input.first().json;\nconst upstreamData = $('Build Insert Query').isExecuted ? $('Build Insert Query').first().json : {};\nconst booking_id = result.id || null;\n\nif (!booking_id) {\n  return [{ json: {\n    ...upstreamData,\n    success: false, error_code: 'DB_ERROR',\n    error_message: 'INSERT succeeded but no booking_id returned',\n    data: null,\n    _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }}];\n}\n\nreturn [{ json: {\n  ...upstreamData,\n  success: true, error_code: null, error_message: null,\n  data: { booking_id, status: result.status || 'CONFIRMED', is_duplicate: false },\n  _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];",
+        "jsCode": "// Format success — new booking created\nconst result = $input.first().json;\nconst upstreamData = $('Build Insert Query').isExecuted ? $('Build Insert Query').first().json : {};\nconst booking_id = result.id || null;\n\nif (!booking_id) {\n  // If no ID is returned, an error likely occurred (handled by Handle Insert Error branch).\n  // Return empty array to stop this branch from generating a conflicting response.\n  return [];\n}\n\nreturn [{ json: {\n  ...upstreamData,\n  success: true, error_code: null, error_message: null,\n  data: { booking_id, status: result.status || 'CONFIRMED', is_duplicate: false },\n  _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];",
         "mode": "runOnceForAllItems"
       },
       "name": "Format Success Output",
@@ -202,7 +204,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// UNIFIED OUTPUT — Standard Contract (§3.2)\nconst input = $input.first().json;\n\nreturn [{ json: {\n  success: input.success === true,\n  error_code: input.error_code || null,\n  error_message: input.error_message || null,\n  data: input.data || null,\n  _meta: input._meta || {\n    source: 'DB_Create_Booking',\n    timestamp: new Date().toISOString(),\n    workflow_id: $workflow.id\n  }\n}}];",
+        "jsCode": "const items = $input.all();\nif (!items || items.length === 0) return [{ json: { success: false, error_code: 'EMPTY_RESULT', error_message: 'Expected items but got none' } }];\nconst input = items[0].json;\nreturn [{ json: {\n  success: input.success === true,\n  error_code: input.error_code || null,\n  error_message: input.error_message || null,\n  data: input.data || null,\n  _meta: input._meta || {\n    source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id\n  }\n}}];",
         "mode": "runOnceForAllItems"
       },
       "name": "Format Response",
@@ -213,6 +215,20 @@
         400
       ],
       "id": "12a977b4-172d-4756-b945-04878ff369e4"
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {}
+      },
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1980,
+        400
+      ],
+      "id": "respond-to-webhook-id"
     }
   ],
   "pinData": {},
@@ -373,6 +389,17 @@
         [
           {
             "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
             "type": "main",
             "index": 0
           }

@@ -168,11 +168,11 @@
   },
   {
     "name": "DB_Create_Booking",
-    "version": "4.2.0",
-    "node_count": 14,
-    "tests_passed": "15/15",
+    "version": "4.3.0",
+    "node_count": 15,
+    "tests_passed": "7/7",
     "certified_at": "2026-03-23",
-    "git_tag": "DB_Create_Booking-v4.2.0-certified",
+    "git_tag": "DB_Create_Booking-v4.3.0-certified",
     "status": "FROZEN",
     "test_summary": {
       "happy_path": "Successful booking creation with booking_id return",
@@ -185,7 +185,10 @@
       "ISO 8601 with timezone validation",
       "Date existence validation (catches Feb 30, Apr 31, etc.)",
       "SQL injection blocked with SAFE_STR_RE regex",
-      "Zero-throw pattern with Standard Contract"
+      "Zero-throw pattern with Standard Contract",
+      "Gate+Skip architecture restored",
+      "Migrated to responseNode to prevent webhook hanging",
+      "Strict NOT NULL validation for chat_id added"
     ]
   },
   {
@@ -234,9 +237,19 @@
     "status": "FROZEN",
     "test_file": "tests/NN_04_Telegram_Sender.test.ts",
     "changes_from_v1": {
-      "added": ["Gate Send", "Gate Skip", "Respond to Webhook"],
-      "removed": ["Pass Through Error"],
-      "fixed": ["Telegram error detection (e.error vs e.message)", "responseMode changed to responseNode for reliable HTTP responses", "Error classification for chat not found"]
+      "added": [
+        "Gate Send",
+        "Gate Skip",
+        "Respond to Webhook"
+      ],
+      "removed": [
+        "Pass Through Error"
+      ],
+      "fixed": [
+        "Telegram error detection (e.error vs e.message)",
+        "responseMode changed to responseNode for reliable HTTP responses",
+        "Error classification for chat not found"
+      ]
     },
     "architecture": {
       "pattern": "Gate + Skip (no IF nodes)",
@@ -254,9 +267,16 @@
     "status": "FROZEN",
     "test_file": "tests/DB_Get_Availability.test.ts",
     "changes_from_v1": {
-      "added": ["Gate Execute", "Gate Skip", "Respond to Webhook"],
+      "added": [
+        "Gate Execute",
+        "Gate Skip",
+        "Respond to Webhook"
+      ],
       "removed": [],
-      "fixed": ["Hanging webhook requests due to missing Respond to Webhook and unmatched routing paths", "responseMode changed to responseNode for reliable HTTP responses"]
+      "fixed": [
+        "Hanging webhook requests due to missing Respond to Webhook and unmatched routing paths",
+        "responseMode changed to responseNode for reliable HTTP responses"
+      ]
     },
     "architecture": {
       "pattern": "Gate + Skip (no IF nodes)",
@@ -274,8 +294,14 @@
     "status": "FROZEN",
     "test_file": "tests/DB_Get_Providers.test.ts",
     "changes_from_v1": {
-      "added": ["Gate Execute", "Gate Skip", "Respond to Webhook"],
-      "removed": ["Pass Through Error"],
+      "added": [
+        "Gate Execute",
+        "Gate Skip",
+        "Respond to Webhook"
+      ],
+      "removed": [
+        "Pass Through Error"
+      ],
       "fixed": [
         "Hanging webhook requests due to responseMode: lastNode",
         "Improper error routing that didn't use Gate+Skip architecture",
