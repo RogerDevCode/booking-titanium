@@ -1,5 +1,37 @@
 [
   {
+    "name": "NN_01_Booking_Gateway",
+    "version": "5.0.0",
+    "node_count": 11,
+    "tests_passed": "6/6",
+    "certified_at": "2026-03-23",
+    "git_tag": "NN_01_Booking_Gateway-v5.0.0-certified",
+    "status": "FROZEN",
+    "test_file": "tests/NN_01_Booking_Gateway.test.ts",
+    "test_summary": {
+      "validation": "2/2 tests passed - missing chat_id, missing text rejected via NN_02",
+      "orchestration": "2/2 tests passed - NN_02 error propagation, Standard Contract compliance",
+      "integration": "2/2 tests passed - webhook configuration, pipeline delegation"
+    },
+    "architecture": {
+      "pattern": "Orchestrator / Gateway pattern",
+      "description": "Main Telegram entry point - delegates to NN_02 (parser), NN_03-B (AI), NN_04 (sender)",
+      "validation": "Delegated to NN_02_Message_Parser (certified v1.0.0)",
+      "error_handling": "Final Response node aggregates errors from all sub-workflows",
+      "sub_workflows": [
+        "NN_02_Message_Parser (f80XLogu45Zg1TSM) - Input validation",
+        "NN_03-B_Pipeline_Agent (X3D2dWkBu8QLlNSm) - Intent classification & AI",
+        "NN_04_Telegram_Sender (WE7DxLKAECtsA8Up) - Response delivery"
+      ]
+    },
+    "data_flow": [
+      "Webhook → NN_02_Message_Parser → Verify Parser",
+      "If valid → Prepare AI Input → NN_03-B_Pipeline_Agent → Verify AI",
+      "If AI success → NN_04_Telegram_Sender → Final Response",
+      "If any error → Format Error → Final Response (Standard Contract)"
+    ]
+  },
+  {
     "name": "NN_03-B_Pipeline_Agent",
     "version": "3.0.0",
     "node_count": 59,
