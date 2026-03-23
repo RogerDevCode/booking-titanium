@@ -1,5 +1,39 @@
 [
   {
+    "name": "DB_Find_Next_Available",
+    "version": "2.0.0",
+    "node_count": 11,
+    "tests_passed": "8/8",
+    "certified_at": "2026-03-23",
+    "git_tag": "DB_Find_Next_Available-v2.0.0-certified",
+    "status": "FROZEN",
+    "test_file": "tests/DB_Find_Next_Available.test.ts",
+    "changes_from_v1": {
+      "added": [
+        "Validate Input (Code node with zero-throw pattern)",
+        "Gate Execute",
+        "Gate Skip",
+        "Handle DAL Error",
+        "Format Response",
+        "Respond to Webhook"
+      ],
+      "removed": [],
+      "fixed": [
+        "Added input validation for provider_id, service_id, date",
+        "Added date existence validation (rejects Feb 30, etc.)",
+        "Changed responseMode from lastNode to responseNode",
+        "Added proper error handling for DAL service failures",
+        "Implemented Gate + Skip architecture (no IF nodes)",
+        "Standard Contract output for all paths"
+      ]
+    },
+    "architecture": {
+      "pattern": "Gate + Skip (no IF nodes)",
+      "validation": "Positive integer regex + ISO 8601 date format + date existence check",
+      "error_handling": "Zero-throw pattern with Standard Contract, responseNode mode"
+    }
+  },
+  {
     "name": "RAG_01_Document_Ingestion",
     "version": "1.7.0",
     "node_count": 22,
