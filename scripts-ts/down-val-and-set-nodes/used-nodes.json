@@ -1,18 +1,106 @@
 {
   "_meta": {
-    "generatedAt": "2026-03-02T16:24:17.486Z",
-    "n8nVersion": "2.10.2",
+    "generatedAt": "2026-03-19T17:15:20.638Z",
+    "n8nVersion": "2.13.0",
     "n8nUrl": "https://n8n.stax.ink",
     "method": "docker cp+exec (n8n_titanium)",
     "container": "n8n_titanium",
-    "totalNodes": 543,
-    "extractedAt": "2026-03-15T14:11:10.076Z",
-    "sourceWorkflowsDir": "/home/manager/Sync/N8N_Projects/booking-titanium/workflows/seed",
-    "totalWorkflowsScanned": 14,
-    "totalNodesUsed": 11,
+    "totalNodes": 546,
+    "extractedAt": "2026-03-20T22:55:08.498Z",
+    "sourceWorkflowsDir": "/home/manager/Sync/N8N_Projects/booking-titanium/workflows",
+    "totalWorkflowsScanned": 47,
+    "totalNodesUsed": 24,
     "nodesNotFound": 0
   },
   "nodes": [
+    {
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "displayName": "AI Agent",
+      "latestVersion": 3.1,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5,
+        1.6,
+        1.7,
+        1.8,
+        1.9,
+        2,
+        2.1,
+        2.2,
+        2.3,
+        3,
+        3.1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "displayName": "Basic LLM Chain",
+      "latestVersion": 1.9,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5,
+        1.6,
+        1.7,
+        1.8,
+        1.9
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "displayName": "Groq Chat Model",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "displayName": "Simple Memory",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "displayName": "Call n8n Sub-Workflow Tool",
+      "latestVersion": 2.2,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        2,
+        2.1,
+        2.2
+      ],
+      "group": [
+        "transform"
+      ]
+    },
     {
       "type": "n8n-nodes-base.code",
       "displayName": "Code",
@@ -49,6 +137,20 @@
       ]
     },
     {
+      "type": "n8n-nodes-base.executeWorkflow",
+      "displayName": "Execute Sub-workflow",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "displayName": "Execute Workflow Trigger",
       "latestVersion": 1.1,
@@ -58,6 +160,20 @@
       ],
       "group": [
         "trigger"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.gmail",
+      "displayName": "Gmail",
+      "latestVersion": 2.2,
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2
+      ],
+      "group": [
+        "transform"
       ]
     },
     {
@@ -137,6 +253,54 @@
       ]
     },
     {
+      "type": "n8n-nodes-base.respondToWebhook",
+      "displayName": "Respond to Webhook",
+      "latestVersion": 1.5,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "displayName": "Schedule Trigger",
+      "latestVersion": 1.3,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "group": [
+        "trigger",
+        "schedule"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.set",
+      "displayName": "Set",
+      "latestVersion": 3.4,
+      "availableVersions": [
+        1,
+        2,
+        3,
+        3.1,
+        3.2,
+        3.3,
+        3.4
+      ],
+      "group": [
+        "input"
+      ]
+    },
+    {
       "type": "n8n-nodes-base.splitInBatches",
       "displayName": "Split In Batches",
       "latestVersion": 3,
@@ -147,6 +311,47 @@
       ],
       "group": [
         "organization"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.splitOut",
+      "displayName": "Split Out",
+      "latestVersion": 1,
+      "availableVersions": [
+        1
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.switch",
+      "displayName": "Switch",
+      "latestVersion": 3.4,
+      "availableVersions": [
+        1,
+        2,
+        3,
+        3.1,
+        3.2,
+        3.3,
+        3.4
+      ],
+      "group": [
+        "transform"
+      ]
+    },
+    {
+      "type": "n8n-nodes-base.telegram",
+      "displayName": "Telegram",
+      "latestVersion": 1.2,
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "group": [
+        "output"
       ]
     },
     {

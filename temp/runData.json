@@ -1,0 +1,16 @@
+{
+  "Webhook": [
+    {
+      "startTime": 1774268991375,
+      "executionIndex": 0,
+      "source": [],
+      "hints": [],
+      "executionTime": 0,
+      "executionStatus": "error",
+      "error": {
+        "message": "No Respond to Webhook node found in the workflow",
+        "stack": "WorkflowConfigurationError: No Respond to Webhook node found in the workflow\n    at checkResponseModeConfiguration (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/Webhook/utils.ts:213:9)\n    at Webhook.webhook (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/Webhook/Webhook.node.ts:216:34)\n    at WebhookService.runWebhook (/usr/local/lib/node_modules/n8n/src/webhooks/webhook.service.ts:465:21)\n    at Object.executeWebhook (/usr/local/lib/node_modules/n8n/src/webhooks/webhook-helpers.ts:526:60)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+      }
+    }
+  ]
+}

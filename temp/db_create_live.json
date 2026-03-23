@@ -1,0 +1,14 @@
+ID: 0pqnF4CQSGJMp7br
+Name: DB_Create_Booking
+Active: Yes
+Created: 2026-03-18T23:52:59.919Z
+Updated: 2026-03-23T12:29:19.697Z
+Trigger Count: 1
+Nodes: 15
+Node types:
+  - n8n-nodes-base.code: 9
+  - n8n-nodes-base.executeWorkflowTrigger: 1
+  - n8n-nodes-base.manualTrigger: 1
+  - n8n-nodes-base.postgres: 2
+  - n8n-nodes-base.respondToWebhook: 1
+  - n8n-nodes-base.webhook: 1

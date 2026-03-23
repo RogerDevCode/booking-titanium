@@ -1,0 +1,80 @@
+ts-jest[ts-jest-transformer] (WARN) Define `ts-jest` config under `globals` is deprecated. Please do
+transform: {
+    <transform_regex>: ['ts-jest', { /* ts-jest config goes here in Jest */ }],
+},
+See more at https://kulshekhar.github.io/ts-jest/docs/getting-started/presets#advanced
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) 
+    The "ts-jest" config option "isolatedModules" is deprecated and will be removed in v30.0.0. Please use "isolatedModules: true", see https://www.typescriptlang.org/tsconfig/#isolatedModules
+  
+FAIL tests/DB_Create_Booking.test.ts (8.421 s)
+  DB_Create_Booking Paranoia Tests
+    ✕ runs Happy Path successfully (5744 ms)
+    ✕ handles Indempotent Duplicate without raising DB errors (442 ms)
+    ✕ rejects missing idempotency_key (378 ms)
+    ✕ rejects missing start_time (415 ms)
+    ✕ rejects invalid type: provider_id as zero (320 ms)
+    ✕ rejects invalid range: end_time before start_time (440 ms)
+    ✕ rejects strict ISO normalization: Feb 30th (463 ms)
+
+  ● DB_Create_Booking Paranoia Tests › runs Happy Path successfully
+
+    AxiosError: Request failed with status code 404
+
+      at settle (node_modules/axios/lib/core/settle.js:20:7)
+      at BrotliDecompress.handleStreamEnd (node_modules/axios/lib/adapters/http.js:844:13)
+      at Axios.request (node_modules/axios/lib/core/Axios.js:46:41)
+
+  ● DB_Create_Booking Paranoia Tests › handles Indempotent Duplicate without raising DB errors
+
+    AxiosError: Request failed with status code 404
+
+      at settle (node_modules/axios/lib/core/settle.js:20:7)
+      at BrotliDecompress.handleStreamEnd (node_modules/axios/lib/adapters/http.js:844:13)
+      at Axios.request (node_modules/axios/lib/core/Axios.js:46:41)
+
+  ● DB_Create_Booking Paranoia Tests › rejects missing idempotency_key
+
+    AxiosError: Request failed with status code 404
+
+      at settle (node_modules/axios/lib/core/settle.js:20:7)
+      at BrotliDecompress.handleStreamEnd (node_modules/axios/lib/adapters/http.js:844:13)
+      at Axios.request (node_modules/axios/lib/core/Axios.js:46:41)
+
+  ● DB_Create_Booking Paranoia Tests › rejects missing start_time
+
+    AxiosError: Request failed with status code 404
+
+      at settle (node_modules/axios/lib/core/settle.js:20:7)
+      at BrotliDecompress.handleStreamEnd (node_modules/axios/lib/adapters/http.js:844:13)
+      at Axios.request (node_modules/axios/lib/core/Axios.js:46:41)
+
+  ● DB_Create_Booking Paranoia Tests › rejects invalid type: provider_id as zero
+
+    AxiosError: Request failed with status code 404
+
+      at settle (node_modules/axios/lib/core/settle.js:20:7)
+      at BrotliDecompress.handleStreamEnd (node_modules/axios/lib/adapters/http.js:844:13)
+      at Axios.request (node_modules/axios/lib/core/Axios.js:46:41)
+
+  ● DB_Create_Booking Paranoia Tests › rejects invalid range: end_time before start_time
+
+    AxiosError: Request failed with status code 404
+
+      at settle (node_modules/axios/lib/core/settle.js:20:7)
+      at BrotliDecompress.handleStreamEnd (node_modules/axios/lib/adapters/http.js:844:13)
+      at Axios.request (node_modules/axios/lib/core/Axios.js:46:41)
+
+  ● DB_Create_Booking Paranoia Tests › rejects strict ISO normalization: Feb 30th
+
+    AxiosError: Request failed with status code 404
+
+      at settle (node_modules/axios/lib/core/settle.js:20:7)
+      at BrotliDecompress.handleStreamEnd (node_modules/axios/lib/adapters/http.js:844:13)
+      at Axios.request (node_modules/axios/lib/core/Axios.js:46:41)
+
+Test Suites: 1 failed, 1 total
+Tests:       7 failed, 7 total
+Snapshots:   0 total
+Time:        8.862 s
+Ran all test suites matching tests/DB_Create_Booking.test.ts.

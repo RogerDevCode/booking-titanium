@@ -40,7 +40,8 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first()?.json.body || $input.first()?.json || {};\nconst provider_id = input.provider_id !== undefined ? Number(input.provider_id) : null;\nconst service_id = input.service_id !== undefined ? Number(input.service_id) : null;\nconst title = input.title !== undefined ? String(input.title).trim() : '';\nconst content = input.content !== undefined ? String(input.content).trim() : '';\nconst language = input.language !== undefined ? String(input.language).toLowerCase().trim() : 'es';\nconst status = input.status !== undefined ? String(input.status).toLowerCase().trim() : 'published';\nconst summary = input.summary !== undefined ? String(input.summary).trim() : '';\nconst source_type = input.source_type !== undefined ? String(input.source_type).toLowerCase().trim() : 'other';\nlet metadata = input.metadata || {};\nconst errors = [];\nconst validStatuses = ['draft', 'published', 'archived'];\nconst validSources = ['faq', 'policy', 'service', 'emergency', 'other'];\nif (!Number.isInteger(provider_id) || provider_id <= 0) errors.push('provider_id must be positive integer');\nif (title.length < 5 || title.length > 200) errors.push('title must be 5-200 chars');\nif (content.length < 10 || content.length > 50000) errors.push('content must be 10-50000 chars');\nif (!validStatuses.includes(status)) errors.push('status must be: draft, published, archived');\nif (!validSources.includes(source_type)) metadata.original_source_type = source_type;\nif (language.length !== 2) errors.push('language must be 2 chars');\nif (errors.length > 0) throw new Error('VALIDATION_ERROR: ' + errors.join(' | '));\nreturn [{ json: { provider_id, service_id: service_id || null, title: title.substring(0, 500), content: content.substring(0, 50000), summary: summary.substring(0, 1000), source_type: validSources.includes(source_type) ? source_type : 'other', status, language, metadata } }];\n"
+        "jsCode": "const input = $input.first()?.json.body || $input.first()?.json || {};\nconst provider_id = input.provider_id !== undefined ? Number(input.provider_id) : null;\nconst service_id = input.service_id !== undefined ? Number(input.service_id) : null;\nconst title = input.title !== undefined ? String(input.title).trim() : '';\nconst content = input.content !== undefined ? String(input.content).trim() : '';\nconst language = input.language !== undefined ? String(input.language).toLowerCase().trim() : 'es';\nconst status = input.status !== undefined ? String(input.status).toLowerCase().trim() : 'published';\nconst summary = input.summary !== undefined ? String(input.summary).trim() : '';\nconst source_type = input.source_type !== undefined ? String(input.source_type).toLowerCase().trim() : 'other';\nlet metadata = input.metadata || {};\nconst errors = [];\nconst validStatuses = ['draft', 'published', 'archived'];\nconst validSources = ['faq', 'policy', 'service', 'emergency', 'other'];\nif (!Number.isInteger(provider_id) || provider_id <= 0) errors.push('provider_id must be positive integer');\nif (title.length < 5 || title.length > 200) errors.push('title must be 5-200 chars');\nif (content.length < 10 || content.length > 50000) errors.push('content must be 10-50000 chars');\nif (!validStatuses.includes(status)) errors.push('status must be: draft, published, archived');\nif (!validSources.includes(source_type)) metadata.original_source_type = source_type;\nif (language.length !== 2) errors.push('language must be 2 chars');\nif (errors.length > 0) throw new Error('VALIDATION_ERROR: ' + errors.join(' | '));\nreturn [{ json: { provider_id, service_id: service_id || null, title: title.substring(0, 500), content: content.substring(0, 50000), summary: summary.substring(0, 1000), source_type: validSources.includes(source_type) ? source_type : 'other', status, language, metadata } }];\n",
+        "onError": "continueErrorOutput"
       },
       "name": "Validate & Normalize",
       "type": "n8n-nodes-base.code",
@@ -336,6 +337,13 @@
         [
           {
             "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Validation Error",
             "type": "main",
             "index": 0
           }

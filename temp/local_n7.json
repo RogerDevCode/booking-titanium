@@ -1,0 +1,14 @@
+{
+  "parameters": {
+    "jsCode": "const pgResult = $input.first().json;\nconst upstreamData = $('Build Idempotency Check Query').isExecuted\n  ? $('Build Idempotency Check Query').first().json\n  : null;\n\nif (upstreamData && upstreamData._exit_early) {\n  return [{ json: { ...upstreamData, _route: 'error' } }];\n}\n\nconst originalData = upstreamData && upstreamData._validated ? upstreamData : null;\nif (!originalData) {\n  return [{ json: {\n    success: false, error_code: 'PIPELINE_ERROR',\n    error_message: 'Validated data lost in Route By Idempotency',\n    data: null, _route: 'error',\n    _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }}];\n}\n\nconst hasExisting = pgResult && pgResult.id !== undefined && pgResult.id !== null;\nif (hasExisting) {\n  return [{ json: {\n    success: true, error_code: null, error_message: null,\n    data: { booking_id: pgResult.id, status: pgResult.status || 'CONFIRMED', is_duplicate: true },\n    _meta: { source: 'DB_Create_Booking', timestamp: new Date().toISOString(), workflow_id: $workflow.id },\n    _route: 'existing'\n  }}];\n}\n\nreturn [{ json: { ...originalData, _route: 'new' } }];",
+    "mode": "runOnceForAllItems"
+  },
+  "name": "Route By Idempotency",
+  "type": "n8n-nodes-base.code",
+  "typeVersion": 2,
+  "position": [
+    880,
+    304
+  ],
+  "id": "e35f96a6-faa1-47ce-932d-00f5691c5789"
+}

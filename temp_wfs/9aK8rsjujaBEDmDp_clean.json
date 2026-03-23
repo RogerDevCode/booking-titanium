@@ -1,0 +1,99 @@
+{
+  "name": "BB_00_Config",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "id": "41bea39f-1a54-417f-b9af-250fce75fec7"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        400
+      ],
+      "id": "ad399099-32eb-4a8c-8a8a-35af9d6776f9"
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "bb-00-config",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        600
+      ],
+      "webhookId": "bb-00-config",
+      "id": "6a2ec381-e29f-4186-9946-9c7c464f5549"
+    },
+    {
+      "parameters": {
+        "jsCode": "// BB_00_Config — Global Constants (Community Edition replacement for $vars)\n// Centralizado: un solo lugar para mantener todas las constantes\nreturn [{\n  json: {\n    N8N_EDITOR_BASE_URL: 'https://n8n.stax.ink',\n    TELEGRAM_ADMIN_ID: '5391760292',\n    BUSINESS_EMAIL: 'baba.orere@gmail.com',\n    DEFAULT_PROVIDER_ID: 1,\n    DEFAULT_SERVICE_ID: 1,\n    DAL_SERVICE_URL: 'http://127.0.0.1:3000',\n    _meta: {\n      source: 'BB_00_Config',\n      timestamp: new Date().toISOString(),\n      version: '1.0.0'\n    }\n  }\n}];"
+      },
+      "name": "Global Constants",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        400
+      ],
+      "id": "750278b6-9ce1-4806-861e-46f218eab2c8"
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Global Constants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Global Constants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Global Constants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": true
+  }
+}

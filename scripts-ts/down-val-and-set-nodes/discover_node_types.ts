@@ -728,7 +728,7 @@ function saveSSOT(cache: NodeTypeCache, filePath: string): void {
     nodes,
   };
 
-  const resolvedPath = resolve(process.cwd(), filePath);
+  const resolvedPath = resolve(__dirname_local, filePath);
   writeFileSync(resolvedPath, JSON.stringify(ssot, null, 2), "utf-8");
   console.log(`  ${C.green}✔ SSOT file:    ${resolvedPath}${C.reset}`);
 }

@@ -1,0 +1,6385 @@
+{
+  "discoveredAt": "2026-03-19T17:15:20.638Z",
+  "n8nBaseUrl": "https://n8n.stax.ink",
+  "n8nVersion": "2.13.0",
+  "method": "docker cp+exec (n8n_titanium)",
+  "containerName": "n8n_titanium",
+  "totalTypes": 546,
+  "nodeTypes": {
+    "n8n-nodes-base.actionNetwork": {
+      "displayName": "Action Network",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Action Network API"
+    },
+    "n8n-nodes-base.activeCampaign": {
+      "displayName": "ActiveCampaign",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Create and edit data in ActiveCampaign"
+    },
+    "n8n-nodes-base.activeCampaignTrigger": {
+      "displayName": "ActiveCampaign Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle ActiveCampaign events via webhooks"
+    },
+    "n8n-nodes-base.acuitySchedulingTrigger": {
+      "displayName": "Acuity Scheduling Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Acuity Scheduling events via webhooks"
+    },
+    "n8n-nodes-base.adalo": {
+      "displayName": "Adalo",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Adalo API"
+    },
+    "n8n-nodes-base.affinity": {
+      "displayName": "Affinity",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Affinity API"
+    },
+    "n8n-nodes-base.affinityTrigger": {
+      "displayName": "Affinity Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Affinity events via webhooks"
+    },
+    "n8n-nodes-base.agileCrm": {
+      "displayName": "Agile CRM",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Agile CRM API"
+    },
+    "n8n-nodes-base.aiTransform": {
+      "displayName": "AI Transform",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Modify data based on instructions written in plain english"
+    },
+    "n8n-nodes-base.airtable": {
+      "displayName": "Airtable",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2
+      ],
+      "latestVersion": 2.2,
+      "group": [
+        "input"
+      ],
+      "description": "Read, update, write and delete data from Airtable"
+    },
+    "n8n-nodes-base.airtableTrigger": {
+      "displayName": "Airtable Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Airtable events occur"
+    },
+    "n8n-nodes-base.airtop": {
+      "displayName": "Airtop",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Scrape and control any site with Airtop"
+    },
+    "n8n-nodes-base.amqp": {
+      "displayName": "AMQP Sender",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Sends a raw-message via AMQP 1.0, executed once per item"
+    },
+    "n8n-nodes-base.amqpTrigger": {
+      "displayName": "AMQP Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Listens to AMQP 1.0 Messages"
+    },
+    "n8n-nodes-base.apiTemplateIo": {
+      "displayName": "APITemplate.io",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the APITemplate.io API"
+    },
+    "n8n-nodes-base.asana": {
+      "displayName": "Asana",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Asana REST API"
+    },
+    "n8n-nodes-base.asanaTrigger": {
+      "displayName": "Asana Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Asana events occur."
+    },
+    "n8n-nodes-base.autopilot": {
+      "displayName": "Autopilot",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Autopilot API"
+    },
+    "n8n-nodes-base.autopilotTrigger": {
+      "displayName": "Autopilot Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Autopilot events via webhooks"
+    },
+    "n8n-nodes-base.awsLambda": {
+      "displayName": "AWS Lambda",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Invoke functions on AWS Lambda"
+    },
+    "n8n-nodes-base.awsSns": {
+      "displayName": "AWS SNS",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends data to AWS SNS"
+    },
+    "n8n-nodes-base.awsSnsTrigger": {
+      "displayName": "AWS SNS Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle AWS SNS events via webhooks"
+    },
+    "n8n-nodes-base.awsCertificateManager": {
+      "displayName": "AWS Certificate Manager",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends data to AWS Certificate Manager"
+    },
+    "n8n-nodes-base.awsCognito": {
+      "displayName": "AWS Cognito",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends data to AWS Cognito"
+    },
+    "n8n-nodes-base.awsComprehend": {
+      "displayName": "AWS Comprehend",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends data to Amazon Comprehend"
+    },
+    "n8n-nodes-base.awsDynamoDb": {
+      "displayName": "AWS DynamoDB",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the AWS DynamoDB API"
+    },
+    "n8n-nodes-base.awsElb": {
+      "displayName": "AWS ELB",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends data to AWS ELB API"
+    },
+    "n8n-nodes-base.awsIam": {
+      "displayName": "AWS IAM",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Interacts with Amazon IAM"
+    },
+    "n8n-nodes-base.awsRekognition": {
+      "displayName": "AWS Rekognition",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends data to AWS Rekognition"
+    },
+    "n8n-nodes-base.awsS3": {
+      "displayName": "AwsS3",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "output"
+      ],
+      "description": "Sends data to AWS S3"
+    },
+    "n8n-nodes-base.awsSes": {
+      "displayName": "AWS SES",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends data to AWS SES"
+    },
+    "n8n-nodes-base.awsSqs": {
+      "displayName": "AWS SQS",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends messages to AWS SQS"
+    },
+    "n8n-nodes-base.awsTextract": {
+      "displayName": "AWS Textract",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends data to Amazon Textract"
+    },
+    "n8n-nodes-base.awsTranscribe": {
+      "displayName": "AWS Transcribe",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends data to AWS Transcribe"
+    },
+    "n8n-nodes-base.bambooHr": {
+      "displayName": "BambooHR",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume BambooHR API"
+    },
+    "n8n-nodes-base.bannerbear": {
+      "displayName": "Bannerbear",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Bannerbear API"
+    },
+    "n8n-nodes-base.baserow": {
+      "displayName": "Baserow",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume the Baserow API"
+    },
+    "n8n-nodes-base.beeminder": {
+      "displayName": "Beeminder",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Beeminder API"
+    },
+    "n8n-nodes-base.bitbucketTrigger": {
+      "displayName": "Bitbucket Trigger",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Bitbucket events via webhooks"
+    },
+    "n8n-nodes-base.bitly": {
+      "displayName": "Bitly",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Bitly API"
+    },
+    "n8n-nodes-base.bitwarden": {
+      "displayName": "Bitwarden",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Bitwarden API"
+    },
+    "n8n-nodes-base.box": {
+      "displayName": "Box",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Box API"
+    },
+    "n8n-nodes-base.boxTrigger": {
+      "displayName": "Box Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Box events occur"
+    },
+    "n8n-nodes-base.Brandfetch": {
+      "displayName": "Brandfetch",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Brandfetch API"
+    },
+    "n8n-nodes-base.sendInBlue": {
+      "displayName": "Brevo",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Brevo API"
+    },
+    "n8n-nodes-base.sendInBlueTrigger": {
+      "displayName": "Brevo Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Brevo events occur"
+    },
+    "n8n-nodes-base.bubble": {
+      "displayName": "Bubble",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Bubble Data API"
+    },
+    "n8n-nodes-base.calTrigger": {
+      "displayName": "Cal.com Trigger",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Cal.com events via webhooks"
+    },
+    "n8n-nodes-base.calendlyTrigger": {
+      "displayName": "Calendly Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Calendly events occur"
+    },
+    "n8n-nodes-base.chargebee": {
+      "displayName": "Chargebee",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Retrieve data from Chargebee API"
+    },
+    "n8n-nodes-base.chargebeeTrigger": {
+      "displayName": "Chargebee Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Chargebee events occur"
+    },
+    "n8n-nodes-base.circleCi": {
+      "displayName": "CircleCI",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume CircleCI API"
+    },
+    "n8n-nodes-base.ciscoWebex": {
+      "displayName": "Webex by Cisco",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Cisco Webex API"
+    },
+    "n8n-nodes-base.ciscoWebexTrigger": {
+      "displayName": "Webex by Cisco Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Cisco Webex events occur."
+    },
+    "n8n-nodes-base.clearbit": {
+      "displayName": "Clearbit",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Clearbit API"
+    },
+    "n8n-nodes-base.clickUp": {
+      "displayName": "ClickUp",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume ClickUp API (Beta)"
+    },
+    "n8n-nodes-base.clickUpTrigger": {
+      "displayName": "ClickUp Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle ClickUp events via webhooks (Beta)"
+    },
+    "n8n-nodes-base.clockify": {
+      "displayName": "Clockify",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Clockify REST API"
+    },
+    "n8n-nodes-base.clockifyTrigger": {
+      "displayName": "Clockify Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Listens to Clockify events"
+    },
+    "n8n-nodes-base.cloudflare": {
+      "displayName": "Cloudflare",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Cloudflare API"
+    },
+    "n8n-nodes-base.cockpit": {
+      "displayName": "Cockpit",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Cockpit API"
+    },
+    "n8n-nodes-base.coda": {
+      "displayName": "Coda",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Coda API"
+    },
+    "n8n-nodes-base.code": {
+      "displayName": "Code",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "transform"
+      ],
+      "description": "Run custom JavaScript or Python code"
+    },
+    "n8n-nodes-base.coinGecko": {
+      "displayName": "CoinGecko",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume CoinGecko API"
+    },
+    "n8n-nodes-base.compareDatasets": {
+      "displayName": "Compare Datasets",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3
+      ],
+      "latestVersion": 2.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Compare two inputs for changes"
+    },
+    "n8n-nodes-base.compression": {
+      "displayName": "Compression",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Compress and decompress files"
+    },
+    "n8n-nodes-base.contentful": {
+      "displayName": "Contentful",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Contentful API"
+    },
+    "n8n-nodes-base.convertKit": {
+      "displayName": "ConvertKit",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume ConvertKit API"
+    },
+    "n8n-nodes-base.convertKitTrigger": {
+      "displayName": "ConvertKit Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle ConvertKit events via webhooks"
+    },
+    "n8n-nodes-base.copper": {
+      "displayName": "Copper",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Copper API"
+    },
+    "n8n-nodes-base.copperTrigger": {
+      "displayName": "Copper Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Copper events via webhooks"
+    },
+    "n8n-nodes-base.cortex": {
+      "displayName": "Cortex",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Apply the Cortex analyzer/responder on the given entity"
+    },
+    "n8n-nodes-base.crateDb": {
+      "displayName": "CrateDB",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Add and update data in CrateDB"
+    },
+    "n8n-nodes-base.cron": {
+      "displayName": "Cron",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger",
+        "schedule"
+      ],
+      "description": "Triggers the workflow at a specific time"
+    },
+    "n8n-nodes-base.crypto": {
+      "displayName": "Crypto",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "transform"
+      ],
+      "description": "Provide cryptographic utilities"
+    },
+    "n8n-nodes-base.currents": {
+      "displayName": "Currents",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Interact with the Currents API for test orchestration and analytics"
+    },
+    "n8n-nodes-base.currentsTrigger": {
+      "displayName": "Currents Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Currents events occur"
+    },
+    "n8n-nodes-base.customerIo": {
+      "displayName": "Customer.io",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Customer.io API"
+    },
+    "n8n-nodes-base.customerIoTrigger": {
+      "displayName": "Customer.io Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow on a Customer.io update (Beta)"
+    },
+    "n8n-nodes-base.dataTable": {
+      "displayName": "Data table",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "input",
+        "transform"
+      ],
+      "description": "Permanently save data across workflow executions in a table"
+    },
+    "n8n-nodes-base.dateTime": {
+      "displayName": "Date & Time",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "transform"
+      ],
+      "description": "Allows you to manipulate date and time values"
+    },
+    "n8n-nodes-base.debugHelper": {
+      "displayName": "DebugHelper",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Causes problems intentionally and generates useful data for debugging"
+    },
+    "n8n-nodes-base.deepL": {
+      "displayName": "DeepL",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input",
+        "output"
+      ],
+      "description": "Translate data using DeepL"
+    },
+    "n8n-nodes-base.demio": {
+      "displayName": "Demio",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume the Demio API"
+    },
+    "n8n-nodes-base.dhl": {
+      "displayName": "DHL",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume DHL API"
+    },
+    "n8n-nodes-base.discord": {
+      "displayName": "Discord",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "output"
+      ],
+      "description": "Sends data to Discord"
+    },
+    "n8n-nodes-base.discourse": {
+      "displayName": "Discourse",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Discourse API"
+    },
+    "n8n-nodes-base.disqus": {
+      "displayName": "Disqus",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Access data on Disqus"
+    },
+    "n8n-nodes-base.drift": {
+      "displayName": "Drift",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Drift API"
+    },
+    "n8n-nodes-base.dropbox": {
+      "displayName": "Dropbox",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Access data on Dropbox"
+    },
+    "n8n-nodes-base.dropcontact": {
+      "displayName": "Dropcontact",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Find B2B emails and enrich contacts"
+    },
+    "n8n-nodes-base.e2eTest": {
+      "displayName": "E2E Test",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Dummy node used for e2e testing"
+    },
+    "n8n-nodes-base.erpNext": {
+      "displayName": "ERPNext",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume ERPNext API"
+    },
+    "n8n-nodes-base.editImage": {
+      "displayName": "Edit Image",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Edits an image like blur, resize or adding border and text"
+    },
+    "n8n-nodes-base.egoi": {
+      "displayName": "E-goi",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume E-goi API"
+    },
+    "n8n-nodes-base.elasticSecurity": {
+      "displayName": "Elastic Security",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Elastic Security API"
+    },
+    "n8n-nodes-base.elasticsearch": {
+      "displayName": "Elasticsearch",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Elasticsearch API"
+    },
+    "n8n-nodes-base.emailReadImap": {
+      "displayName": "Email Trigger (IMAP)",
+      "availableVersions": [
+        1,
+        2,
+        2.1
+      ],
+      "latestVersion": 2.1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Triggers the workflow when a new email is received"
+    },
+    "n8n-nodes-base.emailSend": {
+      "displayName": "Send Email",
+      "availableVersions": [
+        1,
+        2,
+        2.1
+      ],
+      "latestVersion": 2.1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends an email using SMTP protocol"
+    },
+    "n8n-nodes-base.emelia": {
+      "displayName": "Emelia",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume the Emelia API"
+    },
+    "n8n-nodes-base.emeliaTrigger": {
+      "displayName": "Emelia Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Emelia campaign activity events via webhooks"
+    },
+    "n8n-nodes-base.errorTrigger": {
+      "displayName": "Error Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Triggers the workflow when another workflow has an error"
+    },
+    "n8n-nodes-base.eventbriteTrigger": {
+      "displayName": "Eventbrite Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Eventbrite events via webhooks"
+    },
+    "n8n-nodes-base.executeCommand": {
+      "displayName": "Execute Command",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Executes a command on the host"
+    },
+    "n8n-nodes-base.executeWorkflow": {
+      "displayName": "Execute Sub-workflow",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Execute another workflow"
+    },
+    "n8n-nodes-base.executeWorkflowTrigger": {
+      "displayName": "Execute Workflow Trigger",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Helpers for calling other n8n workflows. Used for designing modular, microservice-like workflows."
+    },
+    "n8n-nodes-base.executionData": {
+      "displayName": "Execution Data",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "input"
+      ],
+      "description": "Add execution data for search"
+    },
+    "n8n-nodes-base.facebookGraphApi": {
+      "displayName": "Facebook Graph API",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Interacts with Facebook using the Graph API"
+    },
+    "n8n-nodes-base.facebookTrigger": {
+      "displayName": "Facebook Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Facebook events occur"
+    },
+    "n8n-nodes-base.facebookLeadAdsTrigger": {
+      "displayName": "Facebook Lead Ads Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Facebook Lead Ads events via webhooks"
+    },
+    "n8n-nodes-base.figmaTrigger": {
+      "displayName": "Figma Trigger (Beta)",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Figma events occur"
+    },
+    "n8n-nodes-base.filemaker": {
+      "displayName": "FileMaker",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Retrieve data from the FileMaker data API"
+    },
+    "n8n-nodes-base.convertToFile": {
+      "displayName": "Convert to File",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "input"
+      ],
+      "description": "Convert JSON data to binary data"
+    },
+    "n8n-nodes-base.extractFromFile": {
+      "displayName": "Extract from File",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "input"
+      ],
+      "description": "Convert binary data to JSON"
+    },
+    "n8n-nodes-base.readWriteFile": {
+      "displayName": "Read/Write Files from Disk",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "input"
+      ],
+      "description": "Read or write files from the computer that runs n8n"
+    },
+    "n8n-nodes-base.filter": {
+      "displayName": "Filter",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3
+      ],
+      "latestVersion": 2.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Keep only items matching a condition"
+    },
+    "n8n-nodes-base.flow": {
+      "displayName": "Flow",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Flow API"
+    },
+    "n8n-nodes-base.flowTrigger": {
+      "displayName": "Flow Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Flow events via webhooks"
+    },
+    "n8n-nodes-base.form": {
+      "displayName": "n8n Form",
+      "availableVersions": [
+        1,
+        2.3,
+        2.4,
+        2.5
+      ],
+      "latestVersion": 2.5,
+      "group": [
+        "input"
+      ],
+      "description": "Generate webforms in n8n and pass their responses to the workflow"
+    },
+    "n8n-nodes-base.formTrigger": {
+      "displayName": "n8n Form Trigger",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3,
+        2.4,
+        2.5
+      ],
+      "latestVersion": 2.5,
+      "group": [
+        "trigger"
+      ],
+      "description": "Generate webforms in n8n and pass their responses to the workflow"
+    },
+    "n8n-nodes-base.formIoTrigger": {
+      "displayName": "Form.io Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle form.io events via webhooks"
+    },
+    "n8n-nodes-base.formstackTrigger": {
+      "displayName": "Formstack Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow on a Formstack form submission."
+    },
+    "n8n-nodes-base.freshdesk": {
+      "displayName": "Freshdesk",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Freshdesk API"
+    },
+    "n8n-nodes-base.freshservice": {
+      "displayName": "Freshservice",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Freshservice API"
+    },
+    "n8n-nodes-base.freshworksCrm": {
+      "displayName": "Freshworks CRM",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Freshworks CRM API"
+    },
+    "n8n-nodes-base.ftp": {
+      "displayName": "FTP",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Transfer files via FTP or SFTP"
+    },
+    "n8n-nodes-base.function": {
+      "displayName": "Function",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Run custom function code which gets executed once and allows you to add, remove, change and replace items"
+    },
+    "n8n-nodes-base.functionItem": {
+      "displayName": "Function Item",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Run custom function code which gets executed once per item"
+    },
+    "n8n-nodes-base.getResponse": {
+      "displayName": "GetResponse",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume GetResponse API"
+    },
+    "n8n-nodes-base.getResponseTrigger": {
+      "displayName": "GetResponse Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when GetResponse events occur"
+    },
+    "n8n-nodes-base.ghost": {
+      "displayName": "Ghost",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Ghost API"
+    },
+    "n8n-nodes-base.git": {
+      "displayName": "Git",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Control git."
+    },
+    "n8n-nodes-base.github": {
+      "displayName": "GitHub",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume GitHub API"
+    },
+    "n8n-nodes-base.githubTrigger": {
+      "displayName": "Github Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Github events occur"
+    },
+    "n8n-nodes-base.gitlab": {
+      "displayName": "GitLab",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Retrieve data from GitLab API"
+    },
+    "n8n-nodes-base.gitlabTrigger": {
+      "displayName": "GitLab Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when GitLab events occur"
+    },
+    "n8n-nodes-base.goToWebinar": {
+      "displayName": "GoToWebinar",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the GoToWebinar API"
+    },
+    "n8n-nodes-base.gong": {
+      "displayName": "Gong",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Interact with Gong API"
+    },
+    "n8n-nodes-base.googleAds": {
+      "displayName": "Google Ads",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use the Google Ads API"
+    },
+    "n8n-nodes-base.googleAnalytics": {
+      "displayName": "Google Analytics",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "transform"
+      ],
+      "description": "Use the Google Analytics API"
+    },
+    "n8n-nodes-base.googleBigQuery": {
+      "displayName": "Google BigQuery",
+      "availableVersions": [
+        1,
+        2,
+        2.1
+      ],
+      "latestVersion": 2.1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Google BigQuery API"
+    },
+    "n8n-nodes-base.googleBooks": {
+      "displayName": "Google Books",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "input",
+        "output"
+      ],
+      "description": "Read data from Google Books"
+    },
+    "n8n-nodes-base.googleBusinessProfile": {
+      "displayName": "Google Business Profile",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Google Business Profile API"
+    },
+    "n8n-nodes-base.googleBusinessProfileTrigger": {
+      "displayName": "Google Business Profile Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Fetches reviews from Google Business Profile and starts the workflow on specified polling intervals."
+    },
+    "n8n-nodes-base.googleCalendar": {
+      "displayName": "Google Calendar",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Google Calendar API"
+    },
+    "n8n-nodes-base.googleCalendarTrigger": {
+      "displayName": "Google Calendar Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Google Calendar events occur"
+    },
+    "n8n-nodes-base.googleChat": {
+      "displayName": "Google Chat",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Google Chat API"
+    },
+    "n8n-nodes-base.googleCloudNaturalLanguage": {
+      "displayName": "Google Cloud Natural Language",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input",
+        "output"
+      ],
+      "description": "Consume Google Cloud Natural Language API"
+    },
+    "n8n-nodes-base.googleCloudStorage": {
+      "displayName": "Google Cloud Storage",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use the Google Cloud Storage API"
+    },
+    "n8n-nodes-base.googleContacts": {
+      "displayName": "Google Contacts",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Google Contacts API"
+    },
+    "n8n-nodes-base.googleDocs": {
+      "displayName": "Google Docs",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Google Docs API."
+    },
+    "n8n-nodes-base.googleDrive": {
+      "displayName": "Google Drive",
+      "availableVersions": [
+        1,
+        2,
+        3
+      ],
+      "latestVersion": 3,
+      "group": [
+        "input"
+      ],
+      "description": "Access data on Google Drive"
+    },
+    "n8n-nodes-base.googleDriveTrigger": {
+      "displayName": "Google Drive Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Google Drive events occur"
+    },
+    "n8n-nodes-base.googleFirebaseCloudFirestore": {
+      "displayName": "Google Cloud Firestore",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "input"
+      ],
+      "description": "Interact with Google Firebase - Cloud Firestore API"
+    },
+    "n8n-nodes-base.googleFirebaseRealtimeDatabase": {
+      "displayName": "Google Cloud Realtime Database",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Interact with Google Firebase - Realtime Database API"
+    },
+    "n8n-nodes-base.gSuiteAdmin": {
+      "displayName": "Google Workspace Admin",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Google Workspace Admin API"
+    },
+    "n8n-nodes-base.gmail": {
+      "displayName": "Gmail",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2
+      ],
+      "latestVersion": 2.2,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Gmail API"
+    },
+    "n8n-nodes-base.gmailTrigger": {
+      "displayName": "Gmail Trigger",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "trigger"
+      ],
+      "description": "Fetches emails from Gmail and starts the workflow on specified polling intervals."
+    },
+    "n8n-nodes-base.googlePerspective": {
+      "displayName": "Google Perspective",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Google Perspective API"
+    },
+    "n8n-nodes-base.googleSheets": {
+      "displayName": "Google Sheets",
+      "availableVersions": [
+        1,
+        2,
+        3,
+        4,
+        4.1,
+        4.2,
+        4.3,
+        4.4,
+        4.5,
+        4.6,
+        4.7
+      ],
+      "latestVersion": 4.7,
+      "group": [
+        "input",
+        "output"
+      ],
+      "description": "Read, update and write data to Google Sheets"
+    },
+    "n8n-nodes-base.googleSheetsTrigger": {
+      "displayName": "Google Sheets Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Google Sheets events occur"
+    },
+    "n8n-nodes-base.googleSlides": {
+      "displayName": "Google Slides",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "input",
+        "output"
+      ],
+      "description": "Consume the Google Slides API"
+    },
+    "n8n-nodes-base.googleTasks": {
+      "displayName": "Google Tasks",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Google Tasks API"
+    },
+    "n8n-nodes-base.googleTranslate": {
+      "displayName": "Google Translate",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "input",
+        "output"
+      ],
+      "description": "Translate data using Google Translate"
+    },
+    "n8n-nodes-base.youTube": {
+      "displayName": "YouTube",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume YouTube API"
+    },
+    "n8n-nodes-base.gotify": {
+      "displayName": "Gotify",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Gotify API"
+    },
+    "n8n-nodes-base.grafana": {
+      "displayName": "Grafana",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Grafana API"
+    },
+    "n8n-nodes-base.graphql": {
+      "displayName": "GraphQL",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "input"
+      ],
+      "description": "Makes a GraphQL request and returns the received data"
+    },
+    "n8n-nodes-base.grist": {
+      "displayName": "Grist",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume the Grist API"
+    },
+    "n8n-nodes-base.gumroadTrigger": {
+      "displayName": "Gumroad Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Gumroad events via webhooks"
+    },
+    "n8n-nodes-base.hackerNews": {
+      "displayName": "Hacker News",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Hacker News API"
+    },
+    "n8n-nodes-base.haloPSA": {
+      "displayName": "HaloPSA",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume HaloPSA API"
+    },
+    "n8n-nodes-base.harvest": {
+      "displayName": "Harvest",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Access data on Harvest"
+    },
+    "n8n-nodes-base.helpScout": {
+      "displayName": "Help Scout",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Help Scout API"
+    },
+    "n8n-nodes-base.helpScoutTrigger": {
+      "displayName": "Help Scout Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Help Scout events occur"
+    },
+    "n8n-nodes-base.highLevel": {
+      "displayName": "HighLevel",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume HighLevel API"
+    },
+    "n8n-nodes-base.homeAssistant": {
+      "displayName": "Home Assistant",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Home Assistant API"
+    },
+    "n8n-nodes-base.html": {
+      "displayName": "HTML",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "latestVersion": 1.2,
+      "group": [
+        "transform"
+      ],
+      "description": "Work with HTML"
+    },
+    "n8n-nodes-base.htmlExtract": {
+      "displayName": "HTML Extract",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Extracts data from HTML"
+    },
+    "n8n-nodes-base.httpRequest": {
+      "displayName": "HTTP Request",
+      "availableVersions": [
+        1,
+        2,
+        3,
+        4,
+        4.1,
+        4.2,
+        4.3,
+        4.4
+      ],
+      "latestVersion": 4.4,
+      "group": [
+        "output"
+      ],
+      "description": "Makes an HTTP request and returns the response data"
+    },
+    "n8n-nodes-base.hubspot": {
+      "displayName": "HubSpot",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2
+      ],
+      "latestVersion": 2.2,
+      "group": [
+        "output"
+      ],
+      "description": "Consume HubSpot API"
+    },
+    "n8n-nodes-base.hubspotTrigger": {
+      "displayName": "HubSpot Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when HubSpot events occur"
+    },
+    "n8n-nodes-base.humanticAi": {
+      "displayName": "Humantic AI",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Humantic AI API"
+    },
+    "n8n-nodes-base.hunter": {
+      "displayName": "Hunter",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Hunter API"
+    },
+    "n8n-nodes-base.iCal": {
+      "displayName": "iCalendar",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Create iCalendar file"
+    },
+    "n8n-nodes-base.if": {
+      "displayName": "If",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3
+      ],
+      "latestVersion": 2.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Route items to different branches (true/false)"
+    },
+    "n8n-nodes-base.intercom": {
+      "displayName": "Intercom",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Intercom API"
+    },
+    "n8n-nodes-base.interval": {
+      "displayName": "Interval",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger",
+        "schedule"
+      ],
+      "description": "Triggers the workflow in a given interval"
+    },
+    "n8n-nodes-base.invoiceNinja": {
+      "displayName": "Invoice Ninja",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Invoice Ninja API"
+    },
+    "n8n-nodes-base.invoiceNinjaTrigger": {
+      "displayName": "Invoice Ninja Trigger",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Invoice Ninja events occur"
+    },
+    "n8n-nodes-base.itemLists": {
+      "displayName": "Item Lists",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        3,
+        3.1
+      ],
+      "latestVersion": 3.1,
+      "group": [
+        "input"
+      ],
+      "description": "Helper for working with lists of items and transforming arrays"
+    },
+    "n8n-nodes-base.iterable": {
+      "displayName": "Iterable",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Iterable API"
+    },
+    "n8n-nodes-base.jenkins": {
+      "displayName": "Jenkins",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Jenkins API"
+    },
+    "n8n-nodes-base.jinaAi": {
+      "displayName": "Jina AI",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Interact with Jina AI API"
+    },
+    "n8n-nodes-base.jira": {
+      "displayName": "Jira Software",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Jira Software API"
+    },
+    "n8n-nodes-base.jiraTrigger": {
+      "displayName": "Jira Trigger",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Jira events occur"
+    },
+    "n8n-nodes-base.jotFormTrigger": {
+      "displayName": "Jotform Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Jotform events via webhooks"
+    },
+    "n8n-nodes-base.jwt": {
+      "displayName": "JWT",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "JWT"
+    },
+    "n8n-nodes-base.kafka": {
+      "displayName": "Kafka",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Sends messages to a Kafka topic"
+    },
+    "n8n-nodes-base.kafkaTrigger": {
+      "displayName": "Kafka Trigger",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "trigger"
+      ],
+      "description": "Consume messages from a Kafka topic"
+    },
+    "n8n-nodes-base.keap": {
+      "displayName": "Keap",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Keap API"
+    },
+    "n8n-nodes-base.keapTrigger": {
+      "displayName": "Keap Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Infusionsoft events occur"
+    },
+    "n8n-nodes-base.koBoToolbox": {
+      "displayName": "KoBoToolbox",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Work with KoBoToolbox forms and submissions"
+    },
+    "n8n-nodes-base.koBoToolboxTrigger": {
+      "displayName": "KoBoToolbox Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Process KoBoToolbox submissions"
+    },
+    "n8n-nodes-base.ldap": {
+      "displayName": "Ldap",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Interact with LDAP servers"
+    },
+    "n8n-nodes-base.lemlist": {
+      "displayName": "Lemlist",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Lemlist API"
+    },
+    "n8n-nodes-base.lemlistTrigger": {
+      "displayName": "Lemlist Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Lemlist events via webhooks"
+    },
+    "n8n-nodes-base.line": {
+      "displayName": "Line",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Line API"
+    },
+    "n8n-nodes-base.linear": {
+      "displayName": "Linear",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Linear API"
+    },
+    "n8n-nodes-base.linearTrigger": {
+      "displayName": "Linear Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Linear events occur"
+    },
+    "n8n-nodes-base.lingvaNex": {
+      "displayName": "LingvaNex",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume LingvaNex API"
+    },
+    "n8n-nodes-base.linkedIn": {
+      "displayName": "LinkedIn",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume LinkedIn API"
+    },
+    "n8n-nodes-base.localFileTrigger": {
+      "displayName": "Local File Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Triggers a workflow on file system changes"
+    },
+    "n8n-nodes-base.loneScale": {
+      "displayName": "LoneScale",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Create List, add / delete items"
+    },
+    "n8n-nodes-base.loneScaleTrigger": {
+      "displayName": "LoneScale Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Trigger LoneScale Workflow"
+    },
+    "n8n-nodes-base.mqtt": {
+      "displayName": "MQTT",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Push messages to MQTT"
+    },
+    "n8n-nodes-base.mqttTrigger": {
+      "displayName": "MQTT Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Listens to MQTT events"
+    },
+    "n8n-nodes-base.magento2": {
+      "displayName": "Magento 2",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Magento API"
+    },
+    "n8n-nodes-base.mailcheck": {
+      "displayName": "Mailcheck",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Mailcheck API"
+    },
+    "n8n-nodes-base.mailchimp": {
+      "displayName": "Mailchimp",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Mailchimp API"
+    },
+    "n8n-nodes-base.mailchimpTrigger": {
+      "displayName": "Mailchimp Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Mailchimp events via webhooks"
+    },
+    "n8n-nodes-base.mailerLite": {
+      "displayName": "MailerLite",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "input"
+      ],
+      "description": "Consume MailerLite API"
+    },
+    "n8n-nodes-base.mailerLiteTrigger": {
+      "displayName": "MailerLite Trigger",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when MailerLite events occur"
+    },
+    "n8n-nodes-base.mailgun": {
+      "displayName": "Mailgun",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends an email via Mailgun"
+    },
+    "n8n-nodes-base.mailjet": {
+      "displayName": "Mailjet",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Mailjet API"
+    },
+    "n8n-nodes-base.mailjetTrigger": {
+      "displayName": "Mailjet Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Mailjet events via webhooks"
+    },
+    "n8n-nodes-base.mandrill": {
+      "displayName": "Mandrill",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Mandrill API"
+    },
+    "n8n-nodes-base.manualTrigger": {
+      "displayName": "Manual Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Runs the flow on clicking a button in n8n"
+    },
+    "n8n-nodes-base.markdown": {
+      "displayName": "Markdown",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Convert data between Markdown and HTML"
+    },
+    "n8n-nodes-base.marketstack": {
+      "displayName": "Marketstack",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Marketstack API"
+    },
+    "n8n-nodes-base.matrix": {
+      "displayName": "Matrix",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Matrix API"
+    },
+    "n8n-nodes-base.mattermost": {
+      "displayName": "Mattermost",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends data to Mattermost"
+    },
+    "n8n-nodes-base.mautic": {
+      "displayName": "Mautic",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Mautic API"
+    },
+    "n8n-nodes-base.mauticTrigger": {
+      "displayName": "Mautic Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Mautic events via webhooks"
+    },
+    "n8n-nodes-base.medium": {
+      "displayName": "Medium",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Medium API"
+    },
+    "n8n-nodes-base.merge": {
+      "displayName": "Merge",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        3,
+        3.1,
+        3.2
+      ],
+      "latestVersion": 3.2,
+      "group": [
+        "transform"
+      ],
+      "description": "Merges data of multiple streams once data from both is available"
+    },
+    "n8n-nodes-base.messageBird": {
+      "displayName": "MessageBird",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends SMS via MessageBird"
+    },
+    "n8n-nodes-base.metabase": {
+      "displayName": "Metabase",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use the Metabase API"
+    },
+    "n8n-nodes-base.azureCosmosDb": {
+      "displayName": "Azure Cosmos DB",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Interact with Azure Cosmos DB API"
+    },
+    "n8n-nodes-base.microsoftDynamicsCrm": {
+      "displayName": "Microsoft Dynamics CRM",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Microsoft Dynamics CRM API"
+    },
+    "n8n-nodes-base.microsoftEntra": {
+      "displayName": "Microsoft Entra ID",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Interact with Microsoft Entra ID API"
+    },
+    "n8n-nodes-base.microsoftExcel": {
+      "displayName": "Microsoft Excel 365",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2
+      ],
+      "latestVersion": 2.2,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Microsoft Excel API"
+    },
+    "n8n-nodes-base.microsoftGraphSecurity": {
+      "displayName": "Microsoft Graph Security",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Microsoft Graph Security API"
+    },
+    "n8n-nodes-base.microsoftOneDrive": {
+      "displayName": "Microsoft OneDrive",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Microsoft OneDrive API"
+    },
+    "n8n-nodes-base.microsoftOneDriveTrigger": {
+      "displayName": "Microsoft OneDrive Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Trigger for Microsoft OneDrive API."
+    },
+    "n8n-nodes-base.microsoftOutlook": {
+      "displayName": "Microsoft Outlook",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Microsoft Outlook API"
+    },
+    "n8n-nodes-base.microsoftOutlookTrigger": {
+      "displayName": "Microsoft Outlook Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Fetches emails from Microsoft Outlook and starts the workflow on specified polling intervals."
+    },
+    "n8n-nodes-base.microsoftSharePoint": {
+      "displayName": "Microsoft SharePoint",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Interact with Microsoft SharePoint API"
+    },
+    "n8n-nodes-base.microsoftSql": {
+      "displayName": "Microsoft SQL",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "input"
+      ],
+      "description": "Get, add and update data in Microsoft SQL"
+    },
+    "n8n-nodes-base.azureStorage": {
+      "displayName": "Azure Storage",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Interact with Azure Storage API"
+    },
+    "n8n-nodes-base.microsoftTeams": {
+      "displayName": "Microsoft Teams",
+      "availableVersions": [
+        1,
+        1.1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Microsoft Teams API"
+    },
+    "n8n-nodes-base.microsoftTeamsTrigger": {
+      "displayName": "Microsoft Teams Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Triggers workflows in n8n based on events from Microsoft Teams, such as new messages or team updates, using specified configurations."
+    },
+    "n8n-nodes-base.microsoftToDo": {
+      "displayName": "Microsoft To Do",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Microsoft To Do API."
+    },
+    "n8n-nodes-base.mindee": {
+      "displayName": "Mindee",
+      "availableVersions": [
+        1,
+        2,
+        3
+      ],
+      "latestVersion": 3,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Mindee API"
+    },
+    "n8n-nodes-base.misp": {
+      "displayName": "MISP",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the MISP API"
+    },
+    "n8n-nodes-base.mistralAi": {
+      "displayName": "Mistral AI",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Mistral AI API"
+    },
+    "n8n-nodes-base.mocean": {
+      "displayName": "Mocean",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Send SMS and voice messages via Mocean"
+    },
+    "n8n-nodes-base.mondayCom": {
+      "displayName": "Monday.com",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Monday.com API"
+    },
+    "n8n-nodes-base.mongoDb": {
+      "displayName": "MongoDB",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "latestVersion": 1.2,
+      "group": [
+        "input"
+      ],
+      "description": "Find, insert and update documents in MongoDB"
+    },
+    "n8n-nodes-base.monicaCrm": {
+      "displayName": "Monica CRM",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Monica CRM API"
+    },
+    "n8n-nodes-base.moveBinaryData": {
+      "displayName": "Convert to/from binary data",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Move data between binary and JSON properties"
+    },
+    "n8n-nodes-base.msg91": {
+      "displayName": "MSG91",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Sends transactional SMS via MSG91"
+    },
+    "n8n-nodes-base.mySql": {
+      "displayName": "MySQL",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3,
+        2.4,
+        2.5
+      ],
+      "latestVersion": 2.5,
+      "group": [
+        "input"
+      ],
+      "description": "Get, add and update data in MySQL"
+    },
+    "n8n-nodes-base.n8n": {
+      "displayName": "n8n",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Handle events and perform actions on your n8n instance"
+    },
+    "n8n-nodes-base.n8nTrainingCustomerDatastore": {
+      "displayName": "Customer Datastore (n8n training)",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Dummy node used for n8n training"
+    },
+    "n8n-nodes-base.n8nTrainingCustomerMessenger": {
+      "displayName": "Customer Messenger (n8n training)",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Dummy node used for n8n training"
+    },
+    "n8n-nodes-base.n8nTrigger": {
+      "displayName": "n8n Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle events and perform actions on your n8n instance"
+    },
+    "n8n-nodes-base.nasa": {
+      "displayName": "NASA",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Retrieve data from the NASA API"
+    },
+    "n8n-nodes-base.netlify": {
+      "displayName": "Netlify",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Netlify API"
+    },
+    "n8n-nodes-base.netlifyTrigger": {
+      "displayName": "Netlify Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle netlify events via webhooks"
+    },
+    "n8n-nodes-base.citrixAdc": {
+      "displayName": "Netscaler ADC",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Netscaler ADC API"
+    },
+    "n8n-nodes-base.nextCloud": {
+      "displayName": "Nextcloud",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Access data on Nextcloud"
+    },
+    "n8n-nodes-base.noOp": {
+      "displayName": "No Operation, do nothing",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "organization"
+      ],
+      "description": "No Operation"
+    },
+    "n8n-nodes-base.nocoDb": {
+      "displayName": "NocoDB",
+      "availableVersions": [
+        1,
+        2,
+        3
+      ],
+      "latestVersion": 3,
+      "group": [
+        "input"
+      ],
+      "description": "Read, update, write and delete data from NocoDB"
+    },
+    "n8n-nodes-base.notion": {
+      "displayName": "Notion",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2
+      ],
+      "latestVersion": 2.2,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Notion API"
+    },
+    "n8n-nodes-base.notionTrigger": {
+      "displayName": "Notion Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Notion events occur"
+    },
+    "n8n-nodes-base.npm": {
+      "displayName": "Npm",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume NPM registry API"
+    },
+    "n8n-nodes-base.odoo": {
+      "displayName": "Odoo",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Odoo API"
+    },
+    "n8n-nodes-base.okta": {
+      "displayName": "Okta",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use the Okta API"
+    },
+    "n8n-nodes-base.oneSimpleApi": {
+      "displayName": "One Simple API",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "A toolbox of no-code utilities"
+    },
+    "n8n-nodes-base.onfleet": {
+      "displayName": "Onfleet",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Onfleet API"
+    },
+    "n8n-nodes-base.onfleetTrigger": {
+      "displayName": "Onfleet Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Onfleet events occur"
+    },
+    "n8n-nodes-base.openAi": {
+      "displayName": "OpenAI",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Open AI"
+    },
+    "n8n-nodes-base.openThesaurus": {
+      "displayName": "OpenThesaurus",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Get synonmns for German words using the OpenThesaurus API"
+    },
+    "n8n-nodes-base.openWeatherMap": {
+      "displayName": "OpenWeatherMap",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Gets current and future weather information"
+    },
+    "n8n-nodes-base.oracleDatabase": {
+      "displayName": "Oracle Database",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Get, add and update data in Oracle database"
+    },
+    "n8n-nodes-base.orbit": {
+      "displayName": "Orbit",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Orbit API"
+    },
+    "n8n-nodes-base.oura": {
+      "displayName": "Oura",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Oura API"
+    },
+    "n8n-nodes-base.paddle": {
+      "displayName": "Paddle",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Paddle API"
+    },
+    "n8n-nodes-base.pagerDuty": {
+      "displayName": "PagerDuty",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume PagerDuty API"
+    },
+    "n8n-nodes-base.payPal": {
+      "displayName": "PayPal",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume PayPal API"
+    },
+    "n8n-nodes-base.payPalTrigger": {
+      "displayName": "PayPal Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle PayPal events via webhooks"
+    },
+    "n8n-nodes-base.peekalink": {
+      "displayName": "Peekalink",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume the Peekalink API"
+    },
+    "n8n-nodes-base.perplexity": {
+      "displayName": "Perplexity",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": " AI-powered answer engine that provides accurate, trusted, and real-time answers to any question. Generates AI responses with citations"
+    },
+    "n8n-nodes-base.phantombuster": {
+      "displayName": "Phantombuster",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Phantombuster API"
+    },
+    "n8n-nodes-base.philipsHue": {
+      "displayName": "Philips Hue",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Philips Hue API"
+    },
+    "n8n-nodes-base.pipedrive": {
+      "displayName": "Pipedrive",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Create and edit data in Pipedrive"
+    },
+    "n8n-nodes-base.pipedriveTrigger": {
+      "displayName": "Pipedrive Trigger",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Pipedrive events occur"
+    },
+    "n8n-nodes-base.plivo": {
+      "displayName": "Plivo",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Send SMS/MMS messages or make phone calls"
+    },
+    "n8n-nodes-base.postBin": {
+      "displayName": "PostBin",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume PostBin API"
+    },
+    "n8n-nodes-base.postHog": {
+      "displayName": "PostHog",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume PostHog API"
+    },
+    "n8n-nodes-base.postgres": {
+      "displayName": "Postgres",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3,
+        2.4,
+        2.5,
+        2.6
+      ],
+      "latestVersion": 2.6,
+      "group": [
+        "input"
+      ],
+      "description": "Get, add and update data in Postgres"
+    },
+    "n8n-nodes-base.postgresTrigger": {
+      "displayName": "Postgres Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Listens to Postgres messages"
+    },
+    "n8n-nodes-base.postmarkTrigger": {
+      "displayName": "Postmark Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Postmark events occur"
+    },
+    "n8n-nodes-base.profitWell": {
+      "displayName": "ProfitWell",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume ProfitWell API"
+    },
+    "n8n-nodes-base.pushbullet": {
+      "displayName": "Pushbullet",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Pushbullet API"
+    },
+    "n8n-nodes-base.pushcut": {
+      "displayName": "Pushcut",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Pushcut API"
+    },
+    "n8n-nodes-base.pushcutTrigger": {
+      "displayName": "Pushcut Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Pushcut events occur"
+    },
+    "n8n-nodes-base.pushover": {
+      "displayName": "Pushover",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Pushover API"
+    },
+    "n8n-nodes-base.questDb": {
+      "displayName": "QuestDB",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Get, add and update data in QuestDB"
+    },
+    "n8n-nodes-base.quickbase": {
+      "displayName": "Quick Base",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Integrate with the Quick Base RESTful API"
+    },
+    "n8n-nodes-base.quickbooks": {
+      "displayName": "QuickBooks Online",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the QuickBooks Online API"
+    },
+    "n8n-nodes-base.quickChart": {
+      "displayName": "QuickChart",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Create a chart via QuickChart"
+    },
+    "n8n-nodes-base.rabbitmq": {
+      "displayName": "RabbitMQ",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Sends messages to a RabbitMQ topic"
+    },
+    "n8n-nodes-base.rabbitmqTrigger": {
+      "displayName": "RabbitMQ Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Listens to RabbitMQ messages"
+    },
+    "n8n-nodes-base.raindrop": {
+      "displayName": "Raindrop",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Raindrop API"
+    },
+    "n8n-nodes-base.readBinaryFile": {
+      "displayName": "Read Binary File",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Reads a binary file from disk"
+    },
+    "n8n-nodes-base.readBinaryFiles": {
+      "displayName": "Read Binary Files",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Reads binary files from disk"
+    },
+    "n8n-nodes-base.readPDF": {
+      "displayName": "Read PDF",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Reads a PDF and extracts its content"
+    },
+    "n8n-nodes-base.reddit": {
+      "displayName": "Reddit",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Reddit API"
+    },
+    "n8n-nodes-base.redis": {
+      "displayName": "Redis",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Get, send and update data in Redis"
+    },
+    "n8n-nodes-base.redisTrigger": {
+      "displayName": "Redis Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Subscribe to redis channel"
+    },
+    "n8n-nodes-base.renameKeys": {
+      "displayName": "Rename Keys",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Update item field names"
+    },
+    "n8n-nodes-base.respondToWebhook": {
+      "displayName": "Respond to Webhook",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5
+      ],
+      "latestVersion": 1.5,
+      "group": [
+        "transform"
+      ],
+      "description": "Returns data for Webhook"
+    },
+    "n8n-nodes-base.rocketchat": {
+      "displayName": "RocketChat",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume RocketChat API"
+    },
+    "n8n-nodes-base.rssFeedRead": {
+      "displayName": "RSS Read",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "latestVersion": 1.2,
+      "group": [
+        "input"
+      ],
+      "description": "Reads data from an RSS Feed"
+    },
+    "n8n-nodes-base.rssFeedReadTrigger": {
+      "displayName": "RSS Feed Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts a workflow when an RSS feed is updated"
+    },
+    "n8n-nodes-base.rundeck": {
+      "displayName": "Rundeck",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Manage Rundeck API"
+    },
+    "n8n-nodes-base.s3": {
+      "displayName": "S3",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Sends data to any S3-compatible service"
+    },
+    "n8n-nodes-base.salesforce": {
+      "displayName": "Salesforce",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Salesforce API"
+    },
+    "n8n-nodes-base.salesforceTrigger": {
+      "displayName": "Salesforce Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Fetches data from Salesforce and starts the workflow on specified polling intervals."
+    },
+    "n8n-nodes-base.salesmate": {
+      "displayName": "Salesmate",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Salesmate API"
+    },
+    "n8n-nodes-base.scheduleTrigger": {
+      "displayName": "Schedule Trigger",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "trigger",
+        "schedule"
+      ],
+      "description": "Triggers the workflow on a given schedule"
+    },
+    "n8n-nodes-base.seaTable": {
+      "displayName": "SeaTable",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "output"
+      ],
+      "description": "Read, update, write and delete data from SeaTable"
+    },
+    "n8n-nodes-base.seaTableTrigger": {
+      "displayName": "SeaTable Trigger",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when SeaTable events occur"
+    },
+    "n8n-nodes-base.securityScorecard": {
+      "displayName": "SecurityScorecard",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume SecurityScorecard API"
+    },
+    "n8n-nodes-base.segment": {
+      "displayName": "Segment",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Segment API"
+    },
+    "n8n-nodes-base.sendGrid": {
+      "displayName": "SendGrid",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume SendGrid API"
+    },
+    "n8n-nodes-base.sendy": {
+      "displayName": "Sendy",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Sendy API"
+    },
+    "n8n-nodes-base.sentryIo": {
+      "displayName": "Sentry.io",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Sentry.io API"
+    },
+    "n8n-nodes-base.serviceNow": {
+      "displayName": "ServiceNow",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume ServiceNow API"
+    },
+    "n8n-nodes-base.set": {
+      "displayName": "Set",
+      "availableVersions": [
+        1,
+        2,
+        3,
+        3.1,
+        3.2,
+        3.3,
+        3.4
+      ],
+      "latestVersion": 3.4,
+      "group": [
+        "input"
+      ],
+      "description": "Add or edit fields on an input item and optionally remove other fields"
+    },
+    "n8n-nodes-base.shopify": {
+      "displayName": "Shopify",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Shopify API"
+    },
+    "n8n-nodes-base.shopifyTrigger": {
+      "displayName": "Shopify Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Shopify events via webhooks"
+    },
+    "n8n-nodes-base.signl4": {
+      "displayName": "SIGNL4",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume SIGNL4 API"
+    },
+    "n8n-nodes-base.simulate": {
+      "displayName": "Simulate",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "organization"
+      ],
+      "description": "Simulate a node"
+    },
+    "n8n-nodes-base.simulateTrigger": {
+      "displayName": "Simulate Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Simulate a trigger node"
+    },
+    "n8n-nodes-base.slack": {
+      "displayName": "Slack",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2,
+        2.3,
+        2.4
+      ],
+      "latestVersion": 2.4,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Slack API"
+    },
+    "n8n-nodes-base.slackTrigger": {
+      "displayName": "Slack Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Slack events via webhooks"
+    },
+    "n8n-nodes-base.sms77": {
+      "displayName": "seven",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Send SMS and make text-to-speech calls"
+    },
+    "n8n-nodes-base.snowflake": {
+      "displayName": "Snowflake",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Get, add and update data in Snowflake"
+    },
+    "n8n-nodes-base.splitInBatches": {
+      "displayName": "Split In Batches",
+      "availableVersions": [
+        1,
+        2,
+        3
+      ],
+      "latestVersion": 3,
+      "group": [
+        "organization"
+      ],
+      "description": "Split data into batches and iterate over each batch"
+    },
+    "n8n-nodes-base.splunk": {
+      "displayName": "Splunk",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Splunk Enterprise API"
+    },
+    "n8n-nodes-base.spotify": {
+      "displayName": "Spotify",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Access public song data via the Spotify API"
+    },
+    "n8n-nodes-base.spreadsheetFile": {
+      "displayName": "Spreadsheet File",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "transform"
+      ],
+      "description": "Reads and writes data from a spreadsheet file like CSV, XLS, ODS, etc"
+    },
+    "n8n-nodes-base.sseTrigger": {
+      "displayName": "SSE Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Triggers the workflow when Server-Sent Events occur"
+    },
+    "n8n-nodes-base.ssh": {
+      "displayName": "SSH",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Execute commands via SSH"
+    },
+    "n8n-nodes-base.stackby": {
+      "displayName": "Stackby",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Read, write, and delete data in Stackby"
+    },
+    "n8n-nodes-base.stickyNote": {
+      "displayName": "Sticky Note",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Make your workflow easier to understand"
+    },
+    "n8n-nodes-base.stopAndError": {
+      "displayName": "Stop and Error",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Throw an error in the workflow"
+    },
+    "n8n-nodes-base.storyblok": {
+      "displayName": "Storyblok",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Storyblok API"
+    },
+    "n8n-nodes-base.strapi": {
+      "displayName": "Strapi",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Strapi API"
+    },
+    "n8n-nodes-base.strava": {
+      "displayName": "Strava",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Strava API"
+    },
+    "n8n-nodes-base.stravaTrigger": {
+      "displayName": "Strava Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Strava events occur"
+    },
+    "n8n-nodes-base.stripe": {
+      "displayName": "Stripe",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Stripe API"
+    },
+    "n8n-nodes-base.stripeTrigger": {
+      "displayName": "Stripe Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Stripe events via webhooks"
+    },
+    "n8n-nodes-base.supabase": {
+      "displayName": "Supabase",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Add, get, delete and update data in a table"
+    },
+    "n8n-nodes-base.surveyMonkeyTrigger": {
+      "displayName": "SurveyMonkey Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Survey Monkey events occur"
+    },
+    "n8n-nodes-base.switch": {
+      "displayName": "Switch",
+      "availableVersions": [
+        1,
+        2,
+        3,
+        3.1,
+        3.2,
+        3.3,
+        3.4
+      ],
+      "latestVersion": 3.4,
+      "group": [
+        "transform"
+      ],
+      "description": "Route items depending on defined expression or rules"
+    },
+    "n8n-nodes-base.syncroMsp": {
+      "displayName": "SyncroMSP",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Manage contacts, tickets and more from Syncro MSP"
+    },
+    "n8n-nodes-base.taiga": {
+      "displayName": "Taiga",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Taiga API"
+    },
+    "n8n-nodes-base.taigaTrigger": {
+      "displayName": "Taiga Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Taiga events via webhook"
+    },
+    "n8n-nodes-base.tapfiliate": {
+      "displayName": "Tapfiliate",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Tapfiliate API"
+    },
+    "n8n-nodes-base.telegram": {
+      "displayName": "Telegram",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "latestVersion": 1.2,
+      "group": [
+        "output"
+      ],
+      "description": "Sends data to Telegram"
+    },
+    "n8n-nodes-base.telegramTrigger": {
+      "displayName": "Telegram Trigger",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "latestVersion": 1.2,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow on a Telegram update"
+    },
+    "n8n-nodes-base.theHive": {
+      "displayName": "TheHive",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume TheHive API"
+    },
+    "n8n-nodes-base.theHiveTrigger": {
+      "displayName": "TheHive Trigger",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when TheHive events occur"
+    },
+    "n8n-nodes-base.theHiveProject": {
+      "displayName": "TheHive 5",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume TheHive 5 API"
+    },
+    "n8n-nodes-base.theHiveProjectTrigger": {
+      "displayName": "TheHive 5 Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when TheHive events occur"
+    },
+    "n8n-nodes-base.timeSaved": {
+      "displayName": "Track Time Saved",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "organization"
+      ],
+      "description": "Dynamically track time saved based on the workflow’s execution path and the number of items processed"
+    },
+    "n8n-nodes-base.timescaleDb": {
+      "displayName": "TimescaleDB",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Add and update data in TimescaleDB"
+    },
+    "n8n-nodes-base.todoist": {
+      "displayName": "Todoist",
+      "availableVersions": [
+        1,
+        2,
+        2.1,
+        2.2
+      ],
+      "latestVersion": 2.2,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Todoist API"
+    },
+    "n8n-nodes-base.togglTrigger": {
+      "displayName": "Toggl Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Toggl events occur"
+    },
+    "n8n-nodes-base.totp": {
+      "displayName": "TOTP",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Generate a time-based one-time password"
+    },
+    "n8n-nodes-base.aggregate": {
+      "displayName": "Aggregate",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Combine a field from many items into a list in a single item"
+    },
+    "n8n-nodes-base.limit": {
+      "displayName": "Limit",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Restrict the number of items"
+    },
+    "n8n-nodes-base.removeDuplicates": {
+      "displayName": "Remove Duplicates",
+      "availableVersions": [
+        1,
+        1.1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "transform"
+      ],
+      "description": "Delete items with matching field values"
+    },
+    "n8n-nodes-base.sort": {
+      "displayName": "Sort",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Change items order"
+    },
+    "n8n-nodes-base.splitOut": {
+      "displayName": "Split Out",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Turn a list inside item(s) into separate items"
+    },
+    "n8n-nodes-base.summarize": {
+      "displayName": "Summarize",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Sum, count, max, etc. across items"
+    },
+    "n8n-nodes-base.travisCi": {
+      "displayName": "TravisCI",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume TravisCI API"
+    },
+    "n8n-nodes-base.trello": {
+      "displayName": "Trello",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Create, change and delete boards and cards"
+    },
+    "n8n-nodes-base.trelloTrigger": {
+      "displayName": "Trello Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Trello events occur"
+    },
+    "n8n-nodes-base.twake": {
+      "displayName": "Twake",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Twake API"
+    },
+    "n8n-nodes-base.twilio": {
+      "displayName": "Twilio",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Send SMS and WhatsApp messages or make phone calls"
+    },
+    "n8n-nodes-base.twilioTrigger": {
+      "displayName": "Twilio Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow on a Twilio update"
+    },
+    "n8n-nodes-base.twist": {
+      "displayName": "Twist",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Twist API"
+    },
+    "n8n-nodes-base.twitter": {
+      "displayName": "X (Formerly Twitter)",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "output"
+      ],
+      "description": "Consume the X API"
+    },
+    "n8n-nodes-base.typeformTrigger": {
+      "displayName": "Typeform Trigger",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow on a Typeform form submission"
+    },
+    "n8n-nodes-base.uproc": {
+      "displayName": "uProc",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume uProc API"
+    },
+    "n8n-nodes-base.unleashedSoftware": {
+      "displayName": "Unleashed Software",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Unleashed Software API"
+    },
+    "n8n-nodes-base.uplead": {
+      "displayName": "Uplead",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Uplead API"
+    },
+    "n8n-nodes-base.uptimeRobot": {
+      "displayName": "UptimeRobot",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume UptimeRobot API"
+    },
+    "n8n-nodes-base.urlScanIo": {
+      "displayName": "urlscan.io",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Provides various utilities for monitoring websites like health checks or screenshots"
+    },
+    "n8n-nodes-base.venafiTlsProtectDatacenter": {
+      "displayName": "Venafi TLS Protect Datacenter",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Venafi TLS Protect Datacenter"
+    },
+    "n8n-nodes-base.venafiTlsProtectDatacenterTrigger": {
+      "displayName": "Venafi TLS Protect Datacenter Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Venafi events occur"
+    },
+    "n8n-nodes-base.venafiTlsProtectCloud": {
+      "displayName": "Venafi TLS Protect Cloud",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Venafi TLS Protect Cloud API"
+    },
+    "n8n-nodes-base.venafiTlsProtectCloudTrigger": {
+      "displayName": "Venafi TLS Protect Cloud Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Venafi events occur"
+    },
+    "n8n-nodes-base.vero": {
+      "displayName": "Vero",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Vero API"
+    },
+    "n8n-nodes-base.vonage": {
+      "displayName": "Vonage",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Vonage API"
+    },
+    "n8n-nodes-base.wait": {
+      "displayName": "Wait",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "organization"
+      ],
+      "description": "Wait before continue with execution"
+    },
+    "n8n-nodes-base.webflowTrigger": {
+      "displayName": "Webflow Trigger",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Webflow events via webhooks"
+    },
+    "n8n-nodes-base.webflow": {
+      "displayName": "Webflow",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Webflow API"
+    },
+    "n8n-nodes-base.webhook": {
+      "displayName": "Webhook",
+      "availableVersions": [
+        1,
+        1.1,
+        2,
+        2.1
+      ],
+      "latestVersion": 2.1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when a webhook is called"
+    },
+    "n8n-nodes-base.wekan": {
+      "displayName": "Wekan",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Wekan API"
+    },
+    "n8n-nodes-base.whatsApp": {
+      "displayName": "WhatsApp Business Cloud",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "output"
+      ],
+      "description": "Access WhatsApp API"
+    },
+    "n8n-nodes-base.whatsAppTrigger": {
+      "displayName": "WhatsApp Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle WhatsApp events via webhooks"
+    },
+    "n8n-nodes-base.wise": {
+      "displayName": "Wise",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume the Wise API"
+    },
+    "n8n-nodes-base.wiseTrigger": {
+      "displayName": "Wise Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Wise events via webhooks"
+    },
+    "n8n-nodes-base.wooCommerce": {
+      "displayName": "WooCommerce",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume WooCommerce API"
+    },
+    "n8n-nodes-base.wooCommerceTrigger": {
+      "displayName": "WooCommerce Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle WooCommerce events via webhooks"
+    },
+    "n8n-nodes-base.wordpress": {
+      "displayName": "Wordpress",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Wordpress API"
+    },
+    "n8n-nodes-base.workableTrigger": {
+      "displayName": "Workable Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Starts the workflow when Workable events occur"
+    },
+    "n8n-nodes-base.workflowTrigger": {
+      "displayName": "Workflow Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Triggers based on various lifecycle events, like when a workflow is activated"
+    },
+    "n8n-nodes-base.writeBinaryFile": {
+      "displayName": "Write Binary File",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Writes a binary file to disk"
+    },
+    "n8n-nodes-base.wufooTrigger": {
+      "displayName": "Wufoo Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Wufoo events via webhooks"
+    },
+    "n8n-nodes-base.xero": {
+      "displayName": "Xero",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Xero API"
+    },
+    "n8n-nodes-base.xml": {
+      "displayName": "XML",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Convert data from and to XML"
+    },
+    "n8n-nodes-base.yourls": {
+      "displayName": "Yourls",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Yourls API"
+    },
+    "n8n-nodes-base.zammad": {
+      "displayName": "Zammad",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume the Zammad API"
+    },
+    "n8n-nodes-base.zendesk": {
+      "displayName": "Zendesk",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Zendesk API"
+    },
+    "n8n-nodes-base.zendeskTrigger": {
+      "displayName": "Zendesk Trigger",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Handle Zendesk events via webhooks"
+    },
+    "n8n-nodes-base.zohoCrm": {
+      "displayName": "Zoho CRM",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Consume Zoho CRM API"
+    },
+    "n8n-nodes-base.zoom": {
+      "displayName": "Zoom",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "input"
+      ],
+      "description": "Consume Zoom API"
+    },
+    "n8n-nodes-base.zulip": {
+      "displayName": "Zulip",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "output"
+      ],
+      "description": "Consume Zulip API"
+    },
+    "@n8n/n8n-nodes-langchain.guardrails": {
+      "displayName": "Guardrails",
+      "availableVersions": [
+        1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "transform"
+      ],
+      "description": "Safeguard AI models from malicious input or prevent them from generating undesirable responses"
+    },
+    "@n8n/n8n-nodes-langchain.modelSelector": {
+      "displayName": "Model Selector",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use this node to select one of the connected models to this node based on workflow data"
+    },
+    "@n8n/n8n-nodes-langchain.toolExecutor": {
+      "displayName": "Tool Executor",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Node to execute tools without an AI Agent"
+    },
+    "@n8n/n8n-nodes-langchain.agent": {
+      "displayName": "AI Agent",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5,
+        1.6,
+        1.7,
+        1.8,
+        1.9,
+        2,
+        2.1,
+        2.2,
+        2.3,
+        3,
+        3.1
+      ],
+      "latestVersion": 3.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Generates an action plan and executes it. Can use external tools."
+    },
+    "@n8n/n8n-nodes-langchain.agentTool": {
+      "displayName": "AI Agent Tool",
+      "availableVersions": [
+        2.2,
+        3
+      ],
+      "latestVersion": 3,
+      "group": [
+        "transform"
+      ],
+      "description": "Generates an action plan and executes it. Can use external tools."
+    },
+    "@n8n/n8n-nodes-langchain.openAiAssistant": {
+      "displayName": "OpenAI Assistant",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Utilizes Assistant API from Open AI."
+    },
+    "@n8n/n8n-nodes-langchain.chainLlm": {
+      "displayName": "Basic LLM Chain",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5,
+        1.6,
+        1.7,
+        1.8,
+        1.9
+      ],
+      "latestVersion": 1.9,
+      "group": [
+        "transform"
+      ],
+      "description": "A simple chain to prompt a large language model"
+    },
+    "@n8n/n8n-nodes-langchain.chainRetrievalQa": {
+      "displayName": "Question and Answer Chain",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5,
+        1.6,
+        1.7
+      ],
+      "latestVersion": 1.7,
+      "group": [
+        "transform"
+      ],
+      "description": "Answer questions about retrieved documents"
+    },
+    "@n8n/n8n-nodes-langchain.chainSummarization": {
+      "displayName": "Summarization Chain",
+      "availableVersions": [
+        1,
+        2,
+        2.1
+      ],
+      "latestVersion": 2.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Transforms text into a concise summary"
+    },
+    "@n8n/n8n-nodes-langchain.informationExtractor": {
+      "displayName": "Information Extractor",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "latestVersion": 1.2,
+      "group": [
+        "transform"
+      ],
+      "description": "Extract information from text in a structured format"
+    },
+    "@n8n/n8n-nodes-langchain.sentimentAnalysis": {
+      "displayName": "Sentiment Analysis",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Analyze the sentiment of your text"
+    },
+    "@n8n/n8n-nodes-langchain.textClassifier": {
+      "displayName": "Text Classifier",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Classify your text into distinct categories"
+    },
+    "@n8n/n8n-nodes-langchain.code": {
+      "displayName": "LangChain Code",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "LangChain Code Node"
+    },
+    "@n8n/n8n-nodes-langchain.documentBinaryInputLoader": {
+      "displayName": "Binary Input Loader",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use binary data from a previous step in the workflow"
+    },
+    "@n8n/n8n-nodes-langchain.documentDefaultDataLoader": {
+      "displayName": "Default Data Loader",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Load data from previous step in the workflow"
+    },
+    "@n8n/n8n-nodes-langchain.documentGithubLoader": {
+      "displayName": "GitHub Document Loader",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use GitHub data as input to this chain"
+    },
+    "@n8n/n8n-nodes-langchain.documentJsonInputLoader": {
+      "displayName": "JSON Input Loader",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use JSON data from a previous step in the workflow"
+    },
+    "@n8n/n8n-nodes-langchain.embeddingsAwsBedrock": {
+      "displayName": "Embeddings AWS Bedrock",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use Embeddings AWS Bedrock"
+    },
+    "@n8n/n8n-nodes-langchain.embeddingsAzureOpenAi": {
+      "displayName": "Embeddings Azure OpenAI",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use Embeddings Azure OpenAI"
+    },
+    "@n8n/n8n-nodes-langchain.embeddingsCohere": {
+      "displayName": "Embeddings Cohere",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use Cohere Embeddings"
+    },
+    "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini": {
+      "displayName": "Embeddings Google Gemini",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use Google Gemini Embeddings"
+    },
+    "@n8n/n8n-nodes-langchain.embeddingsGoogleVertex": {
+      "displayName": "Embeddings Google Vertex",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use Google Vertex Embeddings"
+    },
+    "@n8n/n8n-nodes-langchain.embeddingsHuggingFaceInference": {
+      "displayName": "Embeddings Hugging Face Inference",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use HuggingFace Inference Embeddings"
+    },
+    "@n8n/n8n-nodes-langchain.embeddingsLemonade": {
+      "displayName": "Embeddings Lemonade",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use Lemonade Embeddings"
+    },
+    "@n8n/n8n-nodes-langchain.embeddingsMistralCloud": {
+      "displayName": "Embeddings Mistral Cloud",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use Embeddings Mistral Cloud"
+    },
+    "@n8n/n8n-nodes-langchain.embeddingsOllama": {
+      "displayName": "Embeddings Ollama",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use Ollama Embeddings"
+    },
+    "@n8n/n8n-nodes-langchain.embeddingsOpenAi": {
+      "displayName": "Embeddings OpenAI",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "latestVersion": 1.2,
+      "group": [
+        "transform"
+      ],
+      "description": "Use Embeddings OpenAI"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatAnthropic": {
+      "displayName": "Anthropic Chat Model",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Language Model Anthropic"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatLemonade": {
+      "displayName": "Lemonade Chat Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Language Model Lemonade Chat"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatOllama": {
+      "displayName": "Ollama Chat Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Language Model Ollama"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatOpenAi": {
+      "displayName": "OpenAI Chat Model",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "For advanced usage with an AI chain"
+    },
+    "@n8n/n8n-nodes-langchain.lmCohere": {
+      "displayName": "Cohere Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Language Model Cohere"
+    },
+    "@n8n/n8n-nodes-langchain.lmLemonade": {
+      "displayName": "Lemonade Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Language Model Lemonade"
+    },
+    "@n8n/n8n-nodes-langchain.lmOllama": {
+      "displayName": "Ollama Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Language Model Ollama"
+    },
+    "@n8n/n8n-nodes-langchain.lmOpenAi": {
+      "displayName": "OpenAI Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "For advanced usage with an AI chain"
+    },
+    "@n8n/n8n-nodes-langchain.lmOpenHuggingFaceInference": {
+      "displayName": "Hugging Face Inference Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Language Model HuggingFaceInference"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatAwsBedrock": {
+      "displayName": "AWS Bedrock Chat Model",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Language Model AWS Bedrock"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi": {
+      "displayName": "Azure OpenAI Chat Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "For advanced usage with an AI chain"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatCohere": {
+      "displayName": "Cohere Chat Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "For advanced usage with an AI chain"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatDeepSeek": {
+      "displayName": "DeepSeek Chat Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "For advanced usage with an AI chain"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatGoogleGemini": {
+      "displayName": "Google Gemini Chat Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Chat Model Google Gemini"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatGoogleVertex": {
+      "displayName": "Google Vertex Chat Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Chat Model Google Vertex"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatGroq": {
+      "displayName": "Groq Chat Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Language Model Groq"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatMistralCloud": {
+      "displayName": "Mistral Cloud Chat Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "For advanced usage with an AI chain"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatOpenRouter": {
+      "displayName": "OpenRouter Chat Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "For advanced usage with an AI chain"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatVercelAiGateway": {
+      "displayName": "Vercel AI Gateway Chat Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "For advanced usage with an AI chain via Vercel AI Gateway"
+    },
+    "@n8n/n8n-nodes-langchain.lmChatXAiGrok": {
+      "displayName": "xAI Grok Chat Model",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "For advanced usage with an AI chain"
+    },
+    "@n8n/n8n-nodes-langchain.mcpClient": {
+      "displayName": "MCP Client",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Standalone MCP Client"
+    },
+    "@n8n/n8n-nodes-langchain.mcpClientTool": {
+      "displayName": "MCP Client Tool",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2
+      ],
+      "latestVersion": 1.2,
+      "group": [
+        "output"
+      ],
+      "description": "Connect tools from an MCP Server"
+    },
+    "@n8n/n8n-nodes-langchain.mcpTrigger": {
+      "displayName": "MCP Server Trigger",
+      "availableVersions": [
+        1,
+        1.1,
+        2
+      ],
+      "latestVersion": 2,
+      "group": [
+        "trigger"
+      ],
+      "description": "Expose n8n tools as an MCP Server endpoint"
+    },
+    "@n8n/n8n-nodes-langchain.memoryBufferWindow": {
+      "displayName": "Simple Memory",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Stores in n8n memory, so no credentials required"
+    },
+    "@n8n/n8n-nodes-langchain.memoryChatRetriever": {
+      "displayName": "Chat Messages Retriever",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Retrieve chat messages from memory and use them in the workflow"
+    },
+    "@n8n/n8n-nodes-langchain.memoryManager": {
+      "displayName": "Chat Memory Manager",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Manage chat messages memory and use it in the workflow"
+    },
+    "@n8n/n8n-nodes-langchain.memoryMongoDbChat": {
+      "displayName": "MongoDB Chat Memory",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Stores the chat history in MongoDB collection."
+    },
+    "@n8n/n8n-nodes-langchain.memoryMotorhead": {
+      "displayName": "Motorhead",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Use Motorhead Memory"
+    },
+    "@n8n/n8n-nodes-langchain.memoryPostgresChat": {
+      "displayName": "Postgres Chat Memory",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Stores the chat history in Postgres table."
+    },
+    "@n8n/n8n-nodes-langchain.memoryRedisChat": {
+      "displayName": "Redis Chat Memory",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5
+      ],
+      "latestVersion": 1.5,
+      "group": [
+        "transform"
+      ],
+      "description": "Stores the chat history in Redis."
+    },
+    "@n8n/n8n-nodes-langchain.memoryXata": {
+      "displayName": "Xata",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4
+      ],
+      "latestVersion": 1.4,
+      "group": [
+        "transform"
+      ],
+      "description": "Use Xata Memory"
+    },
+    "@n8n/n8n-nodes-langchain.memoryZep": {
+      "displayName": "Zep",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Use Zep Memory"
+    },
+    "@n8n/n8n-nodes-langchain.outputParserAutofixing": {
+      "displayName": "Auto-fixing Output Parser",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Deprecated, use structured output parser"
+    },
+    "@n8n/n8n-nodes-langchain.outputParserItemList": {
+      "displayName": "Item List Output Parser",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Return the results as separate items"
+    },
+    "@n8n/n8n-nodes-langchain.outputParserStructured": {
+      "displayName": "Structured Output Parser",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Return data in a defined JSON format"
+    },
+    "@n8n/n8n-nodes-langchain.rerankerCohere": {
+      "displayName": "Reranker Cohere",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use Cohere Reranker to reorder documents after retrieval from a vector store by relevance to the given query."
+    },
+    "@n8n/n8n-nodes-langchain.retrieverContextualCompression": {
+      "displayName": "Contextual Compression Retriever",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Enhances document similarity search by contextual compression."
+    },
+    "@n8n/n8n-nodes-langchain.retrieverMultiQuery": {
+      "displayName": "MultiQuery Retriever",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Automates prompt tuning, generates diverse queries and expands document pool for enhanced retrieval."
+    },
+    "@n8n/n8n-nodes-langchain.retrieverVectorStore": {
+      "displayName": "Vector Store Retriever",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use a Vector Store as Retriever"
+    },
+    "@n8n/n8n-nodes-langchain.retrieverWorkflow": {
+      "displayName": "Workflow Retriever",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Use an n8n Workflow as Retriever"
+    },
+    "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter": {
+      "displayName": "Character Text Splitter",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Split text into chunks by characters"
+    },
+    "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter": {
+      "displayName": "Recursive Character Text Splitter",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Split text into chunks by characters recursively, recommended for most use cases"
+    },
+    "@n8n/n8n-nodes-langchain.textSplitterTokenSplitter": {
+      "displayName": "Token Splitter",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Split text into chunks by tokens"
+    },
+    "@n8n/n8n-nodes-langchain.toolCalculator": {
+      "displayName": "Calculator",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Make it easier for AI agents to perform arithmetic"
+    },
+    "@n8n/n8n-nodes-langchain.toolCode": {
+      "displayName": "Code Tool",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Write a tool in JS or Python"
+    },
+    "@n8n/n8n-nodes-langchain.toolHttpRequest": {
+      "displayName": "HTTP Request Tool",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "output"
+      ],
+      "description": "Makes an HTTP request and returns the response data"
+    },
+    "@n8n/n8n-nodes-langchain.toolSearXng": {
+      "displayName": "SearXNG",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Search in SearXNG"
+    },
+    "@n8n/n8n-nodes-langchain.toolSerpApi": {
+      "displayName": "SerpApi (Google Search)",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Search in Google using SerpAPI"
+    },
+    "@n8n/n8n-nodes-langchain.toolThink": {
+      "displayName": "Think Tool",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Invite the AI agent to do some thinking"
+    },
+    "@n8n/n8n-nodes-langchain.toolVectorStore": {
+      "displayName": "Vector Store Question Answer Tool",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Answer questions with a vector store"
+    },
+    "@n8n/n8n-nodes-langchain.toolWikipedia": {
+      "displayName": "Wikipedia",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Search in Wikipedia"
+    },
+    "@n8n/n8n-nodes-langchain.toolWolframAlpha": {
+      "displayName": "Wolfram|Alpha",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Connects to WolframAlpha's computational intelligence engine."
+    },
+    "@n8n/n8n-nodes-langchain.toolWorkflow": {
+      "displayName": "Call n8n Sub-Workflow Tool",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        2,
+        2.1,
+        2.2
+      ],
+      "latestVersion": 2.2,
+      "group": [
+        "transform"
+      ],
+      "description": "Uses another n8n workflow as a tool. Allows packaging any n8n node(s) as a tool."
+    },
+    "@n8n/n8n-nodes-langchain.chat": {
+      "displayName": "Chat",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "input"
+      ],
+      "description": "Send a message into the chat"
+    },
+    "@n8n/n8n-nodes-langchain.chatTrigger": {
+      "displayName": "Chat Trigger",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4
+      ],
+      "latestVersion": 1.4,
+      "group": [
+        "trigger"
+      ],
+      "description": "Runs the workflow when an n8n generated webchat is submitted"
+    },
+    "@n8n/n8n-nodes-langchain.manualChatTrigger": {
+      "displayName": "Manual Chat Trigger",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Runs the flow on new manual chat message"
+    },
+    "@n8n/n8n-nodes-langchain.chatHubVectorStorePGVector": {
+      "displayName": "ChatHub PGVector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Internal-use vector store for ChatHub"
+    },
+    "@n8n/n8n-nodes-langchain.chatHubVectorStorePinecone": {
+      "displayName": "ChatHub Pinecone Vector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Internal-use vector store for ChatHub"
+    },
+    "@n8n/n8n-nodes-langchain.chatHubVectorStoreQdrant": {
+      "displayName": "ChatHub Qdrant Vector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Internal-use vector store for ChatHub"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreAzureAISearch": {
+      "displayName": "Azure AI Search Vector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Work with your data in Azure AI Search Vector Store"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreChromaDB": {
+      "displayName": "Chroma Vector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Work with your data in Chroma Vector Store"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreInMemory": {
+      "displayName": "Simple Vector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "The easiest way to experiment with vector stores, without external setup."
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreInMemoryInsert": {
+      "displayName": "In Memory Vector Store Insert",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Insert data into an in-memory vector store"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreInMemoryLoad": {
+      "displayName": "In Memory Vector Store Load",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Load embedded data from an in-memory vector store"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreMilvus": {
+      "displayName": "Milvus Vector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Work with your data in Milvus Vector Store"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreMongoDBAtlas": {
+      "displayName": "MongoDB Atlas Vector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Work with your data in MongoDB Atlas Vector Store"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStorePGVector": {
+      "displayName": "Postgres PGVector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Work with your data in Postgresql with the PGVector extension"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStorePinecone": {
+      "displayName": "Pinecone Vector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Work with your data in Pinecone Vector Store"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStorePineconeInsert": {
+      "displayName": "Pinecone: Insert",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Insert data into Pinecone Vector Store index"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStorePineconeLoad": {
+      "displayName": "Pinecone: Load",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Load data from Pinecone Vector Store index"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreQdrant": {
+      "displayName": "Qdrant Vector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Work with your data in a Qdrant collection"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreRedis": {
+      "displayName": "Redis Vector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Work with your data in a Redis vector index"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreSupabase": {
+      "displayName": "Supabase Vector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Work with your data in Supabase Vector Store"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreSupabaseInsert": {
+      "displayName": "Supabase: Insert",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Insert data into Supabase Vector Store index [https://supabase.com/docs/guides/ai/langchain]"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreSupabaseLoad": {
+      "displayName": "Supabase: Load",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Load data from Supabase Vector Store index"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreWeaviate": {
+      "displayName": "Weaviate Vector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Work with your data in a Weaviate Cluster"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreZep": {
+      "displayName": "Zep Vector Store",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3
+      ],
+      "latestVersion": 1.3,
+      "group": [
+        "transform"
+      ],
+      "description": "Work with your data in Zep Vector Store"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreZepInsert": {
+      "displayName": "Zep Vector Store: Insert",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Insert data into Zep Vector Store index"
+    },
+    "@n8n/n8n-nodes-langchain.vectorStoreZepLoad": {
+      "displayName": "Zep Vector Store: Load",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Load data from Zep Vector Store index"
+    },
+    "@n8n/n8n-nodes-langchain.anthropic": {
+      "displayName": "Anthropic",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Interact with Anthropic AI models"
+    },
+    "@n8n/n8n-nodes-langchain.googleGemini": {
+      "displayName": "Google Gemini",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Interact with Google Gemini AI models"
+    },
+    "@n8n/n8n-nodes-langchain.microsoftAgent365Trigger": {
+      "displayName": "Microsoft Agent 365 Trigger",
+      "availableVersions": [
+        1,
+        1.1
+      ],
+      "latestVersion": 1.1,
+      "group": [
+        "trigger"
+      ],
+      "description": "Trigger for Microsoft Agent 365"
+    },
+    "@n8n/n8n-nodes-langchain.ollama": {
+      "displayName": "Ollama",
+      "availableVersions": [
+        1
+      ],
+      "latestVersion": 1,
+      "group": [
+        "transform"
+      ],
+      "description": "Interact with Ollama AI models"
+    },
+    "@n8n/n8n-nodes-langchain.openAi": {
+      "displayName": "OpenAI",
+      "availableVersions": [
+        1,
+        1.1,
+        1.2,
+        1.3,
+        1.4,
+        1.5,
+        1.6,
+        1.7,
+        1.8,
+        2,
+        2.1
+      ],
+      "latestVersion": 2.1,
+      "group": [
+        "transform"
+      ],
+      "description": "Message an assistant or GPT, analyze images, generate audio, etc."
+    }
+  }
+}

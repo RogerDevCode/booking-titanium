@@ -1,0 +1,24 @@
+ts-jest[ts-jest-transformer] (WARN) Define `ts-jest` config under `globals` is deprecated. Please do
+transform: {
+    <transform_regex>: ['ts-jest', { /* ts-jest config goes here in Jest */ }],
+},
+See more at https://kulshekhar.github.io/ts-jest/docs/getting-started/presets#advanced
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+ts-jest[config] (WARN) 
+    The "ts-jest" config option "isolatedModules" is deprecated and will be removed in v30.0.0. Please use "isolatedModules: true", see https://www.typescriptlang.org/tsconfig/#isolatedModules
+  
+PASS tests/DB_Create_Booking.test.ts (11.774 s)
+  DB_Create_Booking Paranoia Tests
+    ✓ runs Happy Path successfully (7714 ms)
+    ✓ handles Indempotent Duplicate without raising DB errors (627 ms)
+    ✓ rejects missing idempotency_key (755 ms)
+    ✓ rejects missing start_time (492 ms)
+    ✓ rejects invalid type: provider_id as zero (735 ms)
+    ✓ rejects invalid range: end_time before start_time (676 ms)
+    ✓ rejects strict ISO normalization: Feb 30th (568 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        12.217 s
+Ran all test suites matching tests/DB_Create_Booking.test.ts.

@@ -16,7 +16,7 @@ import * as path from 'path';
 // CONFIGURACIÓN
 // ============================================================================
 
-const WORKFLOWS_DIR = path.join(__dirname, '../workflows/seed');
+const WORKFLOWS_DIR = path.join(__dirname, '../workflows');
 const SOT_FILE = path.join(__dirname, 'down-val-and-set-nodes/ssot-nodes.json');
 const OUTPUT_FILE = path.join(__dirname, 'down-val-and-set-nodes/used-nodes.json');
 

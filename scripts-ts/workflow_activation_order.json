@@ -17,20 +17,20 @@
     "name": "NN_04_Telegram_Sender",
     "id": "WE7DxLKAECtsA8Up",
     "order": 3,
-    "webhook_path": "nn-04-telegram-sender-v2",
+    "webhook_path": "nn-04-telegram-sender",
     "description": "Sends booking confirmations and responses via Telegram"
   },
   {
     "name": "DB_Get_Availability",
     "id": "zdUslfT9C0sTI83H",
     "order": 4,
-    "webhook_path": "db-get-availability-test"
+    "webhook_path": "db-get-availability"
   },
   {
     "name": "DB_Cancel_Booking",
     "id": "mf4qnUG7UlrAKpQU",
     "order": 5,
-    "webhook_path": "db-cancel-booking-test"
+    "webhook_path": "db-cancel-booking"
   },
   {
     "name": "DB_Find_Next_Available",
@@ -77,17 +77,20 @@
   {
     "name": "DB_Get_Providers",
     "id": "cNC4U2Bg6HoX09YP",
-    "order": 13
+    "order": 13,
+    "webhook_path": "db-get-providers"
   },
   {
     "name": "DB_Get_Services",
     "id": "N2mFFyKLf7365OB9",
-    "order": 14
+    "order": 14,
+    "webhook_path": "db-get-services"
   },
   {
     "name": "DB_Get_Providers_By_Service",
     "id": "koGljfSXUzYESNoh",
-    "order": 15
+    "order": 15,
+    "webhook_path": "db-get-providers-by-service"
   },
   {
     "name": "NN_03-B_Pipeline_Agent",

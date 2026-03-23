@@ -1,0 +1,100 @@
+{
+  "name": "DB_Get_Services",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"provider_id\": 1}"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        432
+      ],
+      "id": "898c6d30-a1c0-495d-9bfb-b9710825aaa8"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        232
+      ],
+      "id": "21260806-58c9-4bef-b1db-d5d76b9c89a5"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'http://127.0.0.1:3000/services-by-provider/' + ($json.provider_id || 1) }}",
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "name": "Call DAL Services",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        250,
+        432
+      ],
+      "id": "b4b407d3-876c-468a-a566-d13f36d45c59"
+    },
+    {
+      "parameters": {
+        "jsCode": "const dalResponse = $input.first()?.json || {};\nconst isSuccess = dalResponse.success === true;\n\nreturn [{\n  json: {\n    success: isSuccess,\n    error_code: isSuccess ? null : (dalResponse.error_code || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || dalResponse.message || 'Failed to list services'),\n    data: isSuccess ? (dalResponse.data || dalResponse) : null,\n    _meta: {\n      source: 'DB_Get_Services',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Get_Services',\n      version: '1.0.0'\n    }\n  }\n}];"
+      },
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        432
+      ],
+      "id": "1a07efee-fa1e-4aa9-adb5-91509431b1db"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Services",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Services",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Services": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": true
+  }
+}

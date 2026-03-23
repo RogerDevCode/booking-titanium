@@ -4,6 +4,7 @@ module.exports = {
   testEnvironment: 'node',
   roots: ['<rootDir>/tests'],
   testMatch: ['**/?(*.)+(spec|test).ts'],
+  setupFiles: ['<rootDir>/tests/jest.setup.ts'],
   maxWorkers: 1,  // Prevent CPU saturation - run single worker
   workerIdleMemoryLimit: '256MB',
   testTimeout: 120000,

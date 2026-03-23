@@ -1,0 +1,132 @@
+{
+  "name": "DB_Find_Next_Available",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\"provider_id\": 1, \"service_id\": 1, \"date\": \"2026-03-04\"}"
+      },
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        400
+      ],
+      "id": "64f1b8c5-220e-4075-aa13-894162cc9d4c"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "id": "804c9941-1c88-448d-ba88-d87ce620d077"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "db-find-next-available",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        600
+      ],
+      "webhookId": "db-find-next-available",
+      "id": "118afff3-0235-4506-b34d-1a010884ff53"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:3000/find-next-available",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"provider_id\": {{ $json.provider_id || $json.body?.provider_id || 1 }},\n  \"service_id\": {{ $json.service_id || $json.body?.service_id || 1 }},\n  \"date\": \"{{ $json.date || $json.body?.date || $now.toISODate() }}\"\n}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "name": "Call DAL Smart Lookup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        500,
+        500
+      ],
+      "id": "08873e84-4864-452a-905c-ff1222e008b9"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first()?.json || {};\nconst isCacheHit = input.cache_hit === true;\nconst dalResponse = isCacheHit ? input.cache_data : input;\nconst isSuccess = dalResponse.success === true || dalResponse.success === undefined;\n\nreturn [{\n  json: {\n    success: dalResponse.success !== undefined ? dalResponse.success : true,\n    error_code: isSuccess ? null : (dalResponse.error_code || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || 'Operation failed'),\n    data: dalResponse.data || dalResponse,\n    _meta: {\n      source: 'DB_Find_Next_Available',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Find_Next_Available',\n      version: '1.2.0'\n    }\n  }\n}];"
+      },
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        400
+      ],
+      "id": "c0ef3f79-c5d6-44b3-80bb-363b8ddcd172"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Proxy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Proxy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Call DAL Proxy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call DAL Smart Lookup": {
+      "main": [
+        [
+          {
+            "node": "Save Cache",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "description": "Encuentra el próximo slot/hora disponible para una reserva a partir de una fecha especificada. Output incluye los próximos turnos disponibles.",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": true
+  }
+}

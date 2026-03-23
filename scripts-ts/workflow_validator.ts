@@ -39,7 +39,7 @@ let issues = 0;
 
 // 1. Standard Contract
 const lastNode = nodes.find(
-  (n) => n.name === "Final Response" || n.name === "Standard Success Output",
+  (n) => n.name === "Final Response" || n.name === "Standard Success Output" || n.name === "Format Success Output",
 );
 if (lastNode && JSON.stringify(lastNode).includes("_meta")) {
   console.log("✅ Standard Contract: Detectado");
@@ -109,7 +109,6 @@ async function validateWithServer() {
       connections: data.connections,
       settings: data.settings || {},
       staticData: data.staticData || {},
-      tags: data.tags || [],
     };
 
     // 2. Verificar si ya existe un workflow con el mismo nombre para actualizar (PUT) o crear (POST)

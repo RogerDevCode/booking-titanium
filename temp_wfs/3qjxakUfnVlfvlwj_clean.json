@@ -1,0 +1,54 @@
+{
+  "name": "Diagnostic Test",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "test-diagnostic",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        250,
+        300
+      ],
+      "webhookId": "test-diagnostic",
+      "id": "8094299d-513d-4e70-b64f-8b3162ca6900"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { status: 'ok', message: 'Diagnostic test successful', timestamp: new Date().toISOString() } }];",
+        "options": {}
+      },
+      "name": "Return Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        300
+      ],
+      "id": "2d9a51fb-57fa-4f94-a68b-ce6e5b202d6e"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Return Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": true
+  }
+}

@@ -31,8 +31,9 @@ describe('SEED_01 Daily Provisioning Paranoia Tests', () => {
   }, TIMEOUT);
 
   it('runs successfully with correct auth token', async () => {
-    const res = await axios.post(SEED_WEBHOOK, { test: true }, { headers: { 'x-seed-token': SEED_AUTH_TOKEN } });
+    const res = await axios.post(SEED_WEBHOOK, { test: true, chat_id: 5391760292 }, { headers: { 'x-seed-token': SEED_AUTH_TOKEN } });
     const data = res.data;
+    if (!data.success) console.log('SEED_01 Failure Data:', JSON.stringify(data, null, 2));
     expect(data.success).toBe(true);
     // Since it's a success, updated AST ensures error_code is null
     expect(data.error_code).toBe(null);
