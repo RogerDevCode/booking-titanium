@@ -1,5 +1,36 @@
 [
   {
+    "name": "GCAL_Delete_Event",
+    "version": "2.0.0",
+    "node_count": 5,
+    "tests_passed": "6/6",
+    "certified_at": "2026-03-23",
+    "git_tag": "GCAL_Delete_Event-v2.0.0-certified",
+    "status": "FROZEN",
+    "test_file": "tests/GCAL_Delete_Event.test.ts",
+    "test_summary": {
+      "validation": "2/2 tests passed - missing event_id, empty event_id rejected",
+      "standard_contract": "2/2 tests passed - error responses include all required fields",
+      "integration": "2/2 tests passed - invalid event_id handled, OAuth errors handled gracefully"
+    },
+    "architecture": {
+      "pattern": "Direct operation with error handling",
+      "description": "Deletes Google Calendar events by event_id",
+      "validation": "Event ID presence check (delegated to GCal API for format validation)",
+      "error_handling": "onError: continueErrorOutput → Format Output (Standard Contract)",
+      "oauth": "Google Calendar OAuth2 (OsRBfz3Cs7Ph5uV5)"
+    },
+    "data_flow": [
+      "Webhook/Execute Trigger → Delete GCal Event → Format Output",
+      "Error path: Delete GCal Event (onError) → Format Output"
+    ],
+    "security_notes": [
+      "Destructive operation (DELETE) - requires valid event_id",
+      "OAuth2 token required for GCal access",
+      "Returns Standard Contract for all error types (OAuth, API, network)"
+    ]
+  },
+  {
     "name": "NN_01_Booking_Gateway",
     "version": "5.0.0",
     "node_count": 11,
