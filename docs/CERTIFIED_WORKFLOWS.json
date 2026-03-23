@@ -1,5 +1,40 @@
 [
   {
+    "name": "NN_03-B_Pipeline_Agent",
+    "version": "3.0.0",
+    "node_count": 59,
+    "tests_passed": "12/12",
+    "certified_at": "2026-03-23",
+    "git_tag": "NN_03-B_Pipeline_Agent-v3.0.0-certified",
+    "status": "FROZEN",
+    "test_file": "tests/NN_03-B_Pipeline_Agent.test.ts",
+    "test_summary": {
+      "validation": "4/4 tests passed - MISSING_FIELD, INVALID_TYPE for chat_id and text",
+      "security": "4/4 tests passed - profanity (Spanish/English), prompt injection, off-topic blocked",
+      "happy_path": "4/4 tests passed - general_chat, get_services, check_availability, create_booking intents"
+    },
+    "architecture": {
+      "pattern": "Multi-branch intent routing with LLM classification",
+      "validation": "chat_id numeric + text length (3-499 chars)",
+      "security": "Rule-based firewall (profanity, injection, off-topic)",
+      "error_handling": "Central Error Handler with Standard Contract output",
+      "intents": [
+        "create_booking", "cancel_booking", "check_availability", "find_next",
+        "get_my_bookings", "reschedule_booking", "update_profile", "manage_reminders",
+        "join_waitlist", "get_services", "general_chat"
+      ]
+    },
+    "sub_workflows": [
+      "DB_Create_Booking", "DB_Cancel_Booking", "DB_Get_Availability",
+      "DB_Find_Next_Available", "DB_Reschedule_Booking", "RAG_02_Document_Retrieval"
+    ],
+    "ai_features": {
+      "classifier": "Groq Llama 3.3 70B (intent classification)",
+      "extractors": "LLM-based parameter extraction for each intent",
+      "generators": "LLM-based response generation in Spanish"
+    }
+  },
+  {
     "name": "DB_Find_Next_Available",
     "version": "2.0.0",
     "node_count": 11,
