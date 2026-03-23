@@ -46,7 +46,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Gate: _exit_early items skip to Format Response\n// Valid items: build services query\nconst input = $input.first().json;\n\nif (input._exit_early) {\n  return [{ json: { ...input, services: [] } }];\n}\n\nconst { provider_id } = input;\n\n// Build query to get services for a specific provider\nconst services_query = `SELECT id, provider_id, name, description, duration_minutes, price, active, created_at FROM services WHERE provider_id = ${provider_id}::int ORDER BY name;`;\n\nreturn [{ json: {\n  ...input,\n  services_query,\n  provider_id\n}}];",
+        "jsCode": "// Gate: _exit_early items skip to Format Response\n// Valid items: build services query\nconst input = $input.first().json;\n\nif (input._exit_early) {\n  return [{ json: { ...input, services: [] } }];\n}\n\nconst { provider_id } = input;\n\n// Build query to get services for a specific provider\n// JOIN services with provider_services to get only services offered by this provider\nconst services_query = `\n  SELECT DISTINCT s.id, s.name\n  FROM services s\n  INNER JOIN provider_services ps ON s.id = ps.service_id\n  WHERE ps.provider_id = ${provider_id}::int\n  ORDER BY s.name;\n`;\n\nreturn [{ json: {\n  ...input,\n  services_query,\n  provider_id\n}}];",
         "mode": "runOnceForAllItems"
       },
       "name": "Build Services Query",
@@ -99,7 +99,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Format services response\nconst items = $input.all();\nconst upstreamData = $('Build Services Query').isExecuted ? $('Build Services Query').first().json : {};\n\n// Map all service rows\nconst services = items.map(item => ({\n  id: item.json.id,\n  provider_id: item.json.provider_id,\n  name: item.json.name,\n  description: item.json.description,\n  duration_minutes: item.json.duration_minutes,\n  price: item.json.price,\n  active: item.json.active,\n  created_at: item.json.created_at\n}));\n\nreturn [{ json: {\n  success: true,\n  error_code: null,\n  error_message: null,\n  data: {\n    services,\n    total: services.length,\n    provider_id: upstreamData.provider_id\n  },\n  _meta: {\n    source: 'DB_Get_Services',\n    timestamp: new Date().toISOString(),\n    workflow_id: $workflow.id\n  }\n}}];",
+        "jsCode": "// Format services response\nconst items = $input.all();\nconst upstreamData = $('Build Services Query').isExecuted ? $('Build Services Query').first().json : {};\n\n// Map all service rows (only id and name)\nconst services = items.map(item => ({\n  id: item.json.id,\n  name: item.json.name\n}));\n\nreturn [{ json: {\n  success: true,\n  error_code: null,\n  error_message: null,\n  data: {\n    services,\n    total: services.length,\n    provider_id: upstreamData.provider_id\n  },\n  _meta: {\n    source: 'DB_Get_Services',\n    timestamp: new Date().toISOString(),\n    workflow_id: $workflow.id\n  }\n}}];",
         "mode": "runOnceForAllItems"
       },
       "name": "Format Services",
@@ -135,8 +135,7 @@
     },
     "Build Services Query": {
       "main": [[
-        { "node": "Pass Through Error", "type": "main", "index": 0 },
-        { "node": "Format Response", "type": "main", "index": 0 }
+        { "node": "Pass Through Error", "type": "main", "index": 0 }
       ]]
     },
     "Pass Through Error": {
