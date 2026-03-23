@@ -223,5 +223,25 @@
       "validation": "UUID regex + ISO 8601 with timezone + date existence check",
       "error_handling": "Zero-throw pattern with Standard Contract"
     }
+  },
+  {
+    "name": "NN_04_Telegram_Sender",
+    "version": "2.0.0",
+    "node_count": 12,
+    "tests_passed": "6/6",
+    "certified_at": "2026-03-23",
+    "git_tag": "NN_04_Telegram_Sender-v2.0.0-certified",
+    "status": "FROZEN",
+    "test_file": "tests/NN_04_Telegram_Sender.test.ts",
+    "changes_from_v1": {
+      "added": ["Gate Send", "Gate Skip", "Respond to Webhook"],
+      "removed": ["Pass Through Error"],
+      "fixed": ["Telegram error detection (e.error vs e.message)", "responseMode changed to responseNode for reliable HTTP responses", "Error classification for chat not found"]
+    },
+    "architecture": {
+      "pattern": "Gate + Skip (no IF nodes)",
+      "validation": "chat_id integer regex + text length 4096 limit",
+      "error_handling": "Zero-throw pattern with Standard Contract, responseNode mode"
+    }
   }
 ]
