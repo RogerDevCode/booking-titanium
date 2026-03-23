@@ -1,11 +1,5 @@
 {
-  "updatedAt": "2026-03-18T22:20:47.123Z",
-  "createdAt": "2026-03-14T20:11:44.422Z",
-  "id": "mSDwCAcyfLzJwvrb",
   "name": "WF5_GCal_Collision_Check",
-  "description": null,
-  "active": true,
-  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -17,23 +11,17 @@
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [
-        0,
-        0
-      ],
+      "position": [0, 0],
       "webhookId": "gcal-collision-check",
-      "id": "a3e33e53-6edf-430c-91a0-6801fe4a0fc9"
+      "id": "gcal-webhook-01"
     },
     {
       "parameters": {},
       "name": "Manual Trigger",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [
-        0,
-        -200
-      ],
-      "id": "b991013c-218d-4b53-8bcf-a808b002394a"
+      "position": [0, -200],
+      "id": "gcal-manual-01"
     },
     {
       "parameters": {
@@ -42,55 +30,19 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
-      "position": [
-        0,
-        200
-      ],
-      "id": "c7918c08-6bdd-44fb-9b1b-96ec4aefa344"
+      "position": [0, 200],
+      "id": "gcal-trigger-01"
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first().json;\nconst body = input.body || input;\n\n// 🛡️ Pre-Validation\nconst start_time = String(body.start_time || '');\nif (!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/.test(start_time)) {\n  return [{ json: { _valid: false, _error: 'Invalid start_time format (ISO 8601 required)' } }];\n}\n\nconst duration = parseInt(body.duration_minutes || 60, 10);\nif (isNaN(duration) || duration < 5 || duration > 1440) {\n  return [{ json: { _valid: false, _error: 'Invalid duration: must be between 5 and 1440 minutes' } }];\n}\n\nconst startDate = new Date(start_time);\nconst endDate = new Date(startDate.getTime() + duration * 60000);\n\nreturn [{ json: {\n  _valid: true,\n  calendar_id: body.calendar_id || 'primary',\n  start_time: startDate.toISOString(),\n  end_time: endDate.toISOString(),\n  exclude_event_id: body.exclude_event_id || null\n}}];"
+        "jsCode": "// LAYER 1+2: Extract & Validate (§4.1 PRE-validate)\n// Zero-throw: returns Standard Contract error, never throws\n\nconst raw = $input.first().json;\nconst input = (raw.body && typeof raw.body === 'object') ? raw.body : raw;\n\n// ISO 8601 with timezone validation\nfunction isIsoDate(str) {\n  if (!str || !str.includes('T')) return false;\n  const tzMatch = str.match(/(Z|[+-]\\d{2}:\\d{2})$/);\n  if (!tzMatch) return false;\n  const d = new Date(str);\n  if (isNaN(d.getTime())) return false;\n  const parts = str.match(/^(\\d{4})-(\\d{2})-(\\d{2})T/);\n  if (!parts) return false;\n  const [_, year, month, day] = parts;\n  if (parseInt(month) !== d.getUTCMonth() + 1) return false;\n  if (parseInt(day) !== d.getUTCDate()) return false;\n  return true;\n}\n\nfunction ve(code, msg) {\n  return [{ json: {\n    success: false, error_code: code, error_message: msg, data: null,\n    _meta: { source: 'WF5_GCal_Collision_Check', timestamp: new Date().toISOString(), workflow_id: $workflow.id },\n    _exit_early: true\n  }}];\n}\n\n// === START_TIME VALIDATION ===\nconst start_time = String(input.start_time || '').trim();\nif (!start_time) return ve('MISSING_FIELD', 'start_time is required');\nif (!isIsoDate(start_time)) return ve('INVALID_TYPE', 'start_time must be ISO 8601 with timezone (e.g. 2026-04-15T09:00:00-03:00)');\n\n// === DURATION VALIDATION ===\nlet duration_minutes = 60; // default\nif (input.duration_minutes !== undefined && input.duration_minutes !== null) {\n  const durStr = String(input.duration_minutes).trim();\n  const INT_RE = /^\\d+$/;\n  if (!INT_RE.test(durStr)) return ve('INVALID_TYPE', 'duration_minutes must be a positive integer');\n  duration_minutes = parseInt(durStr);\n  if (duration_minutes < 5 || duration_minutes > 1440) return ve('INVALID_RANGE', 'duration must be between 5 and 1440 minutes');\n}\n\n// === CALENDAR_ID (optional, default 'primary') ===\nconst calendar_id = String(input.calendar_id || 'primary').trim();\n\n// === EXCLUDE_EVENT_ID (optional) ===\nlet exclude_event_id = null;\nif (input.exclude_event_id !== undefined && input.exclude_event_id !== null) {\n  exclude_event_id = String(input.exclude_event_id).trim();\n}\n\n// Calculate end_time\nconst startDate = new Date(start_time);\nconst endDate = new Date(startDate.getTime() + duration_minutes * 60000);\n\nreturn [{ json: {\n  success: true,\n  calendar_id,\n  start_time: startDate.toISOString(),\n  end_time: endDate.toISOString(),\n  duration_minutes,\n  exclude_event_id,\n  _validated: true\n}}];",
+        "mode": "runOnceForAllItems"
       },
-      "name": "Validate & Prepare",
+      "name": "Validate Input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        250,
-        0
-      ],
-      "id": "91b943b6-d7b1-47ac-b595-63e4e849cda6"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "valid_check",
-              "leftValue": "={{ $json._valid }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "equals"
-              }
-            }
-          ],
-          "combinator": "and"
-        }
-      },
-      "name": "Is Valid?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        500,
-        0
-      ],
-      "id": "128746ad-884b-455f-9cb2-721dc2b0ee2b"
+      "position": [256, 0],
+      "id": "gcal-validate-01"
     },
     {
       "parameters": {
@@ -111,10 +63,7 @@
       "name": "List Potential Conflicts",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.3,
-      "position": [
-        750,
-        -100
-      ],
+      "position": [464, 0],
       "credentials": {
         "googleCalendarOAuth2Api": {
           "id": "OsRBfz3Cs7Ph5uV5",
@@ -122,480 +71,72 @@
         }
       },
       "onError": "continueErrorOutput",
-      "id": "10df8550-522d-4509-9ed7-9cfbe6a2052f"
+      "id": "gcal-list-01"
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst validated = $('Validate & Prepare').first().json;\n\nconst firstItem = items[0]?.json || {};\nconst isGCalError = items.length > 0 && !firstItem.id && (firstItem.message || firstItem.error || firstItem.code);\n\nif (isGCalError) {\n  return [{ json: { _success: false, _gcal_error: firstItem.message || 'GCal API Error' } }];\n}\n\nconst reqStart = new Date(validated.start_time).getTime();\nconst reqEnd = new Date(validated.end_time).getTime();\nconst excludeId = validated.exclude_event_id;\n\nconst conflicts = items.filter(item => {\n  const ev = item.json;\n  if (!ev || !ev.id || ev.status === 'cancelled' || ev.id === excludeId) return false;\n  const evStart = new Date(ev.start.dateTime || ev.start.date).getTime();\n  const evEnd = new Date(ev.end.dateTime || ev.end.date).getTime();\n  return reqStart < evEnd && reqEnd > evStart;\n}).map(c => ({\n  id: c.json.id,\n  summary: c.json.summary,\n  start: c.json.start.dateTime || c.json.start.date\n}));\n\nreturn [{ json: {\n  _success: true,\n  has_collision: conflicts.length > 0,\n  conflicts: conflicts\n}}];"
+        "jsCode": "// Handle GCal API error\nconst e = $input.first().json;\nconst upstreamData = $('Validate Input').isExecuted ? $('Validate Input').first().json : {};\nlet error_code = 'GCAL_API_ERROR';\nlet error_message = e.message || e.error?.message || 'Google Calendar API error';\n\nif (error_message.includes('invalid_grant') || error_message.includes('unauthorized')) {\n  error_code = 'GCAL_AUTH_ERROR';\n  error_message = 'Google Calendar authentication failed';\n} else if (error_message.includes('quota') || error_message.includes('rate limit')) {\n  error_code = 'GCAL_QUOTA_EXCEEDED';\n  error_message = 'Google Calendar API quota exceeded';\n}\n\nreturn [{ json: {\n  ...upstreamData,\n  success: false, error_code, error_message, data: null,\n  _meta: { source: 'WF5_GCal_Collision_Check', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Handle GCal Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [464, 220],
+      "id": "gcal-handle-error-01"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Analyze overlaps and detect collisions\nconst items = $input.all();\nconst upstreamData = $('Validate Input').isExecuted ? $('Validate Input').first().json : {};\n\nconst reqStart = new Date(upstreamData.start_time).getTime();\nconst reqEnd = new Date(upstreamData.end_time).getTime();\nconst excludeId = upstreamData.exclude_event_id;\n\nconst conflicts = items.filter(item => {\n  const ev = item.json;\n  if (!ev || !ev.id || ev.status === 'cancelled' || ev.id === excludeId) return false;\n  const evStart = new Date(ev.start?.dateTime || ev.start?.date).getTime();\n  const evEnd = new Date(ev.end?.dateTime || ev.end?.date).getTime();\n  // Check overlap: reqStart < evEnd && reqEnd > evStart\n  return reqStart < evEnd && reqEnd > evStart;\n}).map(c => ({\n  id: c.json.id,\n  summary: c.json.summary || 'Untitled',\n  start: c.json.start?.dateTime || c.json.start?.date\n}));\n\nreturn [{ json: {\n  ...upstreamData,\n  _success: true,\n  has_collision: conflicts.length > 0,\n  conflicts\n}}];",
+        "mode": "runOnceForAllItems"
       },
       "name": "Analyze Overlaps",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        1000,
-        -100
-      ],
-      "id": "3b089e3d-5f05-4232-b8ab-a74ed1849b74"
+      "position": [672, 0],
+      "id": "gcal-analyze-01"
     },
     {
       "parameters": {
-        "jsCode": "const result = $input.first().json;\nconst isValidNode = $('Is Valid?');\nconst isValidationError = !isValidNode.isExecuted || (isValidNode.first(1)?.json?._valid === false);\n\nif (isValidationError) {\n  return [{ json: {\n    success: false, error_code: 'VALIDATION_ERROR', \n    error_message: $('Validate & Prepare').first().json._error || 'Invalid Input',\n    data: null, _meta: { source: 'WF5_Collision_Check', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }}];\n}\n\nif (result._success === false) {\n  return [{ json: {\n    success: true, \n    error_code: 'GCAL_ERROR',\n    error_message: 'Google Calendar API error: ' + result._gcal_error,\n    data: { slot_available: false, mode: 'fail_closed', error: result._gcal_error },\n    _meta: { source: 'WF5_Collision_Check', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }}];\n}\n\nreturn [{ json: {\n  success: true,\n  error_code: null,\n  error_message: null,\n  data: {\n    slot_available: !result.has_collision,\n    has_collision: result.has_collision,\n    conflicts: result.conflicts,\n    checked_at: new Date().toISOString()\n  },\n  _meta: { source: 'WF5_Collision_Check', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];"
+        "jsCode": "// UNIFIED OUTPUT — Standard Contract (§3.2)\nconst input = $input.first().json;\n\n// Process items that have data OR error_code set\nif (input.data !== undefined || input.error_code !== undefined) {\n  return [{ json: {\n    success: input.success === true,\n    error_code: input.error_code || null,\n    error_message: input.error_message || null,\n    data: input.data || null,\n    _meta: input._meta || {\n      source: 'WF5_GCal_Collision_Check',\n      timestamp: new Date().toISOString(),\n      workflow_id: $workflow.id\n    }\n  }}];\n}\n\n// Items with _success flag from Analyze Overlaps\nif (input._success === true) {\n  return [{ json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      slot_available: !input.has_collision,\n      has_collision: input.has_collision,\n      conflicts: input.conflicts || [],\n      checked_at: new Date().toISOString()\n    },\n    _meta: {\n      source: 'WF5_GCal_Collision_Check',\n      timestamp: new Date().toISOString(),\n      workflow_id: $workflow.id\n    }\n  }}];\n}\n\n// Otherwise, pass-through item — skip it\nreturn [];",
+        "mode": "runOnceForAllItems"
       },
-      "name": "Standard Contract Output",
+      "name": "Format Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        1250,
-        0
-      ],
-      "id": "b7cc9e22-3282-4b1b-9ec5-d886eac16983"
+      "position": [880, 100],
+      "id": "gcal-format-01"
     }
   ],
   "connections": {
     "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Validate & Prepare",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
     },
     "Manual Trigger": {
-      "main": [
-        [
-          {
-            "node": "Validate & Prepare",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
     },
     "Execute Workflow Trigger": {
-      "main": [
-        [
-          {
-            "node": "Validate & Prepare",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
     },
-    "Validate & Prepare": {
-      "main": [
-        [
-          {
-            "node": "Is Valid?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Is Valid?": {
-      "main": [
-        [
-          {
-            "node": "List Potential Conflicts",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Standard Contract Output",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Validate Input": {
+      "main": [[{ "node": "List Potential Conflicts", "type": "main", "index": 0 }]]
     },
     "List Potential Conflicts": {
       "main": [
-        [
-          {
-            "node": "Analyze Overlaps",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Analyze Overlaps",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{ "node": "Analyze Overlaps", "type": "main", "index": 0 }],
+        [{ "node": "Handle GCal Error", "type": "main", "index": 0 }]
       ]
     },
+    "Handle GCal Error": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
+    },
     "Analyze Overlaps": {
-      "main": [
-        [
-          {
-            "node": "Standard Contract Output",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
     }
   },
   "settings": {
     "executionOrder": "v1",
     "callerPolicy": "workflowsFromSameOwner",
-    "availableInMCP": true
+    "availableInMCP": false
   },
-  "staticData": null,
-  "meta": null,
-  "pinData": null,
-  "versionId": "5580ce41-f406-4454-a6eb-47fbb79abdb5",
-  "activeVersionId": "5580ce41-f406-4454-a6eb-47fbb79abdb5",
-  "versionCounter": 24,
-  "triggerCount": 1,
-  "shared": [
-    {
-      "updatedAt": "2026-03-14T20:11:44.422Z",
-      "createdAt": "2026-03-14T20:11:44.422Z",
-      "role": "workflow:owner",
-      "workflowId": "mSDwCAcyfLzJwvrb",
-      "projectId": "1q616I3NzJFEiwV5",
-      "project": {
-        "updatedAt": "2026-03-02T02:24:01.899Z",
-        "createdAt": "2026-03-02T00:39:33.634Z",
-        "id": "1q616I3NzJFEiwV5",
-        "name": "Roger Gallegos <baba.orere@gmail.com>",
-        "type": "personal",
-        "icon": null,
-        "description": null,
-        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
-      }
-    }
-  ],
-  "tags": [],
-  "activeVersion": {
-    "updatedAt": "2026-03-15T18:13:48.310Z",
-    "createdAt": "2026-03-14T20:11:44.427Z",
-    "versionId": "5580ce41-f406-4454-a6eb-47fbb79abdb5",
-    "workflowId": "mSDwCAcyfLzJwvrb",
-    "nodes": [
-      {
-        "parameters": {
-          "httpMethod": "POST",
-          "path": "gcal-collision-check",
-          "responseMode": "lastNode",
-          "options": {}
-        },
-        "name": "Webhook",
-        "type": "n8n-nodes-base.webhook",
-        "typeVersion": 2.1,
-        "position": [
-          0,
-          0
-        ],
-        "webhookId": "gcal-collision-check",
-        "id": "a3e33e53-6edf-430c-91a0-6801fe4a0fc9"
-      },
-      {
-        "parameters": {},
-        "name": "Manual Trigger",
-        "type": "n8n-nodes-base.manualTrigger",
-        "typeVersion": 1,
-        "position": [
-          0,
-          -200
-        ],
-        "id": "b991013c-218d-4b53-8bcf-a808b002394a"
-      },
-      {
-        "parameters": {
-          "inputSource": "passthrough"
-        },
-        "name": "Execute Workflow Trigger",
-        "type": "n8n-nodes-base.executeWorkflowTrigger",
-        "typeVersion": 1.1,
-        "position": [
-          0,
-          200
-        ],
-        "id": "c7918c08-6bdd-44fb-9b1b-96ec4aefa344"
-      },
-      {
-        "parameters": {
-          "jsCode": "const input = $input.first().json;\nconst body = input.body || input;\n\n// 🛡️ Pre-Validation\nconst start_time = String(body.start_time || '');\nif (!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/.test(start_time)) {\n  return [{ json: { _valid: false, _error: 'Invalid start_time format (ISO 8601 required)' } }];\n}\n\nconst duration = parseInt(body.duration_minutes || 60, 10);\nif (isNaN(duration) || duration < 5 || duration > 1440) {\n  return [{ json: { _valid: false, _error: 'Invalid duration: must be between 5 and 1440 minutes' } }];\n}\n\nconst startDate = new Date(start_time);\nconst endDate = new Date(startDate.getTime() + duration * 60000);\n\nreturn [{ json: {\n  _valid: true,\n  calendar_id: body.calendar_id || 'primary',\n  start_time: startDate.toISOString(),\n  end_time: endDate.toISOString(),\n  exclude_event_id: body.exclude_event_id || null\n}}];"
-        },
-        "name": "Validate & Prepare",
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          250,
-          0
-        ],
-        "id": "91b943b6-d7b1-47ac-b595-63e4e849cda6"
-      },
-      {
-        "parameters": {
-          "conditions": {
-            "options": {
-              "caseSensitive": true,
-              "leftValue": "",
-              "typeValidation": "strict"
-            },
-            "conditions": [
-              {
-                "id": "valid_check",
-                "leftValue": "={{ $json._valid }}",
-                "rightValue": true,
-                "operator": {
-                  "type": "boolean",
-                  "operation": "equals"
-                }
-              }
-            ],
-            "combinator": "and"
-          }
-        },
-        "name": "Is Valid?",
-        "type": "n8n-nodes-base.if",
-        "typeVersion": 2.3,
-        "position": [
-          500,
-          0
-        ],
-        "id": "128746ad-884b-455f-9cb2-721dc2b0ee2b"
-      },
-      {
-        "parameters": {
-          "operation": "getAll",
-          "calendar": {
-            "__rl": true,
-            "value": "={{ $json.calendar_id }}",
-            "mode": "id"
-          },
-          "returnAll": true,
-          "options": {
-            "timeMin": "={{ $json.start_time }}",
-            "timeMax": "={{ $json.end_time }}",
-            "showDeleted": false,
-            "singleEvents": true
-          }
-        },
-        "name": "List Potential Conflicts",
-        "type": "n8n-nodes-base.googleCalendar",
-        "typeVersion": 1.3,
-        "position": [
-          750,
-          -100
-        ],
-        "credentials": {
-          "googleCalendarOAuth2Api": {
-            "id": "OsRBfz3Cs7Ph5uV5",
-            "name": "Google Calendar account"
-          }
-        },
-        "onError": "continueErrorOutput",
-        "id": "10df8550-522d-4509-9ed7-9cfbe6a2052f"
-      },
-      {
-        "parameters": {
-          "jsCode": "const items = $input.all();\nconst validated = $('Validate & Prepare').first().json;\n\nconst firstItem = items[0]?.json || {};\nconst isGCalError = items.length > 0 && !firstItem.id && (firstItem.message || firstItem.error || firstItem.code);\n\nif (isGCalError) {\n  return [{ json: { _success: false, _gcal_error: firstItem.message || 'GCal API Error' } }];\n}\n\nconst reqStart = new Date(validated.start_time).getTime();\nconst reqEnd = new Date(validated.end_time).getTime();\nconst excludeId = validated.exclude_event_id;\n\nconst conflicts = items.filter(item => {\n  const ev = item.json;\n  if (!ev || !ev.id || ev.status === 'cancelled' || ev.id === excludeId) return false;\n  const evStart = new Date(ev.start.dateTime || ev.start.date).getTime();\n  const evEnd = new Date(ev.end.dateTime || ev.end.date).getTime();\n  return reqStart < evEnd && reqEnd > evStart;\n}).map(c => ({\n  id: c.json.id,\n  summary: c.json.summary,\n  start: c.json.start.dateTime || c.json.start.date\n}));\n\nreturn [{ json: {\n  _success: true,\n  has_collision: conflicts.length > 0,\n  conflicts: conflicts\n}}];"
-        },
-        "name": "Analyze Overlaps",
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          1000,
-          -100
-        ],
-        "id": "3b089e3d-5f05-4232-b8ab-a74ed1849b74"
-      },
-      {
-        "parameters": {
-          "jsCode": "const result = $input.first().json;\nconst isValidNode = $('Is Valid?');\nconst isValidationError = !isValidNode.isExecuted || (isValidNode.first(1)?.json?._valid === false);\n\nif (isValidationError) {\n  return [{ json: {\n    success: false, error_code: 'VALIDATION_ERROR', \n    error_message: $('Validate & Prepare').first().json._error || 'Invalid Input',\n    data: null, _meta: { source: 'WF5_Collision_Check', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }}];\n}\n\nif (result._success === false) {\n  return [{ json: {\n    success: true, \n    error_code: 'GCAL_ERROR',\n    error_message: 'Google Calendar API error: ' + result._gcal_error,\n    data: { slot_available: false, mode: 'fail_closed', error: result._gcal_error },\n    _meta: { source: 'WF5_Collision_Check', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }}];\n}\n\nreturn [{ json: {\n  success: true,\n  error_code: null,\n  error_message: null,\n  data: {\n    slot_available: !result.has_collision,\n    has_collision: result.has_collision,\n    conflicts: result.conflicts,\n    checked_at: new Date().toISOString()\n  },\n  _meta: { source: 'WF5_Collision_Check', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];"
-        },
-        "name": "Standard Contract Output",
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          1250,
-          0
-        ],
-        "id": "b7cc9e22-3282-4b1b-9ec5-d886eac16983"
-      }
-    ],
-    "connections": {
-      "Webhook": {
-        "main": [
-          [
-            {
-              "node": "Validate & Prepare",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Manual Trigger": {
-        "main": [
-          [
-            {
-              "node": "Validate & Prepare",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Execute Workflow Trigger": {
-        "main": [
-          [
-            {
-              "node": "Validate & Prepare",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Validate & Prepare": {
-        "main": [
-          [
-            {
-              "node": "Is Valid?",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Is Valid?": {
-        "main": [
-          [
-            {
-              "node": "List Potential Conflicts",
-              "type": "main",
-              "index": 0
-            }
-          ],
-          [
-            {
-              "node": "Standard Contract Output",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "List Potential Conflicts": {
-        "main": [
-          [
-            {
-              "node": "Analyze Overlaps",
-              "type": "main",
-              "index": 0
-            }
-          ],
-          [
-            {
-              "node": "Analyze Overlaps",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Analyze Overlaps": {
-        "main": [
-          [
-            {
-              "node": "Standard Contract Output",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      }
-    },
-    "authors": "Roger Gallegos",
-    "name": "Version 5580ce41",
-    "description": "",
-    "autosaved": false,
-    "workflowPublishHistory": [
-      {
-        "createdAt": "2026-03-18T14:18:44.349Z",
-        "id": 1246,
-        "workflowId": "mSDwCAcyfLzJwvrb",
-        "versionId": "5580ce41-f406-4454-a6eb-47fbb79abdb5",
-        "event": "deactivated",
-        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
-      },
-      {
-        "createdAt": "2026-03-18T14:18:44.369Z",
-        "id": 1247,
-        "workflowId": "mSDwCAcyfLzJwvrb",
-        "versionId": "5580ce41-f406-4454-a6eb-47fbb79abdb5",
-        "event": "activated",
-        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
-      },
-      {
-        "createdAt": "2026-03-18T22:20:47.147Z",
-        "id": 1398,
-        "workflowId": "mSDwCAcyfLzJwvrb",
-        "versionId": "5580ce41-f406-4454-a6eb-47fbb79abdb5",
-        "event": "deactivated",
-        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
-      },
-      {
-        "createdAt": "2026-03-18T22:20:47.166Z",
-        "id": 1399,
-        "workflowId": "mSDwCAcyfLzJwvrb",
-        "versionId": "5580ce41-f406-4454-a6eb-47fbb79abdb5",
-        "event": "activated",
-        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
-      },
-      {
-        "createdAt": "2026-03-15T18:13:48.306Z",
-        "id": 961,
-        "workflowId": "mSDwCAcyfLzJwvrb",
-        "versionId": "5580ce41-f406-4454-a6eb-47fbb79abdb5",
-        "event": "activated",
-        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
-      },
-      {
-        "createdAt": "2026-03-18T22:20:53.915Z",
-        "id": 1400,
-        "workflowId": "mSDwCAcyfLzJwvrb",
-        "versionId": "5580ce41-f406-4454-a6eb-47fbb79abdb5",
-        "event": "deactivated",
-        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
-      },
-      {
-        "createdAt": "2026-03-18T22:20:53.932Z",
-        "id": 1401,
-        "workflowId": "mSDwCAcyfLzJwvrb",
-        "versionId": "5580ce41-f406-4454-a6eb-47fbb79abdb5",
-        "event": "activated",
-        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
-      },
-      {
-        "createdAt": "2026-03-18T20:53:35.048Z",
-        "id": 1308,
-        "workflowId": "mSDwCAcyfLzJwvrb",
-        "versionId": "5580ce41-f406-4454-a6eb-47fbb79abdb5",
-        "event": "deactivated",
-        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
-      },
-      {
-        "createdAt": "2026-03-18T20:53:35.070Z",
-        "id": 1309,
-        "workflowId": "mSDwCAcyfLzJwvrb",
-        "versionId": "5580ce41-f406-4454-a6eb-47fbb79abdb5",
-        "event": "activated",
-        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
-      }
-    ]
-  }
+  "active": true
 }
