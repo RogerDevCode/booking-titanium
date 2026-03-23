@@ -1,5 +1,46 @@
 [
   {
+    "name": "NN_05_Reminder_Cron",
+    "version": "2.0.0",
+    "node_count": 8,
+    "tests_passed": "8/8",
+    "certified_at": "2026-03-23",
+    "git_tag": "NN_05_Reminder_Cron-v2.0.0-certified",
+    "status": "FROZEN",
+    "test_file": "tests/NN_05_Reminder_Cron.test.ts",
+    "test_summary": {
+      "architecture": "2/2 tests passed - workflow structure, Standard Contract output",
+      "validation": "3/3 tests passed - invalid dates rejected, Feb 30 detection, temporal anomaly (±1 year)",
+      "integration": "3/3 tests passed - chat_id validation, NN_04 delegation, DAL endpoint"
+    },
+    "architecture": {
+      "pattern": "Scheduled Cron Job with reminder delivery",
+      "description": "Runs every 15 minutes to fetch and send booking reminders via Telegram",
+      "trigger": "Schedule Trigger (every 15 minutes) + Manual Trigger + Execute Workflow Trigger",
+      "validation": "ISO date format, real date existence (anti-Feb30), ±1 year horizon, chat_id presence",
+      "sub_workflows": [
+        "NN_04_Telegram_Sender (WE7DxLKAECtsA8Up) - certified v2.0.0"
+      ]
+    },
+    "data_flow": [
+      "Schedule Trigger → Fetch Pending (DAL) → Split Bookings",
+      "→ Prepare Reminder (validation + formatting) → Notify Telegram (NN_04)",
+      "→ Mark as Sent (DAL) → Format Output"
+    ],
+    "security_notes": [
+      "Date validation: ISO format + real existence check (catches Feb 30, Apr 31, etc.)",
+      "Temporal anomaly detection: Rejects dates too far in future/past (±1 year)",
+      "chat_id required for reminder delivery",
+      "Already INACTIVE - cron disabled to prevent memory buildup"
+    ],
+    "operational_notes": [
+      "Workflow runs on cron schedule (every 15 min)",
+      "Calls http://127.0.0.1:3000/pending-reminders for pending reminders",
+      "Marks reminders as sent via http://127.0.0.1:3000/mark-reminder-sent",
+      "DEACTIVATED after certification to prevent memory accumulation"
+    ]
+  },
+  {
     "name": "GCAL_Delete_Event",
     "version": "2.0.0",
     "node_count": 5,

@@ -1,5 +1,11 @@
 {
+  "updatedAt": "2026-03-18T22:45:44.229Z",
+  "createdAt": "2026-03-02T02:19:34.753Z",
+  "id": "trmFIo0zClyF38L8",
   "name": "NN_05_Reminder_Cron",
+  "description": null,
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -19,7 +25,7 @@
         0,
         432
       ],
-      "id": "cron"
+      "id": "72e9c53f-fdf0-4927-b7f3-bc3d7b80101b"
     },
     {
       "parameters": {},
@@ -30,19 +36,12 @@
         0,
         232
       ],
-      "id": "manual"
+      "id": "fd622e46-de8b-414d-81bf-a64c536fed07"
     },
     {
       "parameters": {
-        "url": "http://dal-service:3000/pending-reminders",
-        "options": {
-          "timeout": 30000,
-          "maxRetries": 3,
-          "retryWait": {
-            "type": "exponentialBackoff",
-            "base": 1000
-          }
-        }
+        "url": "http://127.0.0.1:3000/pending-reminders",
+        "options": {}
       },
       "name": "Fetch Pending",
       "type": "n8n-nodes-base.httpRequest",
@@ -51,7 +50,7 @@
         250,
         432
       ],
-      "id": "fetch"
+      "id": "0a43eb8e-ca88-44e8-ba06-3441eb4b3350"
     },
     {
       "parameters": {
@@ -65,11 +64,11 @@
         500,
         432
       ],
-      "id": "split"
+      "id": "146a8f25-d00f-449f-bce0-d7926ff40f68"
     },
     {
       "parameters": {
-        "jsCode": "// Prepare Reminder — maps dal-service booking to NN_04 payload\nconst item = $input.first()?.json || {};\n\nconst chat_id = String(item.user_id || '');\nconst service = item.service_name || 'Cita';\nconst provider = item.provider_name || 'Profesional';\nconst startRaw = item.start_time || '';\nconst reminder_type = parseInt(item.reminder_type) || 1;\n\n// Format time for display\nlet timeDisplay = startRaw;\ntry {\n  const d = new Date(startRaw);\n  timeDisplay = d.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' });\n} catch(e) {}\n\nconst text = `⏰ Recordatorio: Tienes una cita de ${service} con ${provider} — ${timeDisplay}`;\n\nreturn [{\n  json: {\n    chat_id,\n    text,\n    booking_id: item.id || '',\n    reminder_type\n  }\n}];"
+        "jsCode": "\n// Reminder Preparation v2.2.0 - Strict Formatting\nconst input = $input.first().json;\nconst startRaw = String(input.start_time || '');\n\n// 1. Validación de Formato ISO y Existencia\nconst dateObj = new Date(startRaw);\nif (isNaN(dateObj.getTime()) || !startRaw.includes('T')) {\n  return [{ json: { _error: true, _msg: 'Invalid start_time format in DB' } }];\n}\nconst dtP = startRaw.split('T')[0].split('-');\nconst y = parseInt(dtP[0], 10);\nconst m = parseInt(dtP[1], 10);\nconst d = parseInt(dtP[2], 10);\n\n// 2. Verificación de Fecha Real (Anti Feb 30)\nif (dateObj.getUTCFullYear() !== y || (dateObj.getUTCMonth() + 1) !== m || dateObj.getUTCDate() !== d) {\n  return [{ json: { _error: true, _msg: 'Non-existent date in DB' } }];\n}\n\n// 3. Horizonte de Seguridad (No procesar nada a más de 1 año o muy en el pasado)\nconst now = Date.now();\nconst diff = dateObj.getTime() - now;\nconst ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;\n\nif (Math.abs(diff) > ONE_YEAR_MS) {\n  return [{ json: { _error: true, _msg: 'Temporal anomaly: Date too far in future/past' } }];\n}\n\n// 4. Formateo Seguro (es-AR)\nlet timeDisplay = '';\ntry {\n  timeDisplay = dateObj.toLocaleString('es-AR', { \n    timeZone: 'America/Argentina/Buenos_Aires',\n    day: '2-digit', month: '2-digit', year: 'numeric',\n    hour: '2-digit', minute: '2-digit', hour12: false \n  });\n} catch(e) {\n  timeDisplay = startRaw; // Fallback\n}\n\nconst service = input.service_name || 'Cita';\nconst provider = input.provider_name || 'Profesional';\nconst chat_id = String(input.chat_id || input.user_id || '');\n\nif (!chat_id) {\n  return [{ json: { _error: true, _msg: 'Missing chat_id for reminder' } }];\n}\n\nreturn [{\n  json: {\n    chat_id,\n    text: `⏰ Recordatorio: Tienes una cita de ${service} con ${provider} — ${timeDisplay}`,\n    booking_id: input.id || '',\n    success: true,\n    _meta: { timestamp: new Date().toISOString() }\n  }\n}];\n  "
       },
       "name": "Prepare Reminder",
       "type": "n8n-nodes-base.code",
@@ -78,7 +77,7 @@
         750,
         432
       ],
-      "id": "prepare"
+      "id": "7a6f5dcc-4e3e-4b9c-9ea4-251bbc439131"
     },
     {
       "parameters": {
@@ -96,23 +95,16 @@
         1000,
         432
       ],
-      "id": "exec_tg"
+      "id": "f73a82d4-2b14-4000-8efe-fc070996877b"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "http://dal-service:3000/mark-reminder-sent",
+        "url": "http://127.0.0.1:3000/mark-reminder-sent",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"booking_id\": \"{{ $node[\"Prepare Reminder\"].json.booking_id }}\",\n  \"type\": {{ $node[\"Prepare Reminder\"].json.reminder_type }}\n}",
-        "options": {
-          "timeout": 30000,
-          "maxRetries": 3,
-          "retryWait": {
-            "type": "exponentialBackoff",
-            "base": 1000
-          }
-        }
+        "options": {}
       },
       "name": "Mark as Sent",
       "type": "n8n-nodes-base.httpRequest",
@@ -121,7 +113,7 @@
         1250,
         432
       ],
-      "id": "mark"
+      "id": "6d34fe0f-1486-4ed4-8385-b4d221c06f5e"
     },
     {
       "parameters": {
@@ -134,89 +126,7 @@
         1500,
         432
       ],
-      "id": "format_out"
-    },
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "nn-05-reminder-cron.json-test",
-        "responseMode": "lastNode"
-      },
-      "id": "trigger_webhook_auto",
-      "name": "Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
-      "position": [
-        -200,
-        600
-      ]
-    },
-    {
-      "parameters": {},
-      "id": "trigger_exec_auto",
-      "name": "Execute Workflow Trigger",
-      "type": "n8n-nodes-base.executeWorkflowTrigger",
-      "typeVersion": 1.1,
-      "position": [
-        -200,
-        400
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "/* VRF PRE: Validate */\nconst item = $input.first()?.json || {};\nconst data = item.body || item;\nconst isValid = true; // Auto-generated default\nreturn [{ json: { isValid, ...data } }];"
-      },
-      "id": "validate_pre_auto",
-      "name": "Validate PRE",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        0,
-        400
-      ]
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "valid_cond_auto",
-              "leftValue": "={{ $json.isValid === true }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        }
-      },
-      "id": "if_valid_auto",
-      "name": "Is Valid?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        200,
-        400
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\n// Retorna esquema unificado para todos los workflows\n\nconst result = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'NN_05_REMINDER_CRON',\n      workflow_id: 'NN_05_REMINDER_CRON',\n      timestamp: new Date().toISOString(),\n      version: '4.3.1'\n    }\n  }\n}];"
-      },
-      "id": "standard_contract_1772984456925",
-      "name": "📤 Standard Contract Output",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        5000,
-        500
-      ]
+      "id": "3b6d0edd-a68f-456b-af1f-21aacae85f75"
     }
   ],
   "connections": {
@@ -224,7 +134,7 @@
       "main": [
         [
           {
-            "node": "Validate PRE",
+            "node": "Fetch Pending",
             "type": "main",
             "index": 0
           }
@@ -235,7 +145,7 @@
       "main": [
         [
           {
-            "node": "Validate PRE",
+            "node": "Fetch Pending",
             "type": "main",
             "index": 0
           }
@@ -296,59 +206,288 @@
           }
         ]
       ]
-    },
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Validate PRE",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Execute Workflow Trigger": {
-      "main": [
-        [
-          {
-            "node": "Validate PRE",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Validate PRE": {
-      "main": [
-        [
-          {
-            "node": "Is Valid?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Is Valid?": {
-      "main": [
-        [
-          {
-            "node": "Fetch Pending",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "📤 Standard Contract Output",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
-  "id": "trmFIo0zClyF38L8"
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "2bf35fe1-5282-4a4d-a5b3-c25643cee029",
+  "activeVersionId": "2bf35fe1-5282-4a4d-a5b3-c25643cee029",
+  "versionCounter": 81,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-03-02T02:19:34.753Z",
+      "createdAt": "2026-03-02T02:19:34.753Z",
+      "role": "workflow:owner",
+      "workflowId": "trmFIo0zClyF38L8",
+      "projectId": "1q616I3NzJFEiwV5",
+      "project": {
+        "updatedAt": "2026-03-02T02:24:01.899Z",
+        "createdAt": "2026-03-02T00:39:33.634Z",
+        "id": "1q616I3NzJFEiwV5",
+        "name": "Roger Gallegos <baba.orere@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-03-18T22:45:44.230Z",
+    "createdAt": "2026-03-18T22:45:44.230Z",
+    "versionId": "2bf35fe1-5282-4a4d-a5b3-c25643cee029",
+    "workflowId": "trmFIo0zClyF38L8",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 15
+              }
+            ]
+          }
+        },
+        "name": "Schedule Trigger",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          432
+        ],
+        "id": "72e9c53f-fdf0-4927-b7f3-bc3d7b80101b"
+      },
+      {
+        "parameters": {},
+        "name": "When clicking 'Test workflow'",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          232
+        ],
+        "id": "fd622e46-de8b-414d-81bf-a64c536fed07"
+      },
+      {
+        "parameters": {
+          "url": "http://127.0.0.1:3000/pending-reminders",
+          "options": {}
+        },
+        "name": "Fetch Pending",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          250,
+          432
+        ],
+        "id": "0a43eb8e-ca88-44e8-ba06-3441eb4b3350"
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "data",
+          "options": {}
+        },
+        "name": "Split Bookings",
+        "type": "n8n-nodes-base.splitOut",
+        "typeVersion": 1,
+        "position": [
+          500,
+          432
+        ],
+        "id": "146a8f25-d00f-449f-bce0-d7926ff40f68"
+      },
+      {
+        "parameters": {
+          "jsCode": "\n// Reminder Preparation v2.2.0 - Strict Formatting\nconst input = $input.first().json;\nconst startRaw = String(input.start_time || '');\n\n// 1. Validación de Formato ISO y Existencia\nconst parts = startRaw.match(/^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})/);\nif (!parts) {\n  return [{ json: { _error: true, _msg: 'Invalid start_time format in DB' } }];\n}\n\nconst dateObj = new Date(startRaw);\nconst [full, y, m, d] = parts.map(p => parseInt(p, 10));\n\n// 2. Verificación de Fecha Real (Anti Feb 30)\nif (dateObj.getUTCFullYear() !== y || (dateObj.getUTCMonth() + 1) !== m || dateObj.getUTCDate() !== d) {\n  return [{ json: { _error: true, _msg: 'Non-existent date in DB' } }];\n}\n\n// 3. Horizonte de Seguridad (No procesar nada a más de 1 año o muy en el pasado)\nconst now = Date.now();\nconst diff = dateObj.getTime() - now;\nconst ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;\n\nif (Math.abs(diff) > ONE_YEAR_MS) {\n  return [{ json: { _error: true, _msg: 'Temporal anomaly: Date too far in future/past' } }];\n}\n\n// 4. Formateo Seguro (es-AR)\nlet timeDisplay = '';\ntry {\n  timeDisplay = dateObj.toLocaleString('es-AR', { \n    timeZone: 'America/Argentina/Buenos_Aires',\n    day: '2-digit', month: '2-digit', year: 'numeric',\n    hour: '2-digit', minute: '2-digit', hour12: false \n  });\n} catch(e) {\n  timeDisplay = startRaw; // Fallback\n}\n\nconst service = input.service_name || 'Cita';\nconst provider = input.provider_name || 'Profesional';\nconst chat_id = String(input.chat_id || input.user_id || '');\n\nif (!chat_id) {\n  return [{ json: { _error: true, _msg: 'Missing chat_id for reminder' } }];\n}\n\nreturn [{\n  json: {\n    chat_id,\n    text: `⏰ Recordatorio: Tienes una cita de ${service} con ${provider} — ${timeDisplay}`,\n    booking_id: input.id || '',\n    success: true,\n    _meta: { timestamp: new Date().toISOString() }\n  }\n}];\n  "
+        },
+        "name": "Prepare Reminder",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          750,
+          432
+        ],
+        "id": "7a6f5dcc-4e3e-4b9c-9ea4-251bbc439131"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "WE7DxLKAECtsA8Up",
+            "mode": "id"
+          },
+          "options": {}
+        },
+        "name": "Notify Telegram",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          1000,
+          432
+        ],
+        "id": "f73a82d4-2b14-4000-8efe-fc070996877b"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://127.0.0.1:3000/mark-reminder-sent",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"booking_id\": \"{{ $node[\"Prepare Reminder\"].json.booking_id }}\",\n  \"type\": {{ $node[\"Prepare Reminder\"].json.reminder_type }}\n}",
+          "options": {}
+        },
+        "name": "Mark as Sent",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1250,
+          432
+        ],
+        "id": "6d34fe0f-1486-4ed4-8385-b4d221c06f5e"
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      reminders_sent: $node[\"Split Bookings\"].json ? 1 : 0\n    },\n    _meta: {\n      source: \"NN_05_Reminder_Cron\",\n      timestamp: new Date().toISOString(),\n      workflow_id: \"NN_05\",\n      version: \"1.1.0\"\n    }\n  }\n}];"
+        },
+        "name": "Format Output",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1500,
+          432
+        ],
+        "id": "3b6d0edd-a68f-456b-af1f-21aacae85f75"
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Fetch Pending",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When clicking 'Test workflow'": {
+        "main": [
+          [
+            {
+              "node": "Fetch Pending",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fetch Pending": {
+        "main": [
+          [
+            {
+              "node": "Split Bookings",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split Bookings": {
+        "main": [
+          [
+            {
+              "node": "Prepare Reminder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Reminder": {
+        "main": [
+          [
+            {
+              "node": "Notify Telegram",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Notify Telegram": {
+        "main": [
+          [
+            {
+              "node": "Mark as Sent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mark as Sent": {
+        "main": [
+          [
+            {
+              "node": "Format Output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Roger Gallegos",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-03-18T22:45:50.800Z",
+        "id": 1471,
+        "workflowId": "trmFIo0zClyF38L8",
+        "versionId": "2bf35fe1-5282-4a4d-a5b3-c25643cee029",
+        "event": "deactivated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-18T22:45:50.820Z",
+        "id": 1472,
+        "workflowId": "trmFIo0zClyF38L8",
+        "versionId": "2bf35fe1-5282-4a4d-a5b3-c25643cee029",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-18T22:45:44.255Z",
+        "id": 1469,
+        "workflowId": "trmFIo0zClyF38L8",
+        "versionId": "2bf35fe1-5282-4a4d-a5b3-c25643cee029",
+        "event": "deactivated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      },
+      {
+        "createdAt": "2026-03-18T22:45:44.273Z",
+        "id": 1470,
+        "workflowId": "trmFIo0zClyF38L8",
+        "versionId": "2bf35fe1-5282-4a4d-a5b3-c25643cee029",
+        "event": "activated",
+        "userId": "29ad78ad-2907-4d12-a03c-326ce29a717c"
+      }
+    ]
+  }
 }
