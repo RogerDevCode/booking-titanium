@@ -437,5 +437,25 @@
       "validation": "Positive integer regex + validation for provider_id",
       "error_handling": "Zero-throw pattern with Standard Contract, responseNode mode"
     }
+  },
+  {
+    "name": "NN_02_Message_Parser",
+    "version": "1.0.0",
+    "node_count": 5,
+    "tests_passed": "9/9",
+    "certified_at": "2026-03-23",
+    "git_tag": "NN_02_Message_Parser-v1.0.0-certified",
+    "status": "FROZEN",
+    "test_file": "tests/NN_02_Message_Parser.test.ts",
+    "test_summary": {
+      "happy_path": "4/4 tests passed - parse Telegram messages (standard, channel_post, flat format, sanitization)",
+      "validation": "3/3 tests passed - missing chat_id, missing text, empty payload",
+      "standard_contract": "2/2 tests passed - success and error responses include all required fields"
+    },
+    "architecture": {
+      "pattern": "Single Code node with multi-path input handling",
+      "validation": "chat_id and text presence check + input sanitization",
+      "error_handling": "Zero-throw pattern with Standard Contract, responseNode mode"
+    }
   }
 ]

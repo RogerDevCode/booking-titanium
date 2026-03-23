@@ -2,42 +2,26 @@
   "name": "NN_02_Message_Parser",
   "nodes": [
     {
-      "parameters": {
-        "jsCode": "/* ROBUST VERSION v1.2.2 - handles all Telegram input paths */\nconst input = $input.first()?.json;\n\nconst bodyLayer = input?.body || input || {};\nconst message = bodyLayer.message || bodyLayer.channel_post || bodyLayer;\n\nconst chat_id = message.chat?.id || bodyLayer.chat_id || input?.chat_id;\nconst text = message.text || bodyLayer.text || input?.text;\n\nlet isValid = true;\nlet error_message = null;\n\nif (!chat_id || !text) {\n  isValid = false;\n  error_message = 'Payload missing required chat_id or text fields.';\n}\n\nconst username = message.from?.first_name || message.chat?.first_name || bodyLayer.username || 'Unknown';\n\n// SEC_02: Sanitize\nconst safeText = String(text || '').replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nconst safeUsername = String(username || '').replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 100);\n\nreturn [{\n  json: {\n    isValid,\n    error_message,\n    chat_id,\n    text: safeText,\n    username: safeUsername\n  }\n}];"
-      },
-      "id": "e6f42a9b-7c15-4a6c-b9b5-2d1b10a9f5d1",
-      "name": "Extract & Validate (PRE)",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        480,
-        420
-      ]
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-200, 200],
+      "id": "mp-manual-01"
     },
     {
       "parameters": {
         "httpMethod": "POST",
         "path": "nn-02-booking-parser-test",
-        "responseMode": "lastNode"
+        "responseMode": "responseNode",
+        "options": {}
       },
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [
-        -200,
-        400
-      ],
-      "webhookId": "nn-02-booking-parser-test"
-    },
-    {
-      "parameters": {},
-      "name": "Manual Trigger",
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
-      "position": [
-        -200,
-        200
-      ]
+      "position": [-200, 400],
+      "webhookId": "nn-02-booking-parser-test",
+      "id": "mp-webhook-01"
     },
     {
       "parameters": {
@@ -46,158 +30,50 @@
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
-      "position": [
-        -200,
-        600
-      ]
+      "position": [-200, 600],
+      "id": "mp-trigger-01"
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "valid_cond_nn02",
-              "leftValue": "={{ $json.isValid === true }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        }
+        "jsCode": "/* NN_02_Message_Parser v1.0.0\n * Parses Telegram messages and extracts chat_id, text, username\n * Handles multiple input paths: Execute Workflow, direct webhook, raw fields\n */\nconst input = $input.first()?.json;\n\n// Handle multiple input paths\nconst bodyLayer = input?.body || input || {};\nconst message = bodyLayer.message || bodyLayer.channel_post || bodyLayer;\n\nconst chat_id = message.chat?.id || bodyLayer.chat_id || input?.chat_id;\nconst text = message.text || bodyLayer.text || input?.text;\n\nif (!chat_id || !text) {\n  return [{\n    json: {\n      success: false,\n      error_code: 'VALIDATION_ERROR',\n      error_message: 'Payload missing required chat_id or text fields.',\n      data: null,\n      _meta: { source: 'NN_02_Message_Parser', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n    }\n  }];\n}\n\nconst username = message.from?.first_name || message.chat?.first_name || bodyLayer.username || 'Unknown';\n\n// SEC_02: Sanitize input (prevent SQL injection)\nconst safeText = text.replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 500);\nconst safeUsername = username.replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"''\").substring(0, 100);\n\nreturn [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      chat_id: chat_id,\n      text: safeText,\n      username: safeUsername,\n      type: 'text'\n    },\n    _meta: { source: 'NN_02_Message_Parser', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n  }\n}];",
+        "mode": "runOnceForAllItems"
       },
-      "id": "if_valid_nn02",
-      "name": "Is Valid?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        700,
-        420
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: true,\n    error_code: null,\n    error_message: null,\n    data: {\n      chat_id: $json.chat_id,\n      text: $json.text,\n      username: $json.username,\n      type: 'text'\n    },\n    _meta: { source: 'NN_02_Message_Parser', timestamp: new Date().toISOString(), version: '1.2.2' }\n  }\n}];"
-      },
-      "id": "format_success_nn02",
-      "name": "Format Success",
+      "name": "Extract & Validate",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        950,
-        300
-      ]
+      "position": [200, 400],
+      "id": "mp-extract-01"
     },
     {
       "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: 'VALIDATION_ERROR',\n    error_message: $json.error_message,\n    data: null,\n    _meta: { source: 'NN_02_Message_Parser', timestamp: new Date().toISOString(), version: '1.2.2' }\n  }\n}];"
+        "respondWith": "firstIncomingItem",
+        "options": {}
       },
-      "id": "format_invalid_nn02",
-      "name": "Format Invalid",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        950,
-        500
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT (O02)\n// Retorna esquema unificado para todos los workflows\n\nconst result = $input.first()?.json || {};\n\nreturn [{\n  json: {\n    success: result.success !== false,\n    error_code: result.success === false ? (result.error_code || 'UNKNOWN_ERROR') : null,\n    error_message: result.success === false ? (result.error_message || 'An error occurred') : null,\n    data: result.data || null,\n    _meta: {\n      source: 'NN_02_MESSAGE_PARSER',\n      workflow_id: 'NN_02_MESSAGE_PARSER',\n      timestamp: new Date().toISOString(),\n      version: '4.3.1'\n    }\n  }\n}];"
-      },
-      "id": "standard_contract_1772984456921",
-      "name": "📤 Standard Contract Output",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        5000,
-        500
-      ]
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [450, 400],
+      "id": "mp-respond-01"
     }
   ],
   "connections": {
-    "Execute Workflow Trigger": {
-      "main": [
-        [
-          {
-            "node": "Extract & Validate (PRE)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Manual Trigger": {
+      "main": [[{ "node": "Extract & Validate", "type": "main", "index": 0 }]]
     },
     "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Extract & Validate (PRE)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Extract & Validate", "type": "main", "index": 0 }]]
     },
-    "Manual Trigger": {
-      "main": [
-        [
-          {
-            "node": "Extract & Validate (PRE)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Execute Workflow Trigger": {
+      "main": [[{ "node": "Extract & Validate", "type": "main", "index": 0 }]]
     },
-    "Extract & Validate (PRE)": {
-      "main": [
-        [
-          {
-            "node": "Is Valid?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Is Valid?": {
-      "main": [
-        [
-          {
-            "node": "Format Success",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Format Invalid",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Format Invalid": {
-      "main": [
-        [
-          {
-            "node": "📤 Standard Contract Output",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Extract & Validate": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
-  "id": "f80XLogu45Zg1TSM"
+  "active": true
 }
