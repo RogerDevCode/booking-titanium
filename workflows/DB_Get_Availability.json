@@ -2,250 +2,146 @@
   "name": "DB_Get_Availability",
   "nodes": [
     {
-      "parameters": {
-        "method": "POST",
-        "url": "http://dal-service:3000/availability",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"provider_id\": {{ $json.provider_id }},\n  \"service_id\": {{ $json.service_id }},\n  \"date\": \"{{ $json.date }}\"\n}",
-        "options": {
-          "timeout": 15000,
-          "maxRetries": 3,
-          "retryWait": {
-            "type": "exponentialBackoff",
-            "base": 1000
-          }
-        }
-      },
-      "name": "Call DAL Proxy",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        750,
-        500
-      ],
-      "id": "call_dal"
-    },
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "db-get-availability-test",
-        "responseMode": "lastNode"
-      },
-      "name": "Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
-      "position": [
-        -200,
-        400
-      ],
-      "webhookId": "db-get-availability-test"
-    },
-    {
       "parameters": {},
       "name": "Manual Trigger",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [
-        -200,
-        200
-      ]
+      "position": [0, 0],
+      "id": "avail-manual-01"
     },
     {
       "parameters": {
-        "inputSource": "jsonExample",
-        "jsonExample": "{\"provider_id\": 1, \"service_id\": 1, \"date\": \"2026-03-15\"}"
+        "inputSource": "passthrough"
       },
       "name": "Execute Workflow Trigger",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
-      "position": [
-        -200,
-        600
-      ]
+      "position": [0, 200],
+      "id": "avail-trigger-01"
     },
     {
       "parameters": {
-        "jsCode": "// REGLA 1: NORMALIZACIÓN DE TIPOS\n// REGLA 5: VALIDACIÓN DE PAYLOAD\nconst raw = $input.first()?.json || {};\n// Handle both webhook (raw.body) and execute workflow (raw directly)\nconst input = Object.keys(raw.body || {}).length > 0 ? raw.body : raw;\n\n// Normalizar tipos (REGLA 1)\nconst provider_id = Number(input.provider_id ?? 1);\nconst service_id = Number(input.service_id ?? 1);\nlet date = String(input.date || \"\");\n\n// Evitar que lea la versión 1.3.0 por accidente u otro metadato\nif (!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)) {\n  date = new Date().toISOString().split('T')[0];\n}\n\n// Validar payload (REGLA 5)\nconst isValidProvider = provider_id > 0 && Number.isInteger(provider_id);\nconst isValidService = service_id > 0 && Number.isInteger(service_id);\nconst isValidDate = /^\\d{4}-\\d{2}-\\d{2}$/.test(date);\n\nconst isValid = isValidProvider && isValidService && isValidDate;\n\nreturn [{\n  json: {\n    provider_id,\n    service_id,\n    date,\n    isValid,\n    _meta: {\n      source: 'DB_Get_Availability',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Get_Availability',\n      version: '1.3.1'\n    }\n  }\n}];"
+        "httpMethod": "POST",
+        "path": "db-get-availability",
+        "responseMode": "lastNode",
+        "options": {}
       },
-      "name": "Validate & Normalize (PRE)",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 400],
+      "webhookId": "db-get-availability",
+      "id": "avail-webhook-01"
+    },
+    {
+      "parameters": {
+        "jsCode": "// LAYER 1+2: Extract & Validate (§4.1 PRE-validate)\n// Zero-throw: returns Standard Contract error, never throws\n\nconst raw = $input.first().json;\nconst input = (raw.body && typeof raw.body === 'object') ? raw.body : raw;\n\nfunction ve(code, msg) {\n  return [{ json: {\n    success: false, error_code: code, error_message: msg, data: null,\n    _meta: { source: 'DB_Get_Availability', timestamp: new Date().toISOString(), workflow_id: $workflow.id },\n    _exit_early: true\n  }}];\n}\n\n// === PROVIDER_ID VALIDATION ===\nlet provider_id;\nif (input.provider_id === undefined || input.provider_id === null) {\n  return ve('MISSING_FIELD', 'provider_id is required');\n}\nif (typeof input.provider_id === 'string') {\n  const trimmed = input.provider_id.trim();\n  const INT_RE = /^\\d+$/;\n  if (!INT_RE.test(trimmed)) return ve('INVALID_TYPE', 'provider_id must be a positive integer');\n  provider_id = parseInt(trimmed);\n} else if (typeof input.provider_id === 'number') {\n  provider_id = input.provider_id;\n  if (!Number.isInteger(provider_id) || provider_id < 1) return ve('INVALID_TYPE', 'provider_id must be a positive integer');\n} else {\n  return ve('INVALID_TYPE', 'provider_id must be a number or numeric string');\n}\n\n// === SERVICE_ID VALIDATION ===\nlet service_id;\nif (input.service_id === undefined || input.service_id === null) {\n  return ve('MISSING_FIELD', 'service_id is required');\n}\nif (typeof input.service_id === 'string') {\n  const trimmed = input.service_id.trim();\n  const INT_RE = /^\\d+$/;\n  if (!INT_RE.test(trimmed)) return ve('INVALID_TYPE', 'service_id must be a positive integer');\n  service_id = parseInt(trimmed);\n} else if (typeof input.service_id === 'number') {\n  service_id = input.service_id;\n  if (!Number.isInteger(service_id) || service_id < 1) return ve('INVALID_TYPE', 'service_id must be a positive integer');\n} else {\n  return ve('INVALID_TYPE', 'service_id must be a number or numeric string');\n}\n\n// === DATE VALIDATION ===\nlet date;\nif (input.date === undefined || input.date === null) {\n  return ve('MISSING_FIELD', 'date is required (YYYY-MM-DD format)');\n}\ndate = String(input.date).trim();\n\n// Validate YYYY-MM-DD format\nconst DATE_RE = /^\\d{4}-\\d{2}-\\d{2}$/;\nif (!DATE_RE.test(date)) return ve('INVALID_TYPE', 'date must be in YYYY-MM-DD format');\n\n// Validate date exists (not Feb 30, etc.) and is future\nconst dateObj = new Date(date + 'T00:00:00Z');\nif (isNaN(dateObj.getTime())) return ve('INVALID_DATE', 'date is not a valid calendar date');\n\n// Check date components match (catches Feb 30 → Mar 02 normalization)\nconst [year, month, day] = date.split('-').map(Number);\nif (dateObj.getUTCFullYear() !== year || (dateObj.getUTCMonth() + 1) !== month || dateObj.getUTCDate() !== day) {\n  return ve('INVALID_DATE', 'date does not exist in the calendar');\n}\n\nreturn [{ json: {\n  success: true,\n  provider_id,\n  service_id,\n  date,\n  _validated: true\n}}];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Validate Input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        250,
-        500
-      ]
+      "position": [256, 200],
+      "id": "avail-validate-01"
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "valid_availability",
-              "leftValue": "={{ $json.isValid === true }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "looseTypeValidation": false
+        "jsCode": "// Gate: _exit_early items skip to Format Response\n// Valid items: build availability query\nconst input = $input.first().json;\n\nif (input._exit_early) {\n  return [{ json: { ...input, slots: [] } }];\n}\n\nconst { provider_id, service_id, date } = input;\n\n// Calculate start and end times for the date (UTC)\n// Using date at midnight UTC to avoid timezone issues\nconst start_time = date + 'T00:00:00Z';\nconst end_time = date + 'T23:59:59Z';\n\n// Build query to get available slots\n// Generates 20-minute slots for the entire day (72 slots = 24h * 3 slots/hour)\nconst availability_query = `\n  WITH time_slots AS (\n    SELECT generate_series(\n      '${start_time}'::timestamptz,\n      '${end_time}'::timestamptz,\n      '20 minutes'::interval\n    ) AS slot_start\n  )\n  SELECT \n    ts.slot_start AT TIME ZONE 'UTC' AS slot_start,\n    TO_CHAR(ts.slot_start AT TIME ZONE 'UTC', 'HH24:MI') AS display_time,\n    CASE \n      WHEN b.id IS NULL THEN true \n      ELSE false \n    END AS is_available\n  FROM time_slots ts\n  LEFT JOIN bookings b ON \n    b.provider_id = ${provider_id}::int AND\n    b.service_id = ${service_id}::int AND\n    b.status != 'CANCELLED' AND\n    b.start_time <= ts.slot_start + interval '20 minutes' AND\n    b.start_time >= ts.slot_start - interval '20 minutes'\n  ORDER BY ts.slot_start;\n`;\n\nreturn [{ json: {\n  ...input,\n  availability_query,\n  start_time,\n  end_time\n}}];",
+        "mode": "runOnceForAllItems"
       },
-      "name": "Is Valid?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        500,
-        500
-      ],
-      "id": "is_valid_if"
-    },
-    {
-      "parameters": {
-        "jsCode": "return [{\n  json: {\n    success: false,\n    error_code: \"INVALID_AVAILABILITY_PARAMS\",\n    error_message: \"Parámetros inválidos: provider_id y service_id deben ser números positivos, date debe ser YYYY-MM-DD\",\n    data: null,\n    _meta: {\n      source: 'DB_Get_Availability',\n      timestamp: new Date().toISOString(),\n      workflow_id: 'DB_Get_Availability',\n      version: '1.3.0'\n    }\n  }\n}];"
-      },
-      "name": "Format Invalid Error",
+      "name": "Build Availability Query",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        750,
-        700
-      ],
-      "id": "format_invalid"
+      "position": [464, 200],
+      "id": "avail-build-query-01"
     },
     {
       "parameters": {
-        "jsCode": "// Format availability response — Tool-compatible v3.1.0\nconst input = $input.first()?.json || {};\nconst isCacheHit   = input.cache_hit === true;\nconst dalResponse  = isCacheHit ? input.cache_data : input;\nconst isSuccess    = dalResponse.success !== false;\nconst slots        = dalResponse.data?.available_slots || dalResponse.data?.slots || [];\nconst hasSlots     = slots.length > 0;\n\nlet message;\nif (!isSuccess) {\n  message = dalResponse.error_message || 'Error consultando disponibilidad. Informa al usuario e invítalo a intentarlo en unos minutos.';\n} else if (hasSlots) {\n  message = `Hay ${slots.length} turno(s) disponible(s) para esa fecha. Muéstrale las opciones al usuario para que elija.`;\n} else {\n  message = 'NO HAY TURNOS DISPONIBLES para esa fecha. Instrucción: Informa al usuario y ofrécele SIEMPRE dos alternativas: (1) buscar el próximo turno disponible usando FindNextAvailable, (2) unirse a la lista de espera usando ManageWaitlist.';\n}\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message,\n    error_code:    isSuccess ? null : (dalResponse.error_code    || 'DAL_ERROR'),\n    error_message: isSuccess ? null : (dalResponse.error_message || 'Operation failed'),\n    data: isSuccess ? { available_slots: slots } : null,\n    _meta: { source: 'DB_Get_Availability', timestamp: new Date().toISOString(), version: '3.1.0' }\n  }\n}];"
+        "operation": "executeQuery",
+        "query": "={{ $json.availability_query }}",
+        "options": {}
       },
-      "name": "Final Response",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1150,
-        400
-      ],
-      "id": "final_res_123"
+      "name": "Execute Availability Query",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [672, 200],
+      "alwaysOutputData": true,
+      "id": "avail-execute-pg-01",
+      "credentials": {
+        "postgres": {
+          "id": "5LzvCP9BsQwCi9Z0",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
-        "jsCode": "// 📤 STANDARD CONTRACT OUTPUT — Tool-compatible (v3.0.0)\n// El AI Agent lee \"message\" como respuesta legible y \"data\" para detalles.\nconst result = $input.first()?.json || {};\nconst isSuccess = result.success !== false;\n\n// Construir mensaje legible para el LLM\nlet message = result.message || result.data?.message || null;\nif (!message) {\n  message = isSuccess\n    ? 'Operación completada con éxito.'\n    : (result.error_message || result.error_code || 'Error desconocido.');\n}\n\nreturn [{\n  json: {\n    success: isSuccess,\n    message,\n    error_code:    isSuccess ? null : (result.error_code    || 'UNKNOWN_ERROR'),\n    error_message: isSuccess ? null : (result.error_message || message),\n    data:          result.data || null,\n    _meta: {\n      source:    'DB_GET_AVAILABILITY',\n      timestamp: new Date().toISOString(),\n      version:   '3.0.0'\n    }\n  }\n}];"
+        "jsCode": "// Handle DB error during availability query\nconst e = $input.first().json;\nconst upstreamData = $('Build Availability Query').isExecuted ? $('Build Availability Query').first().json : {};\nlet error_code = 'DB_QUERY_ERROR';\nlet error_message = e.message || e.error?.message || 'Database query error';\n\nif (error_message.includes('connection') || error_message.includes('ECONNREFUSED')) {\n  error_code = 'DB_CONNECTION_ERROR';\n  error_message = 'Database connection failed';\n} else if (error_message.includes('timeout')) {\n  error_code = 'DB_TIMEOUT';\n  error_message = 'Database query timeout';\n} else if (error_message.includes('relation') && error_message.includes('does not exist')) {\n  error_code = 'TABLE_NOT_FOUND';\n  error_message = 'Bookings table does not exist';\n}\n\nreturn [{ json: {\n  ...upstreamData,\n  success: false, error_code, error_message, data: null,\n  _meta: { source: 'DB_Get_Availability', timestamp: new Date().toISOString(), workflow_id: $workflow.id }\n}}];",
+        "mode": "runOnceForAllItems"
       },
-      "id": "standard_contract_1772984456915",
-      "name": "📤 Standard Contract Output",
+      "name": "Handle DB Error",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        5000,
-        500
-      ]
+      "position": [672, 420],
+      "id": "avail-handle-error-01"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format availability response\nconst items = $input.all();\nconst upstreamData = $('Build Availability Query').isExecuted ? $('Build Availability Query').first().json : {};\n\n// Filter available slots\nconst availableSlots = items\n  .filter(item => item.json.is_available === true)\n  .map(item => ({\n    start_time: item.json.slot_start,\n    display_time: item.json.display_time\n  }));\n\nreturn [{ json: {\n  success: true,\n  error_code: null,\n  error_message: null,\n  data: {\n    provider_id: upstreamData.provider_id,\n    service_id: upstreamData.service_id,\n    date: upstreamData.date,\n    slots: availableSlots,\n    total_available: availableSlots.length\n  },\n  _meta: {\n    source: 'DB_Get_Availability',\n    timestamp: new Date().toISOString(),\n    workflow_id: $workflow.id\n  }\n}}];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Format Availability",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 200],
+      "id": "avail-format-01"
+    },
+    {
+      "parameters": {
+        "jsCode": "// UNIFIED OUTPUT — Standard Contract (§3.2)\nconst input = $input.first().json;\n\n// Process items that have data OR error_code set\nif (input.data !== undefined || input.error_code !== undefined) {\n  return [{ json: {\n    success: input.success === true,\n    error_code: input.error_code || null,\n    error_message: input.error_message || null,\n    data: input.data || null,\n    _meta: input._meta || {\n      source: 'DB_Get_Availability',\n      timestamp: new Date().toISOString(),\n      workflow_id: $workflow.id\n    }\n  }}];\n}\n\n// Otherwise, pass-through item — skip it\nreturn [];",
+        "mode": "runOnceForAllItems"
+      },
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1088, 300],
+      "id": "avail-format-response-01"
     }
   ],
   "connections": {
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Validate & Normalize (PRE)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Manual Trigger": {
-      "main": [
-        [
-          {
-            "node": "Validate & Normalize (PRE)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
     },
     "Execute Workflow Trigger": {
+      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
+    },
+    "Webhook": {
+      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
+    },
+    "Validate Input": {
+      "main": [[{ "node": "Build Availability Query", "type": "main", "index": 0 }]]
+    },
+    "Build Availability Query": {
+      "main": [[{ "node": "Execute Availability Query", "type": "main", "index": 0 }]]
+    },
+    "Execute Availability Query": {
       "main": [
-        [
-          {
-            "node": "Validate & Normalize (PRE)",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{ "node": "Format Availability", "type": "main", "index": 0 }],
+        [{ "node": "Handle DB Error", "type": "main", "index": 0 }]
       ]
     },
-    "Validate & Normalize (PRE)": {
-      "main": [
-        [
-          {
-            "node": "Is Valid?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Handle DB Error": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
     },
-    "Is Valid?": {
-      "main": [
-        [
-          {
-            "node": "Call DAL Proxy",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Format Invalid Error",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Call DAL Proxy": {
-      "main": [
-        [
-          {
-            "node": "Final Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Format Invalid Error": {
-      "main": [
-        [
-          {
-            "node": "Final Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Final Response": {
-      "main": [
-        [
-          {
-            "node": "📤 Standard Contract Output",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Format Availability": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
-  "id": "zdUslfT9C0sTI83H"
+  "active": true
 }
