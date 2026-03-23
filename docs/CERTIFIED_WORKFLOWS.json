@@ -530,5 +530,50 @@
       "validation": "Email presence + format regex validation",
       "error_handling": "Zero-throw pattern with Standard Contract, responseNode mode, Gmail error classification"
     }
+  },
+  {
+    "name": "NN_03_AI_Agent",
+    "version": "1.0.0",
+    "node_count": 17,
+    "tests_passed": "10/10",
+    "certified_at": "2026-03-23",
+    "git_tag": "NN_03_AI_Agent-v1.0.0-certified",
+    "status": "FROZEN",
+    "test_file": "tests/NN_03_AI_Agent.test.ts",
+    "test_summary": {
+      "validation": "5/5 tests passed - missing chat_id, missing text, invalid chat_id (non-numeric, negative), text too short",
+      "happy_path": "2/2 tests passed - valid input (chat_id + text), ai_response passthrough mode",
+      "standard_contract": "2/2 tests passed - success and error responses include all required fields",
+      "integration": "1/1 passed - AI Agent processes greeting (handles Groq rate limits gracefully)"
+    },
+    "changes_from_v1": {
+      "added": [
+        "Gate Execute",
+        "Gate Skip",
+        "Respond to Webhook"
+      ],
+      "removed": [
+        "Is Valid? IF node v2.3",
+        "Format Error node"
+      ],
+      "fixed": [
+        "Hanging webhook requests due to responseMode: lastNode",
+        "Replaced IF v2.3 with Gate+Skip pattern",
+        "Added proper error handling for AI Agent failures"
+      ]
+    },
+    "architecture": {
+      "pattern": "Gate + Skip (no IF nodes)",
+      "validation": "chat_id numeric validation + text sanitization (SEC04, SEC05)",
+      "error_handling": "Zero-throw pattern with Standard Contract, responseNode mode, AI Agent error classification",
+      "ai_tools": [
+        "check_availability",
+        "find_next_available",
+        "create_booking",
+        "cancel_booking",
+        "get_providers",
+        "get_providers_by_service"
+      ]
+    }
   }
 ]
